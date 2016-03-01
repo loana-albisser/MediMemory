@@ -1,8 +1,10 @@
 package hslu.bda.medimemory;
 
+import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
@@ -19,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawer;
     private NavigationView nvDrawer;
+    private Fragment fragment = null;
+    private Class fragmentClass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,14 +31,15 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        //setup Fragment
+        fragmentClass = FragmentRegistration.class;
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        changeFragment(fragment);
+        onFloatingButtonPressed();
 
         drawer = (DrawerLayout) findViewById(R.id.activity_main);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -47,6 +52,23 @@ public class MainActivity extends AppCompatActivity {
         setupDrawerContent(nvDrawer);
     }
 
+    public void onFloatingButtonPressed(){
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fragmentClass = FragmentRegistration.class;
+                try {
+                    fragment = (Fragment) fragmentClass.newInstance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                changeFragment(fragment);
+                hideFloatingButton();
+            }
+        });
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.activity_main);
@@ -55,6 +77,39 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void changeFragment(Fragment targetFragment){
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main, targetFragment, "fragment")
+                .commit();
+    }
+
+    public void hideFloatingButton(){
+        final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+                p.setAnchorId(v.NO_ID);
+                fab.setLayoutParams(p);
+                fab.setVisibility(v.GONE);
+            }
+        });
+    }
+
+    public void showFloatingButton(){
+        final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+                p.setAnchorId(v.NO_ID);
+                fab.setLayoutParams(p);
+                fab.setVisibility(v.VISIBLE);
+            }
+        });
     }
 
 
@@ -94,15 +149,13 @@ public class MainActivity extends AppCompatActivity {
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the planet to show based on
         // position
-        Fragment fragment = null;
-
-        Class fragmentClass;
         switch(menuItem.getItemId()) {
-            case R.id.nav_camera:
+            case R.id.nav_registration:
                 fragmentClass = FragmentRegistration.class;
                 break;
-            case R.id.nav_gallery:
+            case R.id.nav_edit:
                 fragmentClass = FragmentHelp.class;
+                showFloatingButton();
                 break;
             default:
                 fragmentClass = FragmentRegistration.class;
@@ -115,8 +168,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.main, fragment).commit();
+        changeFragment(fragment);
 
         // Highlight the selected item, update the title, and close the drawer
         menuItem.setChecked(true);

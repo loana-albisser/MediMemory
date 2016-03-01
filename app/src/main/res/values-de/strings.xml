@@ -18,18 +18,5 @@
     <string name="rd_during">Während dem Essen</string>
     <string name="rd_none">Keine Ernährungsanweisung</string>
     <string name="btn_mediSafe">Speichern</string>
-    <string name="rd_numberOfDays">Beschränkt</string>
-    <string name="rd_always">Kontinuierlich</string>
-    <string name="rd_reminderHour">stündlich</string>
-    <string name="rd_reminderDaily">täglich</string>
-    <string name="rd_reminderWeekly">wöchentlich</string>
-    <string name="btn_selectPhoto">Bitte wähle ein Photo aus</string>
-
-    <string-array name="reminder_array">
-        <item>Stunde</item>
-        <item>Tag</item>
-        <item>Woche</item>
-        <item>Monat</item>
-    </string-array>
 
 </resources>
