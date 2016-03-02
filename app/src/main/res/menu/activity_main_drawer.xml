@@ -7,15 +7,15 @@
         <item
             android:id="@+id/nav_registration"
             android:icon="@drawable/ic_add"
-            android:title="Erfassung" />
+            android:title="@string/nav_registration" />
         <item
             android:id="@+id/nav_edit"
             android:icon="@drawable/ic_edit"
-            android:title="Bearbeiten" />
+            android:title="@string/nav_edit" />
         <item
             android:id="@+id/nav_list"
             android:icon="@drawable/ic_list"
-            android:title="Überischt" />
+            android:title="@string/nav_list" />
     </group>
 
 
@@ -25,11 +25,11 @@
             <item
                 android:id="@+id/nav_settings"
                 android:icon="@drawable/ic_settings"
-                android:title="Einstellungen" />
+                android:title="@string/nav_settings" />
             <item
                 android:id="@+id/nav_help"
                 android:icon="@drawable/ic_help"
-                android:title="Hilfe" />
+                android:title="@string/nav_help" />
     </group>
 
 </menu>

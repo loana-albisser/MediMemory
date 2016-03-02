@@ -10,7 +10,6 @@
     <string name="title_photo">Foto aufnehmen oder auswählen</string>
     <string name="title_reminder">Erinnerungszeit</string>
     <string name="title_duration">Dauer der Einnahme</string>
-    <string name="edit_duration">Wie lange möchsten Sie das medikament einnehmen</string>
     <string name="title_dosage">Dosierung</string>
     <string name="title_foodinstruction">Ernährungsanweisung</string>
     <string name="rd_before">Vor dem Essen</string>
@@ -24,12 +23,34 @@
     <string name="rd_reminderDaily">täglich</string>
     <string name="rd_reminderWeekly">wöchentlich</string>
     <string name="btn_selectPhoto">Bitte wähle ein Photo aus</string>
+    <string name="nav_registration">Erfassung</string>
+    <string name="nav_edit">Bearbeiten</string>
+    <string name="nav_list">Übersicht</string>
+    <string name="nav_settings">Einstellungen</string>
+    <string name="nav_help">Hilfe</string>
+    <string name="nav_header_subtitle">Ein kleiner Beispieltext</string>
+    <string name="iv_contentDescription">Ausgewähltes Tablettenblatt</string>
+    <string name="btn_HourTime">Intervall auswählen</string>
+    <string name="btn_weekTime">Wochentag und Uhrzeit wählen</string>
+    <string name="duration">Das Medikament muss </string>
+    <string name="txt_durationOneDay"> Tag eingenommen werden</string>
+    <string name="txt_durationMoreDays"> Tage eingenommen werden</string>
+    <string name="txt_durationAlways">Das Medikament wird immer eingenommen</string>
+    <string name="txt_dosageInitial">Pro Einnahme muss 1 Tablette eingenommen werden</string>
+    <string name="txt_dosageOne">Pro Einnahme muss </string>
+    <string name="txt_dosageOneTab"> Tablette eingenommen werden</string>
+    <string name="txt_dosageMore">Pro Einnahme müssen </string>
+    <string name="txt_dosageMoreTab"> Tabletten eingenommen werden</string>
+    <string name="btn_dayTime">Uhrzeit eintsellen</string>
 
-    <string-array name="reminder_array">
-        <item>Stunde</item>
-        <item>Tag</item>
-        <item>Woche</item>
-        <item>Monat</item>
+    <string-array name="week_array">
+        <item>Montag</item>
+        <item>Dienstag</item>
+        <item>Mittwoch</item>
+        <item>Donnerstag</item>
+        <item>Freitag</item>
+        <item>Samstag</item>
+        <item>Sonntag</item>
     </string-array>
 
 </resources>

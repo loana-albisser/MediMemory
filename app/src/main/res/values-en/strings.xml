@@ -10,7 +10,6 @@
     <string name="title_photo">Take Photo</string>
     <string name="title_reminder">Reminder</string>
     <string name="title_duration">duration</string>
-    <string name="edit_duration">How long do you want to take the medicine</string>
     <string name="title_dosage">dosage</string>
     <string name="title_foodinstruction">feeding instruction</string>
     <string name="rd_before">after meal</string>

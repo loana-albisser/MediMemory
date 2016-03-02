@@ -1,12 +1,9 @@
 package hslu.bda.medimemory;
 
-import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,7 +17,6 @@ import android.view.MenuItem;
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawer;
-    private NavigationView nvDrawer;
     private Fragment fragment = null;
     private Class fragmentClass;
 
@@ -47,12 +43,12 @@ public class MainActivity extends AppCompatActivity {
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        nvDrawer = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView nvDrawer = (NavigationView) findViewById(R.id.nav_view);
         // Setup drawer view
         setupDrawerContent(nvDrawer);
     }
 
-    public void onFloatingButtonPressed(){
+    private void onFloatingButtonPressed(){
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,28 +82,28 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    public void hideFloatingButton(){
+    private void hideFloatingButton(){
         final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-                p.setAnchorId(v.NO_ID);
+                p.setAnchorId(View.NO_ID);
                 fab.setLayoutParams(p);
-                fab.setVisibility(v.GONE);
+                fab.setVisibility(View.GONE);
             }
         });
     }
 
-    public void showFloatingButton(){
+    private void showFloatingButton(){
         final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-                p.setAnchorId(v.NO_ID);
+                p.setAnchorId(View.NO_ID);
                 fab.setLayoutParams(p);
-                fab.setVisibility(v.VISIBLE);
+                fab.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -146,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    public void selectDrawerItem(MenuItem menuItem) {
+    private void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the planet to show based on
         // position
         switch(menuItem.getItemId()) {

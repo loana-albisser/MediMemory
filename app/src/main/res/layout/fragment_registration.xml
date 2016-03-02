@@ -7,13 +7,17 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/fragment2">
+    android:id="@+id/fragment2"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/cv_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,7 +72,7 @@
                 android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/btnSelectPhoto"
+                    android:id="@+id/btn_SelectPhoto"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/btn_selectPhoto"
@@ -76,10 +80,9 @@
                     android:contextClickable="true" />
 
                 <ImageView
-                    android:id="@+id/ivImage"
+                    android:id="@+id/iv_Image"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_home"></ImageView>
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
 
@@ -94,7 +97,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/ln_reminder">
             <TextView
                 android:id="@+id/title_reminder"
                 android:layout_width="wrap_content"
@@ -108,31 +112,24 @@
 
             <RadioGroup
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:id="@+id/rdg_reminder">
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/reminderHour"
+                    android:id="@+id/rd_reminderHour"
                     android:text="@string/rd_reminderHour"/>
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/reminderDaily"
+                    android:id="@+id/rd_reminderDaily"
                     android:text="@string/rd_reminderDaily"/>
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/reminderWeekly"
+                    android:id="@+id/rd_reminderWeekly"
                     android:text="@string/rd_reminderWeekly"/>
             </RadioGroup>
-
-           <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Uhrzeit der Einahme"
-                android:id="@+id/btn_remindTime"
-                android:enabled="true"
-                android:clickable="true" />
 
         </LinearLayout>
     </android.support.v7.widget.CardView>
@@ -145,7 +142,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/ln_duration">
             <TextView
                 android:id="@+id/title_duration"
                 android:layout_width="wrap_content"
@@ -159,11 +157,12 @@
 
             <RadioGroup
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:id="@+id/rdg_duration">
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/numberOfDays"
+                    android:id="@+id/rd_numberOfDays"
                     android:text="@string/rd_numberOfDays"/>
                 <RadioButton
                     android:layout_width="wrap_content"
@@ -182,7 +181,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/ln_dosage">
             <TextView
                 android:id="@+id/title_dosage"
                 android:layout_width="wrap_content"
@@ -194,11 +194,12 @@
                 android:textSize="22sp" />
 
             <NumberPicker
-                android:id="@+id/numberPicker"
+                android:id="@+id/np_dosage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:contextClickable="true" />
+
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
@@ -250,7 +251,7 @@
     </android.support.v7.widget.CardView>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btn_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/btn_mediSafe"
