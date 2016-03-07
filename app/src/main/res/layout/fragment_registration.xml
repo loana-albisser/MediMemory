@@ -82,7 +82,8 @@
                 <ImageView
                     android:id="@+id/iv_Image"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/desc_pillPhoto" />
 
             </LinearLayout>
 
@@ -117,19 +118,15 @@
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/rd_reminderHour"
-                    android:text="@string/rd_reminderHour"/>
+                    android:id="@+id/rd_daytime"
+                    android:text="@string/rd_daytime" />
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/rd_reminderDaily"
-                    android:text="@string/rd_reminderDaily"/>
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rd_reminderWeekly"
-                    android:text="@string/rd_reminderWeekly"/>
+                    android:id="@+id/rd_interval"
+                    android:text="@string/rd_interval"/>
             </RadioGroup>
+
 
         </LinearLayout>
     </android.support.v7.widget.CardView>
@@ -169,6 +166,11 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/rd_always"
                     android:text="@string/rd_always"/>
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rd_packageEnd"
+                    android:text="@string/rd_packageEnd"/>
             </RadioGroup>
         </LinearLayout>
     </android.support.v7.widget.CardView>
@@ -211,7 +213,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/ln_foodInstruction">
             <TextView
                 android:id="@+id/title_foodInstruction"
                 android:layout_width="wrap_content"
@@ -225,28 +228,58 @@
 
             <RadioGroup
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:id="@+id/rdg_foodInstruction">
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/eat_before"
+                    android:id="@+id/rd_eatBefore"
                     android:text="@string/rd_before"/>
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/eat_after"
-                    android:text="@string/rd_after"/>
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/eat_during"
+                    android:id="@+id/rd_eatDuring"
                     android:text="@string/rd_during"/>
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/eat_none"
-                    android:text="@string/rd_none"/>
+                    android:id="@+id/rd_eatAfter"
+                    android:text="@string/rd_after"/>
             </RadioGroup>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/cv_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/ln_notes">
+            <TextView
+                android:id="@+id/title_notes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="3"
+                android:padding="8dp"
+                android:text="@string/title_notes"
+                android:textColor="#222"
+                android:textStyle="bold"
+                android:textSize="22sp" />
+            <EditText
+                android:id="@+id/edit_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="3"
+                android:padding="8dp"
+                android:hint="@string/hint_notes"
+                android:textColor="#666"
+                android:textSize="14sp"
+                android:inputType="text"/>
+
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
@@ -255,11 +288,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/btn_mediSafe"
-        android:background="@color/colorAccent"
+        android:background="@drawable/btn_layout"
         android:layout_gravity="right"
-        android:textColor="#ffffff"
-        android:layout_margin="4dp" />
+        android:textColor="#ffffff" />
 </LinearLayout>
+
+
 </ScrollView>
 
 

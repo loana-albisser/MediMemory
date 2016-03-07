@@ -8,12 +8,12 @@
     <string name="title_name">Name des Medikamentes</string>
     <string name="edit_name">Name des Medikamentes eingeben</string>
     <string name="title_photo">Foto aufnehmen oder auswählen</string>
-    <string name="title_reminder">Erinnerungszeit</string>
+    <string name="title_reminder">Einnahmezeit</string>
     <string name="title_duration">Dauer der Einnahme</string>
     <string name="title_dosage">Dosierung</string>
     <string name="title_foodinstruction">Ernährungsanweisung</string>
     <string name="rd_before">Vor dem Essen</string>
-    <string name="rd_after">Vor dem Essen</string>
+    <string name="rd_after">Nach dem Essen</string>
     <string name="rd_during">Während dem Essen</string>
     <string name="rd_none">Keine Ernährungsanweisung</string>
     <string name="btn_mediSafe">Speichern</string>
@@ -22,7 +22,7 @@
     <string name="rd_reminderHour">stündlich</string>
     <string name="rd_reminderDaily">täglich</string>
     <string name="rd_reminderWeekly">wöchentlich</string>
-    <string name="btn_selectPhoto">Bitte wähle ein Photo aus</string>
+    <string name="btn_selectPhoto">Bitte wähle ein Foto aus</string>
     <string name="nav_registration">Erfassung</string>
     <string name="nav_edit">Bearbeiten</string>
     <string name="nav_list">Übersicht</string>
@@ -41,16 +41,86 @@
     <string name="txt_dosageOneTab"> Tablette eingenommen werden</string>
     <string name="txt_dosageMore">Pro Einnahme müssen </string>
     <string name="txt_dosageMoreTab"> Tabletten eingenommen werden</string>
-    <string name="btn_dayTime">Uhrzeit eintsellen</string>
+    <string name="btn_dayTime">Uhrzeit einstellen</string>
+    <string name="d_npHour">Einnahme Intervall</string>
+    <string name="d_selectPhoto">Nimm ein Foto auf!</string>
+    <string name="d_chooseLibrary">Wähl Foto von Gallerie</string>
+    <string name="cancel">Abbruch</string>
+    <string name="d_selectFile">Wähl ein Foto aus</string>
+    <string name="tp_timeTitle">Wähle eine Erinnerungszeit aus</string>
+    <string name="d_chooseWeek">Wähle ein Wochentag aus</string>
+    <string name="d_durationTitle">Enddatum angeben</string>
+    <string name="d_weekTitle">Wähle einen Wochentag aus</string>
+    <string name="ok">OK</string>
+    <string name="d_hourTitle">Wähle eine Uhrzeit aus</string>
+    <string name="next">Weiter</string>
+    <string name="d_startTime">Wähle eine Startzeit aus</string>
+    <string name="title_notes">Notizen</string>
+    <string name="hint_notes">Geben Sie weitere Informationen ein</string>
+    <string name="rd_packageEnd">Bis Packung Ende</string>
+    <string name="chk_morning">Morgen</string>
+    <string name="chk_noon">Mittag</string>
+    <string name="chk_afternoon">Nachmittag</string>
+    <string name="chk_evening">Abend</string>
+    <string name="chk_night">Nacht</string>
+    <string name="chk_individual">Benutzerdefiniert</string>
+    <string name="pref_reminder">Erinnerungen</string>
+    <string name="Summary_morning_reminder">Einnahmeerinnerung Morgen</string>
+    <string name="title_morning_reminder">Erinnerung Morgen</string>
+    <string name="Summary_noon_reminder">Einnahmeerinnerung Mittag</string>
+    <string name="title_noon_reminder">Erinnerung Mittag</string>
+    <string name="Summary_evening_reminder">Einnahmeerinnerung Abend</string>
+    <string name="title_evening_reminder">Erinnerung Abend</string>
+    <string name="Summary_night_reminder">Einnahmeerinnerung Nacht</string>
+    <string name="title_night_reminder">Erinnerung Nacht</string>
+    <string name="pref_notifications">Benachrichtigungen</string>
+    <string name="title_ringtone">Klingelton</string>
+    <string name="title_vibration">Vibration</string>
+    <string name="pref_foodinstruction">Ernährungsanweisung</string>
+    <string name="Summary_after_food">Einnahmeerinnerung vor dem Essen</string>
+    <string name="title_after_food">Nach dem Essen</string>
+    <string name="Summary_before_food">Einnahmeerinnerung nach dem Essen</string>
+    <string name="title_before_food">Vor dem Essen</string>
+    <string name="title_reminder_time">Tageszeit</string>
+    <string name="chk_more">Mehr</string>
+    <string name="txt_duration_till">Sie nehmen das Medikament bis am </string>
+    <string name="d_packagEnd">Wie viele Blister befinden sich in ihrer Packung?</string>
+    <string name="txt_durationPackageEnd">In der Packung hat es</string>
+    <string name="pill">Tabletten</string>
+    <string name="txt_eatBefore">Sie nehmen das Medikament vor dem Essen</string>
+    <string name="txt_eatDuring">Sie nehmen das Medikament während dem Essen</string>
+    <string name="txt_eatAfter">Sie nehmen das Medikament nach dem Essen</string>
+    <string name="txt_duration_numberOfPills">In der Verpackung hat es</string>
+    <string name="chooseDate">Wähle ein Datum aus</string>
+    <string name="blister">Blister</string>
+    <string name="desc_pillPhoto">Pill Photo</string>
+    <string name="help_text">Diese App dient zur Hilfe der Einnahme von Medikamenten. \n\nIn einem ersten Schritt können dabei die Medikamentendaten erfasst werden. Durch ein Foto werden die Anzahl Tabletten automatisch erfasst. \n\nDurch Erinnerungen werden Sie zuverlässig an die Einnahme des Medikamentes erinnert.</string>
+    <string name="rd_daytime">Tageszeit</string>
+    <string name="rd_interval">Intervall</string>
+    <string name="reminderTake">Sie nehmen das Medikament</string>
+    <string name="reminderDayTime">Sie nehmen das Medikament am</string>
+    <string name="reminderInterval">Sie nehmen das Medikament alle</string>
+    <string name="nothingSelected">Sie haben nichts ausgewählt</string>
+    <string name="morning">Morgen</string>
+    <string name="noon">Mittag</string>
+    <string name="evening">Abend</string>
+    <string name="night">Nacht</string>
+    <string name="hour">Stunde</string>
+    <string name="day">Tag</string>
+    <string name="week">Woche</string>
 
-    <string-array name="week_array">
-        <item>Montag</item>
-        <item>Dienstag</item>
-        <item>Mittwoch</item>
-        <item>Donnerstag</item>
-        <item>Freitag</item>
-        <item>Samstag</item>
-        <item>Sonntag</item>
+    <string-array name="array_interval">
+        <item>@string/hour</item>
+        <item>@string/day</item>
+        <item>@string/week</item>
     </string-array>
+
+    <string-array name="array_daytime">
+        <item>@string/morning</item>
+        <item>@string/noon</item>
+        <item>@string/evening</item>
+        <item>@string/night</item>
+    </string-array>
+
 
 </resources>

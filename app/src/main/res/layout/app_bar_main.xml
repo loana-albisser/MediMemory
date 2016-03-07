@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="hslu.bda.medimemory.MainActivity">
+    android:id="@+id/app_bar_main"
+    tools:context=".fragment.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
