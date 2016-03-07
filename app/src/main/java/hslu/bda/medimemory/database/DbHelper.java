@@ -14,7 +14,7 @@ public class DbHelper extends SQLiteOpenHelper{
     public static String TABLE_MEDI_EAT = "Medi_eat";
     public static String TABLE_MEDI_DATA = "Medi_data";
     public static String TABLE_MEDI_STATUS = "Medi_status";
-    public static String TABLE_MEDI_CONSUME = "Medi_consume";
+    public static String TABLE_MEDI_CONSUME = "Medi_consumed";
     public static String TABLE_MEDI_DAY = "Medi_day";
     public static String TABLE_MEDI_CONSINDIV = "Medi_consumeIndividual";
     public static String TABLE_MEDI_CONSINTER = "Medi_consumeInterval";
@@ -23,6 +23,7 @@ public class DbHelper extends SQLiteOpenHelper{
     public static String COLUMN_DESC = "description";
     public static String COLUMN_DURATION = "duration";
     public static String COLUMN_CONSTIME = "consumeTime";
+    public static String COLUMN_POINTINTIME = "pointInTime";
     public static String COLUMN_EATPART = "eatpart";
     public static String COLUMN_AMOUNT = "amount";
     public static String COLUMN_WIDTH = "width";
@@ -124,7 +125,7 @@ public class DbHelper extends SQLiteOpenHelper{
                 this.COLUMN_STARTTIME + " TEXT, "+
                 this.COLUMN_ENDTIME + " TEXT, "+
                 this.COLUMN_INTERVAL + " INTEGER, "+
-                this.COLUMN_WEEKDAY + " TEXT, "+
+                this.COLUMN_WEEKDAY + " INTEGER, "+
                 "FOREIGN KEY("+ this.COLUMN_MEDIID +") REFERENCES "+
                 this.TABLE_MEDI_DATA+"("+this.COLUMN_ID+")  ON DELETE CASCADE"+
                 ");";
@@ -147,8 +148,7 @@ public class DbHelper extends SQLiteOpenHelper{
         String CREATE_CONSUME_TABLE = "CREATE TABLE "+this.TABLE_MEDI_CONSUME+"("+
                 this.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 this.COLUMN_MEDIID + " INTEGER, "+
-                this.COLUMN_CONSDAY + " TEXT, "+
-                this.COLUMN_CONSTIME + " TEXT, "+
+                this.COLUMN_POINTINTIME + " TEXT, "+
                 this.COLUMN_STATUS + " INTEGER,"+
                 "FOREIGN KEY("+ this.COLUMN_MEDIID +") REFERENCES "+
                 this.TABLE_MEDI_DATA+"("+this.COLUMN_ID+") ON DELETE CASCADE, " +
