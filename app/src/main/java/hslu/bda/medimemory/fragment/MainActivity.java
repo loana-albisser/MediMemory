@@ -1,9 +1,11 @@
-package hslu.bda.medimemory;
+package hslu.bda.medimemory.fragment;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
+
+
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,22 +13,25 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+import hslu.bda.medimemory.R;
 
+public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawer;
     private Fragment fragment = null;
     private Class fragmentClass;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        fab =(FloatingActionButton)findViewById(R.id.fab);
+        fab.hide();
         setSupportActionBar(toolbar);
-
+        onFloatingButtonPressed();
         //setup Fragment
         fragmentClass = FragmentRegistration.class;
         try {
@@ -35,8 +40,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         changeFragment(fragment);
-        onFloatingButtonPressed();
-
         drawer = (DrawerLayout) findViewById(R.id.activity_main);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -49,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onFloatingButtonPressed(){
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 changeFragment(fragment);
-                hideFloatingButton();
+                fab.hide();
             }
         });
     }
@@ -76,48 +78,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void changeFragment(Fragment targetFragment){
-        getSupportFragmentManager()
+        getFragmentManager()
                 .beginTransaction()
                 .replace(R.id.main, targetFragment, "fragment")
                 .commit();
     }
 
-    private void hideFloatingButton(){
-        final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-                p.setAnchorId(View.NO_ID);
-                fab.setLayoutParams(p);
-                fab.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    private void showFloatingButton(){
-        final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-                p.setAnchorId(View.NO_ID);
-                fab.setLayoutParams(p);
-                fab.setVisibility(View.VISIBLE);
-            }
-        });
-    }
 
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -143,28 +111,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void selectDrawerItem(MenuItem menuItem) {
-        // Create a new fragment and specify the planet to show based on
-        // position
-        switch(menuItem.getItemId()) {
+        Fragment fragment = null;
+        FragmentManager fragmentManager = getFragmentManager();
+        switch (menuItem.getItemId()) {
             case R.id.nav_registration:
-                fragmentClass = FragmentRegistration.class;
+                fragment = new FragmentRegistration();
+                fab.hide();
                 break;
             case R.id.nav_edit:
-                fragmentClass = FragmentHelp.class;
-                showFloatingButton();
+                fragment = new FragmentEdit();
+                fab.show();
                 break;
-            default:
-                fragmentClass = FragmentRegistration.class;
+            case R.id.nav_list:
+                fragment = new FragmentOverview();
+                fab.show();
+                break;
+            case R.id.nav_settings:
+                fragment = new FragmentSettings();
+                fab.show();
+                break;
+            case R.id.nav_help:
+                fragment = new FragmentHelp();
+                fab.show();
+                break;
         }
-
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Insert the fragment by replacing any existing fragment
-        changeFragment(fragment);
+        fragmentManager.beginTransaction().replace(R.id.main, fragment).commit();
 
         // Highlight the selected item, update the title, and close the drawer
         menuItem.setChecked(true);

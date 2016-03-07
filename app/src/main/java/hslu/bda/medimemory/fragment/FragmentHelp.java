@@ -1,10 +1,14 @@
-package hslu.bda.medimemory;
+package hslu.bda.medimemory.fragment;
 
-import android.support.v4.app.Fragment;
+
+
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import hslu.bda.medimemory.R;
 
 /**
  * Created by Loana on 29.02.2016.

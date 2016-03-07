@@ -21,9 +21,6 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
-
-
-
     <ListView
         android:id="@+id/drawer"
         android:layout_width="240dp"
