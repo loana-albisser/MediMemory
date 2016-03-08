@@ -9,20 +9,18 @@ import android.test.RenamingDelegatingContext;
  */
 public class DbHelperTest extends AndroidTestCase{
     private DbHelper dbHelper;
+    private RenamingDelegatingContext context;
 
-
-    public void setUp() throws Exception{
+    @Override
+    protected void setUp() throws Exception{
         super.setUp();
-        RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
+        context = new RenamingDelegatingContext(getContext(), "test_");
+    }
+
+    public void createTest(){
         dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         assertTrue(db.isOpen());
         db.close();
-
     }
-
-
-
-
-
 }
