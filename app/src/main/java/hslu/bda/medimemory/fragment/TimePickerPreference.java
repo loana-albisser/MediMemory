@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import hslu.bda.medimemory.R;
@@ -20,8 +22,6 @@ import hslu.bda.medimemory.R;
 public class TimePickerPreference extends DialogPreference {
     private TimePicker timePicker;
     private Calendar calendar = Calendar.getInstance();
-    private int hour = calendar.get(Calendar.HOUR_OF_DAY);
-    private int minute = calendar.get(Calendar.MINUTE);
     public TimePickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setDialogLayoutResource(R.layout.dialogpreference_timepicker);
@@ -46,7 +46,19 @@ public class TimePickerPreference extends DialogPreference {
 
     @Override
     public void onClick(DialogInterface dialogInterface, int which){
-        setSummary(new StringBuilder().append(timePicker.getCurrentHour()).append(":").append(timePicker.getCurrentMinute()));
+        StringBuilder timeString = new StringBuilder();
+        if (timePicker.getCurrentHour()<10){
+            timeString.append("0").append(timePicker.getCurrentHour());
+        } else {
+            timeString.append(timePicker.getCurrentHour());
+        }
+        timeString.append(":");
+        if (timePicker.getCurrentMinute()<10){
+            timeString.append("0").append(timePicker.getCurrentMinute());
+        } else {
+            timeString.append(timePicker.getCurrentMinute());
+        }
+        setSummary(timeString);
         super.onClick(dialogInterface, which);
     }
 }

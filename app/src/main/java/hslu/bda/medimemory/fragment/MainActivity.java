@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 
 
+import android.view.Menu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private Fragment fragment = null;
     private Class fragmentClass;
     private FloatingActionButton fab;
+    private MenuItem registrationMenuItem;
+    private NavigationView nvDrawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
         fab =(FloatingActionButton)findViewById(R.id.fab);
         fab.hide();
         setSupportActionBar(toolbar);
-        onFloatingButtonPressed();
         //setup Fragment
         fragmentClass = FragmentRegistration.class;
         try {
@@ -40,13 +42,15 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         changeFragment(fragment);
+
         drawer = (DrawerLayout) findViewById(R.id.activity_main);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView nvDrawer = (NavigationView) findViewById(R.id.nav_view);
+        nvDrawer = (NavigationView) findViewById(R.id.nav_view);
+        onFloatingButtonPressed();
         // Setup drawer view
         setupDrawerContent(nvDrawer);
     }
@@ -62,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 changeFragment(fragment);
+                nvDrawer.setCheckedItem(R.id.nav_registration);
+                nvDrawer.getMenu().getItem(0).setChecked(true);
+                setTitle(getResources().getString(R.string.nav_registration));
                 fab.hide();
             }
         });

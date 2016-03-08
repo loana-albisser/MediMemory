@@ -35,12 +35,12 @@
     <string name="duration">Das Medikament muss </string>
     <string name="txt_durationOneDay"> Tag eingenommen werden</string>
     <string name="txt_durationMoreDays"> Tage eingenommen werden</string>
-    <string name="txt_durationAlways">Das Medikament wird immer eingenommen</string>
-    <string name="txt_dosageInitial">Pro Einnahme muss 1 Tablette eingenommen werden</string>
-    <string name="txt_dosageOne">Pro Einnahme muss </string>
-    <string name="txt_dosageOneTab"> Tablette eingenommen werden</string>
+    <string name="txt_durationAlways">Einnahme: unbeschränkt</string>
+    <string name="txt_dosageInitial">Dosierung: 1 Tablette pro Einnahme</string>
+    <string name="txt_dosageOne">Dosierung:</string>
+    <string name="txt_dosageOneTab"> Tablette pro Einnahme</string>
     <string name="txt_dosageMore">Pro Einnahme müssen </string>
-    <string name="txt_dosageMoreTab"> Tabletten eingenommen werden</string>
+    <string name="txt_dosageMoreTab"> Tabletten pro Einnahme</string>
     <string name="btn_dayTime">Uhrzeit einstellen</string>
     <string name="d_npHour">Einnahme Intervall</string>
     <string name="d_selectPhoto">Nimm ein Foto auf!</string>
@@ -51,7 +51,7 @@
     <string name="d_chooseWeek">Wähle ein Wochentag aus</string>
     <string name="d_durationTitle">Enddatum angeben</string>
     <string name="d_weekTitle">Wähle einen Wochentag aus</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="d_hourTitle">Wähle eine Uhrzeit aus</string>
     <string name="next">Weiter</string>
     <string name="d_startTime">Wähle eine Startzeit aus</string>
@@ -87,9 +87,9 @@
     <string name="d_packagEnd">Wie viele Blister befinden sich in ihrer Packung?</string>
     <string name="txt_durationPackageEnd">In der Packung hat es</string>
     <string name="pill">Tabletten</string>
-    <string name="txt_eatBefore">Sie nehmen das Medikament vor dem Essen</string>
-    <string name="txt_eatDuring">Sie nehmen das Medikament während dem Essen</string>
-    <string name="txt_eatAfter">Sie nehmen das Medikament nach dem Essen</string>
+    <string name="txt_eatBefore">Einnahme: Vor dem Essen</string>
+    <string name="txt_eatDuring">Einnahme: Während dem Essen</string>
+    <string name="txt_eatAfter">Einnahme: Nach dem Essen</string>
     <string name="txt_duration_numberOfPills">In der Verpackung hat es</string>
     <string name="chooseDate">Wähle ein Datum aus</string>
     <string name="blister">Blister</string>
@@ -108,18 +108,36 @@
     <string name="hour">Stunde</string>
     <string name="day">Tag</string>
     <string name="week">Woche</string>
+    <string name="taking">Einnahme:</string>
+    <string name="every">all</string>
+    <string name="durationTime">Einnahmedauer:</string>
+    <string name="always">unbeschränkt</string>
+    <string name="till">bis</string>
+    <string name="dosage">Dosierung:</string>
+    <string name="perTaking">pro Einnahme</string>
+    <string name="beforeFood">Vor dem Essen</string>
+    <string name="duringFood">Während dem Essen</string>
+    <string name="afterFood">Nach dem Essen</string>
+    <string name="title_intervalDialog">In welchem Interval nehmen sie das Medikament?</string>
+    <string name="d_per">mal pro</string>
+    <string name="btn_endtime">Endzeit</string>
+    <string name="Startzeit">Startzeit</string>
+    <string name="btn_startEndAlways">durchgehend</string>
+    <string name="title_chooseStartTime">Startzeit auswählen</string>
+    <string name="title_chooseEndTime">Endzeit auswählen</string>
+    <string name="txt_dosage">Dosierung:</string>
 
     <string-array name="array_interval">
-        <item>@string/hour</item>
-        <item>@string/day</item>
-        <item>@string/week</item>
+        <item id= "hour">@string/hour</item>
+        <item id= "day">@string/day</item>
+        <item id= "week">@string/week</item>
     </string-array>
 
     <string-array name="array_daytime">
-        <item>@string/morning</item>
-        <item>@string/noon</item>
-        <item>@string/evening</item>
-        <item>@string/night</item>
+        <item id= "morning">@string/morning</item>
+        <item id= "noon">@string/noon</item>
+        <item id= "evening">@string/evening</item>
+        <item id= "night">@string/night</item>
     </string-array>
 
 
