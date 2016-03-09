@@ -1,9 +1,11 @@
 package hslu.bda.medimemory.fragment;
 
 import android.app.Fragment;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.os.Parcelable;
 import android.preference.DialogPreference;
 import android.preference.Preference;
@@ -18,43 +20,61 @@ import hslu.bda.medimemory.R;
  * Created by Loana on 05.03.2016.
  */
 public class NumberPickerPreference extends DialogPreference {
-    private NumberPickerPreference myView;
+    private static final int MIN_VALUE = 0;
     private NumberPicker numberPicker;
+    private StringBuilder numberString;
     private int value = 15;
+    private int DEFAULT_VALUE = 15;
+    private static final String PREFS_NAME = "Prefname";
+    private static final String PREFS_KEY = "pref_key_before_food";
 
     public NumberPickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setDialogLayoutResource(R.layout.dialogpreference_numberpicker);
         setPositiveButtonText(android.R.string.ok);
         setNegativeButtonText(android.R.string.cancel);
-        setPersistent(false);
     }
+
 
     @Override
     public void onBindDialogView (View view){
         super.onBindDialogView(view);
         numberPicker = (NumberPicker) view.findViewById(R.id.np_preference);
-        numberPicker.setMinValue(0);
+        numberPicker.setMinValue(MIN_VALUE);
         numberPicker.setMaxValue(120);
-        numberPicker.setValue(value);
+        if (value != 0)numberPicker.setValue(value);
     }
 
     @Override
     protected void onDialogClosed(boolean positiveResult){
-        super.onDialogClosed(positiveResult);
+        numberString = new StringBuilder();
         if(positiveResult){
-            //persistInt(numberPicker.getValue());
-            SharedPreferences.Editor editor = getEditor();
-            editor.putInt("key1",numberPicker.getValue());
-            editor.apply();
-            editor.commit();
+            if (callChangeListener(value)) {
+                setValue(numberPicker.getValue());
+                numberString.append(numberPicker.getValue()).append(" ").append(getContext().getResources().getString(R.string.minutes));
+            }
+            setSummary(numberString);
         }
     }
 
+    public void setValue(int value) {
+        this.value = value;
+        persistInt(this.value);
+    }
+
+    public int getValue(){
+        return this.value;
+    }
+
     @Override
-    public void onClick(DialogInterface dialogInterface, int which){
-        setSummary(String.valueOf(numberPicker.getValue()));
-        super.onClick(dialogInterface, which);
+    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+        setValue(restorePersistedValue ? getPersistedInt(DEFAULT_VALUE) : (Integer) defaultValue);
+        //setSummary(getValue());
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return a.getInteger(index, DEFAULT_VALUE);
     }
 
 }

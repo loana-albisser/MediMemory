@@ -1,10 +1,10 @@
 package hslu.bda.medimemory.fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-
 
 import android.view.Menu;
 import android.view.View;
@@ -15,16 +15,22 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.RadioButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import hslu.bda.medimemory.R;
+import hslu.bda.medimemory.fragment.FragmentRegistration;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawer;
     private Fragment fragment = null;
+    private FragmentRegistration fragmentRegistration;
     private Class fragmentClass;
     private FloatingActionButton fab;
     private MenuItem registrationMenuItem;
     private NavigationView nvDrawer;
+    private TextView txt_duration = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,18 @@ public class MainActivity extends AppCompatActivity {
         }
         changeFragment(fragment);
 
+        if (savedInstanceState == null) {
+            fragmentRegistration = new FragmentRegistration();
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.main, fragmentRegistration ,"Fragment_Registration")
+                    .commit();
+            ///changeFragment(fragment);
+        }else{
+            FragmentManager manager = getFragmentManager();
+            fragmentRegistration = (FragmentRegistration) manager.findFragmentByTag("Fragment_Registration");
+        }
+
+        txt_duration = new TextView(this);
         drawer = (DrawerLayout) findViewById(R.id.activity_main);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -54,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         // Setup drawer view
         setupDrawerContent(nvDrawer);
     }
+
 
     private void onFloatingButtonPressed(){
         fab.setOnClickListener(new View.OnClickListener() {
@@ -87,8 +106,26 @@ public class MainActivity extends AppCompatActivity {
     private void changeFragment(Fragment targetFragment){
         getFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main, targetFragment, "fragment")
+                .replace(R.id.main, targetFragment, "Fragment_Registration")
                 .commit();
+    }
+
+    public void onReminderDayTimeRadioButtonClick(View v){
+        fragmentRegistration.showReminderDaytimeDialog();
+    }
+
+    public void onReminderIntervalRadioButtonClick(View v){
+        fragmentRegistration.showReminderIntervalDialog();
+    }
+
+    public void onDurationNumOfBlistersRadioButtonClick(View v) {
+        fragmentRegistration.changeNumberOfBlisterTextField();
+        fragmentRegistration.showNumberOfBlistersNumberPickerDialog();
+        fragmentRegistration.setCurrentNumberOfBlistersValue();
+    }
+
+    public void onDurationDateRadioButtonClick(View v) {
+        fragmentRegistration.showDateDialog();
     }
 
 
@@ -122,31 +159,41 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getFragmentManager();
         switch (menuItem.getItemId()) {
             case R.id.nav_registration:
-                fragment = new FragmentRegistration();
+                //fragment = new FragmentRegistration();
+                //fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Registration").commit();
                 fab.hide();
                 break;
             case R.id.nav_edit:
                 fragment = new FragmentEdit();
+                fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Edit").commit();
                 fab.show();
                 break;
             case R.id.nav_list:
                 fragment = new FragmentOverview();
+                fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Overview").commit();
                 fab.show();
                 break;
             case R.id.nav_settings:
                 fragment = new FragmentSettings();
+                fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Settings").commit();
                 fab.show();
                 break;
             case R.id.nav_help:
                 fragment = new FragmentHelp();
+                fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Help").commit();
                 fab.show();
                 break;
         }
-        fragmentManager.beginTransaction().replace(R.id.main, fragment).commit();
+
+        //
 
         // Highlight the selected item, update the title, and close the drawer
         menuItem.setChecked(true);
         setTitle(menuItem.getTitle());
         drawer.closeDrawer(GravityCompat.START);
     }
+
+
+
+
 }
