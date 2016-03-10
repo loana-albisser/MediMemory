@@ -27,20 +27,16 @@ public class TimePickerPreference extends DialogPreference {
     private int minuteValue;
     private int DEFAULT_HOUR = 0;
     private int DEFAULT_MINUTE = 0;
-    private int MIN_HOUR = 0;
-    private int MIN_MINUTE = 0;
     StringBuilder timeString;
 
     public TimePickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setDialogLayoutResource(R.layout.dialogpreference_timepicker);
         setPositiveButtonText(android.R.string.ok);
-        setNegativeButtonText(android.R.string.cancel);
-
-
-
+        setNegativeButtonText(null);
     }
 
+    @Override
     public void onBindDialogView (View view){
         super.onBindDialogView(view);
         timePicker = (TimePicker) view.findViewById(R.id.tp_preference);
@@ -52,16 +48,19 @@ public class TimePickerPreference extends DialogPreference {
 
     @Override
     protected void onDialogClosed(boolean positiveResult) {
-        timeString = new StringBuilder();
         if (positiveResult) {
             if (callChangeListener(hourValue)||callChangeListener(minuteValue)) {
                 setHour(timePicker.getCurrentHour());
                 setMinute(timePicker.getCurrentMinute());
-                timeString.append(new DecimalFormat("00").format(timePicker.getCurrentHour())).append(":").append(new DecimalFormat("00").format(timePicker.getCurrentMinute()));
             }
-            setSummary(timeString);
+            updateSummary();
         }
+    }
 
+    public void updateSummary(){
+        timeString = new StringBuilder();
+        timeString.append(new DecimalFormat("00").format(hourValue)).append(":").append(new DecimalFormat("00").format(minuteValue));
+        setSummary(timeString);
     }
 
     public void setHour (int hourValue) {
@@ -76,17 +75,14 @@ public class TimePickerPreference extends DialogPreference {
 
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-        setHour(restorePersistedValue ? getPersistedInt(MIN_HOUR) : (Integer) defaultValue);
-        setMinute(restorePersistedValue ? getPersistedInt(MIN_MINUTE) : (Integer) defaultValue);
+        setHour(restorePersistedValue ? getPersistedInt(DEFAULT_HOUR) : (Integer) defaultValue);
+        setMinute(restorePersistedValue ? getPersistedInt(DEFAULT_MINUTE) : (Integer) defaultValue);
+
+        updateSummary();
     }
 
     @Override
     protected Object onGetDefaultValue(TypedArray a, int index) {
-        return a.getInteger(index, DEFAULT_HOUR);//+a.getInteger(index, DEFAULT_MINUTE);
-    }
-
-    @Override
-    public void onClick(DialogInterface dialogInterface, int which){
-        super.onClick(dialogInterface, which);
+        return a.getInteger(index, 0);
     }
 }

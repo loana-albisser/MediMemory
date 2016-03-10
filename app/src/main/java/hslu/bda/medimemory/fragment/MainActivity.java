@@ -1,12 +1,10 @@
 package hslu.bda.medimemory.fragment;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 
-import android.view.Menu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,12 +13,9 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import hslu.bda.medimemory.R;
-import hslu.bda.medimemory.fragment.FragmentRegistration;
 
 public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawer;
@@ -41,24 +36,13 @@ public class MainActivity extends AppCompatActivity{
         fab.hide();
         setSupportActionBar(toolbar);
         //setup Fragment
-        fragmentClass = FragmentRegistration.class;
+        fragmentClass = FragmentOverview.class;
         try {
             fragment = (Fragment) fragmentClass.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        changeFragment(fragment);
-
-        if (savedInstanceState == null) {
-            fragmentRegistration = new FragmentRegistration();
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.main, fragmentRegistration ,"Fragment_Registration")
-                    .commit();
-            ///changeFragment(fragment);
-        }else{
-            FragmentManager manager = getFragmentManager();
-            fragmentRegistration = (FragmentRegistration) manager.findFragmentByTag("Fragment_Registration");
-        }
+        getFragmentManager().beginTransaction().replace(R.id.main, fragment, "Fragment_Overview").commit();
 
         txt_duration = new TextView(this);
         drawer = (DrawerLayout) findViewById(R.id.activity_main);
@@ -68,6 +52,8 @@ public class MainActivity extends AppCompatActivity{
         toggle.syncState();
 
         nvDrawer = (NavigationView) findViewById(R.id.nav_view);
+        nvDrawer.setCheckedItem(R.id.nav_list);
+        nvDrawer.getMenu().getItem(0).setChecked(true);
         onFloatingButtonPressed();
         // Setup drawer view
         setupDrawerContent(nvDrawer);
@@ -84,9 +70,9 @@ public class MainActivity extends AppCompatActivity{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                changeFragment(fragment);
+                changeRegistrationFragment(fragment);
                 nvDrawer.setCheckedItem(R.id.nav_registration);
-                nvDrawer.getMenu().getItem(0).setChecked(true);
+                nvDrawer.getMenu().getItem(1).setChecked(true);
                 setTitle(getResources().getString(R.string.nav_registration));
                 fab.hide();
             }
@@ -103,7 +89,7 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    private void changeFragment(Fragment targetFragment){
+    private void changeRegistrationFragment(Fragment targetFragment){
         getFragmentManager()
                 .beginTransaction()
                 .replace(R.id.main, targetFragment, "Fragment_Registration")
@@ -158,19 +144,33 @@ public class MainActivity extends AppCompatActivity{
         Fragment fragment = null;
         FragmentManager fragmentManager = getFragmentManager();
         switch (menuItem.getItemId()) {
+            case R.id.nav_list:
+                fragment = new FragmentOverview();
+                fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Overview").commit();
+                fab.show();
+                break;
             case R.id.nav_registration:
-                //fragment = new FragmentRegistration();
-                //fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Registration").commit();
+                try {
+                    fragment = (Fragment) fragmentClass.newInstance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                changeRegistrationFragment(fragment);
+                if (fragmentRegistration == null) {
+                    fragmentRegistration = new FragmentRegistration();
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.main, fragmentRegistration ,"Fragment_Registration")
+                            .commit();
+                    changeRegistrationFragment(fragment);
+                }else{
+                    FragmentManager manager = getFragmentManager();
+                    fragmentRegistration = (FragmentRegistration) manager.findFragmentByTag("Fragment_Registration");
+                }
                 fab.hide();
                 break;
             case R.id.nav_edit:
                 fragment = new FragmentEdit();
                 fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Edit").commit();
-                fab.show();
-                break;
-            case R.id.nav_list:
-                fragment = new FragmentOverview();
-                fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Overview").commit();
                 fab.show();
                 break;
             case R.id.nav_settings:

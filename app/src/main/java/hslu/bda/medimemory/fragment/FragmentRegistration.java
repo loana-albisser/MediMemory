@@ -240,7 +240,7 @@ public class FragmentRegistration extends Fragment {
         reminderDaytimeDialog = new AlertDialog.Builder(getActivity());
         daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
         reminderDaytimeDialog.setCancelable(false);
-        reminderDaytimeDialog.setTitle("Um welche Tageszeit möchten sie das Medikament nehmen");
+        reminderDaytimeDialog.setTitle(getResources().getString(R.string.title_reminderDaytime));
         reminderDaytimeDialog.setMultiChoiceItems(R.array.array_daytime, checkItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {

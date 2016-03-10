@@ -25,25 +25,31 @@ public class NumberPickerPreference extends DialogPreference {
     private StringBuilder numberString;
     private int value = 15;
     private int DEFAULT_VALUE = 15;
-    private static final String PREFS_NAME = "Prefname";
-    private static final String PREFS_KEY = "pref_key_before_food";
 
     public NumberPickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setDialogLayoutResource(R.layout.dialogpreference_numberpicker);
         setPositiveButtonText(android.R.string.ok);
-        setNegativeButtonText(android.R.string.cancel);
+        setNegativeButtonText(null);
     }
-
 
     @Override
     public void onBindDialogView (View view){
         super.onBindDialogView(view);
         numberPicker = (NumberPicker) view.findViewById(R.id.np_preference);
-        numberPicker.setMinValue(MIN_VALUE);
+        numberPicker.setMinValue(0);
         numberPicker.setMaxValue(120);
-        if (value != 0)numberPicker.setValue(value);
+        if (value != 0){
+            numberPicker.setValue(value);
+        }
     }
+
+    public void updateSummary(){
+        numberString = new StringBuilder();
+        numberString.append(value).append(" ").append(getContext().getResources().getString(R.string.minutes));
+        setSummary(numberString);
+    }
+
 
     @Override
     protected void onDialogClosed(boolean positiveResult){
@@ -51,10 +57,9 @@ public class NumberPickerPreference extends DialogPreference {
         if(positiveResult){
             if (callChangeListener(value)) {
                 setValue(numberPicker.getValue());
-                numberString.append(numberPicker.getValue()).append(" ").append(getContext().getResources().getString(R.string.minutes));
             }
-            setSummary(numberString);
         }
+        updateSummary();
     }
 
     public void setValue(int value) {
@@ -62,14 +67,11 @@ public class NumberPickerPreference extends DialogPreference {
         persistInt(this.value);
     }
 
-    public int getValue(){
-        return this.value;
-    }
 
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         setValue(restorePersistedValue ? getPersistedInt(DEFAULT_VALUE) : (Integer) defaultValue);
-        //setSummary(getValue());
+        updateSummary();
     }
 
     @Override

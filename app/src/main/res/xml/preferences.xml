@@ -8,22 +8,18 @@
            android:persistent="true">
            <hslu.bda.medimemory.fragment.TimePickerPreference
                android:key="pref_key_morning_reminder"
-               android:summary="@string/Summary_morning_reminder"
                android:title="@string/title_morning_reminder"
                android:persistent="true"/>
            <hslu.bda.medimemory.fragment.TimePickerPreference
                android:key="pref_key_noon_reminder"
-               android:summary="@string/Summary_noon_reminder"
                android:title="@string/title_noon_reminder"
                android:persistent="true"/>
            <hslu.bda.medimemory.fragment.TimePickerPreference
                android:key="pref_key_evening_reminder"
-               android:summary="@string/Summary_evening_reminder"
                android:title="@string/title_evening_reminder"
                android:persistent="true"/>
            <hslu.bda.medimemory.fragment.TimePickerPreference
                android:key="pref_key_night_reminder"
-               android:summary="@string/Summary_night_reminder"
                android:title="@string/title_night_reminder"
                android:persistent="true"/>
        </PreferenceScreen>
@@ -33,12 +29,10 @@
            android:persistent="true">
        <hslu.bda.medimemory.fragment.NumberPickerPreference
            android:key="pref_key_before_food"
-           android:summary="@string/Summary_before_food"
            android:title="@string/title_before_food"
            android:persistent="true"/>
        <hslu.bda.medimemory.fragment.NumberPickerPreference
            android:key="pref_key_after_food"
-           android:summary="@string/Summary_after_food"
            android:title="@string/title_after_food"
            android:persistent="true"/>
        </PreferenceScreen>
