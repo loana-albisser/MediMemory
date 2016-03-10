@@ -20,9 +20,9 @@ public class DataDTO {
     private String note;
     private int active;
 
-    private List<ConsumedDTO> allConsumed = new ArrayList<>();
-    private List<ConsumeIndividualDTO> allConsumeIndividual = new ArrayList<>();
-    private List<ConsumeIntervalDTO> allConsumeInterval = new ArrayList<>();
+    private List<ConsumedDTO> allConsumed = new ArrayList<ConsumedDTO>();
+    private List<ConsumeIndividualDTO> allConsumeIndividual = new ArrayList<ConsumeIndividualDTO>();
+    private List<ConsumeIntervalDTO> allConsumeInterval = new ArrayList<ConsumeIntervalDTO>();
 
     public int getId() {
         return id;
