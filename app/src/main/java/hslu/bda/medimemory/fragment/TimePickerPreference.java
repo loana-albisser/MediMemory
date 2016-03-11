@@ -1,19 +1,17 @@
 package hslu.bda.medimemory.fragment;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.preference.DialogPreference;
-import android.preference.Preference;
+import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
-import java.text.DecimalFormat;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import hslu.bda.medimemory.R;
 
@@ -22,67 +20,93 @@ import hslu.bda.medimemory.R;
  * Created by Loana on 05.03.2016.
  */
 public class TimePickerPreference extends DialogPreference {
-    private TimePicker timePicker;
-    private int hourValue;
-    private int minuteValue;
-    private int DEFAULT_HOUR = 0;
-    private int DEFAULT_MINUTE = 0;
-    StringBuilder timeString;
+    private Calendar calendar;
+    private TimePicker timePicker = null;
 
-    public TimePickerPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public TimePickerPreference(Context ctxt) {
+        this(ctxt, null);
+    }
+
+    public TimePickerPreference(Context ctxt, AttributeSet attrs) {
+        this(ctxt, attrs, android.R.attr.dialogPreferenceStyle);
+    }
+
+    public TimePickerPreference(Context ctxt, AttributeSet attrs, int defStyle) {
+        super(ctxt, attrs, defStyle);
         setDialogLayoutResource(R.layout.dialogpreference_timepicker);
-        setPositiveButtonText(android.R.string.ok);
+        setPositiveButtonText(R.string.ok);
         setNegativeButtonText(null);
+        calendar = new GregorianCalendar();
     }
 
     @Override
-    public void onBindDialogView (View view){
-        super.onBindDialogView(view);
-        timePicker = (TimePicker) view.findViewById(R.id.tp_preference);
+    protected View onCreateDialogView() {
+        timePicker = new TimePicker(getContext());
         timePicker.setIs24HourView(true);
-        if (hourValue != 0) timePicker.setCurrentHour(hourValue);
-        if (minuteValue !=0) timePicker.setCurrentMinute(minuteValue);
+        return (timePicker);
+    }
 
+    @Override
+    protected void onBindDialogView(View v) {
+        super.onBindDialogView(v);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            timePicker.setHour(calendar.get(Calendar.HOUR_OF_DAY));
+            timePicker.setMinute(calendar.get(Calendar.MINUTE));
+        } else {
+            timePicker.setCurrentHour(calendar.get(Calendar.HOUR_OF_DAY));
+            timePicker.setCurrentMinute(calendar.get(Calendar.MINUTE));
+        }
     }
 
     @Override
     protected void onDialogClosed(boolean positiveResult) {
+        super.onDialogClosed(positiveResult);
+
         if (positiveResult) {
-            if (callChangeListener(hourValue)||callChangeListener(minuteValue)) {
-                setHour(timePicker.getCurrentHour());
-                setMinute(timePicker.getCurrentMinute());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+                calendar.set(Calendar.MINUTE, timePicker.getMinute());
+            } else {
+                calendar.set(Calendar.HOUR_OF_DAY, timePicker.getCurrentHour());
+                calendar.set(Calendar.MINUTE, timePicker.getCurrentMinute());
             }
-            updateSummary();
+
+            setSummary(getSummary());
+            if (callChangeListener(calendar.getTimeInMillis())) {
+                persistInt((int) calendar.getTimeInMillis());
+                notifyChanged();
+            }
         }
-    }
-
-    public void updateSummary(){
-        timeString = new StringBuilder();
-        timeString.append(new DecimalFormat("00").format(hourValue)).append(":").append(new DecimalFormat("00").format(minuteValue));
-        setSummary(timeString);
-    }
-
-    public void setHour (int hourValue) {
-        this.hourValue = hourValue;
-        persistInt(this.hourValue);
-    }
-
-    public void setMinute (int minuteValue) {
-        this.minuteValue = minuteValue;
-        persistInt(this.minuteValue);
-    }
-
-    @Override
-    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-        setHour(restorePersistedValue ? getPersistedInt(DEFAULT_HOUR) : (Integer) defaultValue);
-        setMinute(restorePersistedValue ? getPersistedInt(DEFAULT_MINUTE) : (Integer) defaultValue);
-
-        updateSummary();
     }
 
     @Override
     protected Object onGetDefaultValue(TypedArray a, int index) {
-        return a.getInteger(index, 0);
+        return (a.getString(index));
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        if (restoreValue) {
+            if (defaultValue == null) {
+                calendar.setTimeInMillis(getPersistedInt((int) System.currentTimeMillis()));
+            } else {
+                calendar.setTimeInMillis(Long.parseLong(getPersistedString((String) defaultValue)));
+            }
+        } else {
+            if (defaultValue == null) {
+                calendar.setTimeInMillis(System.currentTimeMillis());
+            } else {
+                calendar.setTimeInMillis(Long.parseLong((String) defaultValue));
+            }
+        }
+        setSummary(getSummary());
+    }
+
+    @Override
+    public CharSequence getSummary() {
+        if (calendar == null) {
+            return null;
+        }
+        return DateFormat.getTimeFormat(getContext()).format(new Date(calendar.getTimeInMillis()));
     }
 }

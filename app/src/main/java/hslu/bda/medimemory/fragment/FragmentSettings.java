@@ -1,19 +1,7 @@
 package hslu.bda.medimemory.fragment;
 
-import android.app.TimePickerDialog;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.DialogPreference;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.NumberPicker;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
 
 import hslu.bda.medimemory.R;
