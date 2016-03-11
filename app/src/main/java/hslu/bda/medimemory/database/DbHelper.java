@@ -14,7 +14,7 @@ public class DbHelper extends SQLiteOpenHelper{
     public static String TABLE_MEDI_EAT = "Medi_eat";
     public static String TABLE_MEDI_DATA = "Medi_data";
     public static String TABLE_MEDI_STATUS = "Medi_status";
-    public static String TABLE_MEDI_CONSUME = "Medi_consumed";
+    public static String TABLE_MEDI_CONSUMED = "Medi_consumed";
     public static String TABLE_MEDI_DAY = "Medi_day";
     public static String TABLE_MEDI_CONSINDIV = "Medi_consumeIndividual";
     public static String TABLE_MEDI_CONSINTER = "Medi_consumeInterval";
@@ -145,7 +145,7 @@ public class DbHelper extends SQLiteOpenHelper{
     }
 
     private void createConsumeTable(SQLiteDatabase db) {
-        String CREATE_CONSUME_TABLE = "CREATE TABLE "+this.TABLE_MEDI_CONSUME+"("+
+        String CREATE_CONSUME_TABLE = "CREATE TABLE "+this.TABLE_MEDI_CONSUMED +"("+
                 this.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 this.COLUMN_MEDIID + " INTEGER, "+
                 this.COLUMN_POINTINTIME + " TEXT, "+

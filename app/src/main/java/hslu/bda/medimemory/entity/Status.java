@@ -1,9 +1,14 @@
-package hslu.bda.medimemory.dto;
+package hslu.bda.medimemory.entity;
+
+import android.content.ContentValues;
+
+import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbHelper;
 
 /**
  * Created by manager on 07.03.2016.
  */
-public class StatusDTO {
+public class Status implements DbObject{
 
     private int id;
     private String description;
@@ -11,14 +16,14 @@ public class StatusDTO {
     /**
      * Empty Constructor
      */
-    public StatusDTO (){}
+    public Status(){}
 
     /**
      * Constructor to return Object with supplied fields
      * @param id of the status
      * @param description of the status
      */
-    public StatusDTO (int id, String description){
+    public Status(int id, String description){
         this.setId(id);
         this.setDescription(description);
     }
@@ -53,5 +58,30 @@ public class StatusDTO {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+
+    @Override
+    public ContentValues getContentValues() {
+        final ContentValues values = new ContentValues();
+        values.put(DbHelper.COLUMN_ID,getId());
+        values.put(DbHelper.COLUMN_DESC, getDescription());
+
+        return values;
+    }
+
+    @Override
+    public String getTableName() {
+        return DbHelper.TABLE_MEDI_STATUS;
+    }
+
+    @Override
+    public String getPrimaryFieldName() {
+        return DbHelper.COLUMN_ID;
+    }
+
+    @Override
+    public String getPrimaryFieldValue() {
+        return String.valueOf(getId());
     }
 }

@@ -1,9 +1,14 @@
-package hslu.bda.medimemory.dto;
+package hslu.bda.medimemory.entity;
+
+import android.content.ContentValues;
+
+import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbHelper;
 
 /**
  * Created by tbeugste on 07.03.2016.
  */
-public class EatDTO {
+public class Eat implements DbObject{
 
     private int id;
     private String description;
@@ -11,14 +16,14 @@ public class EatDTO {
     /**
      * Empty Constructor
      */
-    public EatDTO (){}
+    public Eat(){}
 
     /**
      * Constructor to return Object with supplied fields
      * @param id of the eatpart
      * @param description of the eatpart
      */
-    public EatDTO (int id, String description){
+    public Eat(int id, String description){
         this.setId(id);
         this.setDescription(description);
     }
@@ -53,5 +58,30 @@ public class EatDTO {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+
+    @Override
+    public ContentValues getContentValues() {
+        final ContentValues values = new ContentValues();
+        values.put(DbHelper.COLUMN_ID,getId());
+        values.put(DbHelper.COLUMN_DESC, getDescription());
+
+        return values;
+    }
+
+    @Override
+    public String getTableName() {
+        return DbHelper.TABLE_MEDI_EAT;
+    }
+
+    @Override
+    public String getPrimaryFieldName() {
+        return DbHelper.COLUMN_ID;
+    }
+
+    @Override
+    public String getPrimaryFieldValue() {
+        return String.valueOf(getId());
     }
 }

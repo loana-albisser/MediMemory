@@ -1,14 +1,14 @@
-package hslu.bda.medimemory.dto;
+package hslu.bda.medimemory.entity;
 
 import android.test.AndroidTestCase;
 
 /**
  * Created by manager on 07.03.2016.
  */
-public class EatDTOTest extends AndroidTestCase {
+public class EatTest extends AndroidTestCase {
     private int id;
     private String description;
-    private EatDTO eatDTO;
+    private Eat eat;
 
 
 
@@ -19,7 +19,7 @@ public class EatDTOTest extends AndroidTestCase {
     }
 
     public void createTest(){
-        eatDTO = new EatDTO();
-        assertTrue(eatDTO!=null);
+        eat = new Eat();
+        assertTrue(eat !=null);
     }
 }

@@ -1,11 +1,17 @@
-package hslu.bda.medimemory.dto;
+package hslu.bda.medimemory.entity;
 
+import android.content.ContentValues;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbHelper;
 
 /**
  * Created by manager on 07.03.2016.
  */
-public class ConsumeIntervalDTO {
+public class ConsumeInterval implements DbObject{
 
     private int id;
     private int mediid;
@@ -13,10 +19,11 @@ public class ConsumeIntervalDTO {
     private Calendar endTime;
     private int interval;
     private int weekday;
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    public ConsumeIntervalDTO(){};
+    public ConsumeInterval(){};
 
-    public ConsumeIntervalDTO(int id, int mediid, Calendar startTime, Calendar endTime, int interval, int weekday){
+    public ConsumeInterval(int id, int mediid, Calendar startTime, Calendar endTime, int interval, int weekday){
         this.setId(id);
         this.setMediid(mediid);
         this.setStartTime(startTime);
@@ -87,5 +94,34 @@ public class ConsumeIntervalDTO {
      */
     public void setWeekday(int weekday) {
         this.weekday = weekday;
+    }
+
+
+    @Override
+    public ContentValues getContentValues() {
+        final ContentValues values = new ContentValues();
+        values.put(DbHelper.COLUMN_ID,getId());
+        values.put(DbHelper.COLUMN_MEDIID, getMediid());
+        values.put(DbHelper.COLUMN_STARTTIME, simpleDateFormat.format(getStartTime()));
+        values.put(DbHelper.COLUMN_ENDTIME, simpleDateFormat.format(getEndTime()));
+        values.put(DbHelper.COLUMN_INTERVAL, getInterval());
+        values.put(DbHelper.COLUMN_WEEKDAY, getWeekday());
+
+        return values;
+    }
+
+    @Override
+    public String getTableName() {
+        return DbHelper.TABLE_MEDI_CONSINTER;
+    }
+
+    @Override
+    public String getPrimaryFieldName() {
+        return DbHelper.COLUMN_ID;
+    }
+
+    @Override
+    public String getPrimaryFieldValue() {
+        return String.valueOf(getId());
     }
 }

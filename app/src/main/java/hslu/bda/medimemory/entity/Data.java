@@ -1,13 +1,19 @@
-package hslu.bda.medimemory.dto;
+package hslu.bda.medimemory.entity;
 
+import android.content.ContentValues;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbHelper;
+
 /**
  * Created by manager on 07.03.2016.
  */
-public class DataDTO {
+public class Data implements DbObject{
 
     private int id;
     private String description;
@@ -19,10 +25,11 @@ public class DataDTO {
     private Calendar createDate;
     private String note;
     private int active;
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private List<ConsumedDTO> allConsumed = new ArrayList<ConsumedDTO>();
-    private List<ConsumeIndividualDTO> allConsumeIndividual = new ArrayList<ConsumeIndividualDTO>();
-    private List<ConsumeIntervalDTO> allConsumeInterval = new ArrayList<ConsumeIntervalDTO>();
+    private List<Consumed> allConsumed = new ArrayList<Consumed>();
+    private List<ConsumeIndividual> allConsumeIndividual = new ArrayList<ConsumeIndividual>();
+    private List<ConsumeInterval> allConsumeInterval = new ArrayList<ConsumeInterval>();
 
     public int getId() {
         return id;
@@ -104,27 +111,60 @@ public class DataDTO {
         this.active = active;
     }
 
-    public List<ConsumedDTO> getAllConsumed() {
+    public List<Consumed> getAllConsumed() {
         return allConsumed;
     }
 
-    public void setAllConsumed(List<ConsumedDTO> allConsumed) {
+    public void setAllConsumed(List<Consumed> allConsumed) {
         this.allConsumed = allConsumed;
     }
 
-    public List<ConsumeIndividualDTO> getAllConsumeIndividual() {
+    public List<ConsumeIndividual> getAllConsumeIndividual() {
         return allConsumeIndividual;
     }
 
-    public void setAllConsumeIndividual(List<ConsumeIndividualDTO> allConsumeIndividual) {
+    public void setAllConsumeIndividual(List<ConsumeIndividual> allConsumeIndividual) {
         this.allConsumeIndividual = allConsumeIndividual;
     }
 
-    public List<ConsumeIntervalDTO> getAllConsumeInterval() {
+    public List<ConsumeInterval> getAllConsumeInterval() {
         return allConsumeInterval;
     }
 
-    public void setAllConsumeInterval(List<ConsumeIntervalDTO> allConsumeInterval) {
+    public void setAllConsumeInterval(List<ConsumeInterval> allConsumeInterval) {
         this.allConsumeInterval = allConsumeInterval;
+    }
+
+
+    @Override
+    public ContentValues getContentValues() {
+        final ContentValues values = new ContentValues();
+        values.put(DbHelper.COLUMN_ID,getId());
+        values.put(DbHelper.COLUMN_DESC, getDescription());
+        values.put(DbHelper.COLUMN_DURATION, getDuration());
+        values.put(DbHelper.COLUMN_AMOUNT, getAmount());
+        values.put(DbHelper.COLUMN_WIDTH, getAmount());
+        values.put(DbHelper.COLUMN_LENGTH, getLength());
+        values.put(DbHelper.COLUMN_PICTURE, getPicture());
+        values.put(DbHelper.COLUMN_CREATEDATE, simpleDateFormat.format(getCreateDate()));
+        values.put(DbHelper.COLUMN_NOTE, getNote());
+        values.put(DbHelper.COLUMN_ACTIVE, getActive());
+
+        return values;
+    }
+
+    @Override
+    public String getTableName() {
+        return DbHelper.TABLE_MEDI_DATA;
+    }
+
+    @Override
+    public String getPrimaryFieldName() {
+        return DbHelper.COLUMN_ID;
+    }
+
+    @Override
+    public String getPrimaryFieldValue() {
+        return String.valueOf(getId());
     }
 }
