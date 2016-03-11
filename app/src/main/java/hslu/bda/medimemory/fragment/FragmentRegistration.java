@@ -15,12 +15,14 @@ import android.provider.MediaStore;
 
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -30,7 +32,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -57,32 +58,29 @@ public class FragmentRegistration extends Fragment {
     private final int REQUEST_CAMERA = 0;
     private final int SELECT_FILE = 1;
     private ImageView ivImage;
-    private Button btn_select;
 
     private TextView txt_reminder;
     private View dialogView;
     private int selectedIntervalPosition;
-    final boolean [] checkItems = {false,false,false,false};
-    private AlertDialog.Builder reminderDaytimeDialog;
+    private final boolean [] checkItems = {false,false,false,false};
     private Spinner sp_reminderInterval;
+    private int numberofCheckedItems;
+    private RadioButton rd_reminderInterval;
     private TimePickerDialog tp_startEndTimeInterval;
-    private int selectedHour;
-    private int selectedMinute;
     private StringBuilder daytimebuilder;
     private List<String> daytimes;
     private NumberPicker np_reminderInterval;
     private StringBuilder intervalbuilder;
     private int selectedValue = 1;
     private String selectedInterval;
+    private CardView cv_foodInstruction;
 
     private TextView txt_duration = null;
-    private StringBuilder numDaysString;
     private StringBuilder numberOfBlisterString;
-    final Calendar calendar;
+    private final Calendar calendar;
     private int selectedYear;
     private int selectedMonth;
     private int selectedDay;
-    private AlertDialog.Builder npb_numberofBlisters;
     private NumberPicker np_numberofBlisters;
     private int numberOfBlisters = 1;
 
@@ -90,8 +88,6 @@ public class FragmentRegistration extends Fragment {
     private NumberPicker np_dosage;
 
     private TextView txt_foodInstruction = null;
-
-    private FragmentRegistration mStartCommunicationListner;
 
     public FragmentRegistration() {
         calendar = Calendar.getInstance();
@@ -115,7 +111,7 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void setupShowImage() {
-        btn_select = (Button) root.findViewById(R.id.btn_SelectPhoto);
+        Button btn_select = (Button) root.findViewById(R.id.btn_SelectPhoto);
         btn_select.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -197,7 +193,7 @@ public class FragmentRegistration extends Fragment {
         cursor.moveToFirst();
 
         String selectedImagePath = cursor.getString(column_index);
-
+        cursor.close();
         Bitmap bm;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -214,7 +210,7 @@ public class FragmentRegistration extends Fragment {
         ivImage.setImageBitmap(bm);
     }
 
-    public void showInfoTextField(TextView textView, ViewGroup viewGroup) {
+    private void showInfoTextField(TextView textView, ViewGroup viewGroup) {
         textView.setPadding(10, 10, 10, 10);
         textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         viewGroup.addView(textView);
@@ -222,7 +218,9 @@ public class FragmentRegistration extends Fragment {
 
     private void showReminderDetails(){
         RadioGroup rdg_reminder = (RadioGroup) root.findViewById(R.id.rdg_reminder);
+        rd_reminderInterval = (RadioButton)root.findViewById(R.id.rd_interval);
         final LinearLayout ln_reminder = (LinearLayout)root.findViewById(R.id.ln_reminder);
+        cv_foodInstruction = (CardView)root.findViewById(R.id.cv_foodInstruction);
         txt_reminder = new TextView(getActivity());
         txt_reminder.setVisibility(View.GONE);
         showInfoTextField(txt_reminder, ln_reminder);
@@ -230,14 +228,21 @@ public class FragmentRegistration extends Fragment {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 txt_reminder.setVisibility(View.VISIBLE);
+                if (checkedId == rd_reminderInterval.getId()) {
+                    cv_foodInstruction.setVisibility(View.GONE);
+                } else {
+                    cv_foodInstruction.setVisibility(View.VISIBLE);
+                }
             }
         });
+
     }
+
 
     public void showReminderDaytimeDialog(){
         daytimes = Arrays.asList(getResources().getStringArray(R.array.array_daytime));
         daytimebuilder = new StringBuilder();
-        reminderDaytimeDialog = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder reminderDaytimeDialog = new AlertDialog.Builder(getActivity());
         daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
         reminderDaytimeDialog.setCancelable(false);
         reminderDaytimeDialog.setTitle(getResources().getString(R.string.title_reminderDaytime));
@@ -264,9 +269,9 @@ public class FragmentRegistration extends Fragment {
         reminderDaytimeDialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                int numberofCheckedItems = 0;
+                numberofCheckedItems = 0;
                 for (int i = 0; i < checkItems.length; i++) {
-                    if (checkItems[i] == true) {
+                    if (checkItems[i]) {
                         numberofCheckedItems++;
                         daytimebuilder.append(daytimes.get(i)).append(" ");
                     }
@@ -294,21 +299,24 @@ public class FragmentRegistration extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (selectedValue == 1) {
-                    if (selectedInterval == getResources().getString(R.string.hour)) {
+                    if (selectedInterval.equals(getResources().getString(R.string.hour))) {
                         intervalbuilder.append(getResources().getString(R.string.everyHour));
-                    } else if (selectedInterval == getResources().getString(R.string.day)) {
-                        intervalbuilder.append(getResources().getString(R.string.day));
-                    } else if (selectedInterval == getResources().getString(R.string.week)) {
-                        intervalbuilder.append(getResources().getString(R.string.week));
+                    } else if (selectedInterval.equals(getResources().getString(R.string.day))) {
+                        intervalbuilder.append(getResources().getString(R.string.everyDay));
+                    }
+                    /*else if (selectedInterval == getResources().getString(R.string.day)) {
+                        intervalbuilder.append(getResources().getString(R.string.everyDay));
+                    }*/else if (selectedInterval.equals(getResources().getString(R.string.week))) {
+                        intervalbuilder.append(getResources().getString(R.string.everyWeek));
                     }
                 } else {
                     intervalbuilder.append(getResources().getString(R.string.every)).append(" ");
                     intervalbuilder.append(selectedValue).append(" ");
-                    if (selectedInterval == getResources().getString(R.string.hour)) {
+                    if (selectedInterval.equals(getResources().getString(R.string.hour))) {
                         intervalbuilder.append(getResources().getString(R.string.hourMult));
-                    } else if (selectedInterval == getResources().getString(R.string.day)) {
+                    } else if (selectedInterval.equals(getResources().getString(R.string.day))) {
                         intervalbuilder.append(getResources().getString(R.string.dayMult));
-                    } else if (selectedInterval == getResources().getString(R.string.week)) {
+                    } else if (selectedInterval.equals(getResources().getString(R.string.week))) {
                         intervalbuilder.append(getResources().getString(R.string.weekMult));
                     }
 
@@ -343,13 +351,13 @@ public class FragmentRegistration extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedIntervalPosition = (int) parent.getItemIdAtPosition(position);
                 selectedInterval = parent.getItemAtPosition(position).toString();
-                if (selectedInterval == getResources().getString(R.string.hour)) {
+                if (selectedInterval.equals(getResources().getString(R.string.hour))) {
                     np_reminderInterval.setMaxValue(23);
                     np_reminderInterval.setValue(selectedValue);
-                } else if (selectedInterval == getResources().getString(R.string.day)) {
+                } else if (selectedInterval.equals(getResources().getString(R.string.day))) {
                     np_reminderInterval.setMaxValue(20);
                     np_reminderInterval.setValue(selectedValue);
-                } else if (selectedInterval == getResources().getString(R.string.week)) {
+                } else if (selectedInterval.equals(getResources().getString(R.string.week))) {
                     np_reminderInterval.setMaxValue(60);
                     np_reminderInterval.setValue(selectedValue);
                 }
@@ -381,6 +389,7 @@ public class FragmentRegistration extends Fragment {
                         btn_starttime.setText(startString);
                     }
                 }, 0, 0, true);
+                tp_startEndTimeInterval.setButton(DialogInterface.BUTTON_NEGATIVE, null, tp_startEndTimeInterval);
                 showTimeDialog(getResources().getString(R.string.title_chooseStartTime));
             }
         });
@@ -396,6 +405,7 @@ public class FragmentRegistration extends Fragment {
                         btn_endtime.setText(endString);
                     }
                 }, 23, 59, true);
+                tp_startEndTimeInterval.setButton(DialogInterface.BUTTON_NEGATIVE, null, tp_startEndTimeInterval);
                 showTimeDialog(getResources().getString(R.string.title_chooseEndTime));
             }
         });
@@ -405,19 +415,20 @@ public class FragmentRegistration extends Fragment {
 
             }
         });
+
         Dialog d = dialogStartEndTime.create();
         d.show();
     }
 
     private void showTimeDialog(String title){
         final Calendar c = Calendar.getInstance();
-        selectedHour = c.get(Calendar.HOUR_OF_DAY);
-        selectedMinute = c.get(Calendar.MINUTE);
+        int selectedHour = c.get(Calendar.HOUR_OF_DAY);
+        int selectedMinute = c.get(Calendar.MINUTE);
         tp_startEndTimeInterval.setTitle(title);
         tp_startEndTimeInterval.show();
     }
 
-    public void setDuration() {
+    private void setDuration() {
         RadioGroup radioGroup = (RadioGroup)root.findViewById(R.id.rdg_duration);
         final LinearLayout ln_duration = (LinearLayout) root.findViewById(R.id.ln_duration);
         txt_duration = new TextView(getActivity());
@@ -428,7 +439,7 @@ public class FragmentRegistration extends Fragment {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 StringBuilder durationString = new StringBuilder();
                 txt_duration.setVisibility(View.VISIBLE);
-               if (checkedId == R.id.rd_always) {
+                if (checkedId == R.id.rd_always) {
                     durationString.append(getResources().getString(R.string.txt_durationAlways));
                     txt_duration.setText(durationString);
                 }
@@ -454,7 +465,7 @@ public class FragmentRegistration extends Fragment {
                 selectedDay = dayOfMonth;
             }
         }, selectedYear, selectedMonth, selectedDay);
-
+        dpd.setButton(DialogInterface.BUTTON_NEGATIVE, null, dpd);
         dpd.show();
     }
 
@@ -469,7 +480,7 @@ public class FragmentRegistration extends Fragment {
     }
 
     public void showNumberOfBlistersNumberPickerDialog(){
-        npb_numberofBlisters = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder npb_numberofBlisters = new AlertDialog.Builder(getActivity());
         numberOfBlisterString = new StringBuilder();
         npb_numberofBlisters.setCancelable(false);
         np_numberofBlisters.setMaxValue(20);
@@ -493,7 +504,7 @@ public class FragmentRegistration extends Fragment {
 
 
 
-    public void setDosage(){
+    private void setDosage(){
         final ViewGroup ln_dosage = (ViewGroup) root.findViewById(R.id.ln_dosage);
         txt_dosage = new TextView(getActivity());
         txt_dosage.setText(getResources().getString(R.string.txt_dosageInitial));
@@ -548,34 +559,64 @@ public class FragmentRegistration extends Fragment {
 
 
 
+
+
     private void save(){
         Button btn_save = (Button)root.findViewById(R.id.btn_save);
+        final RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
+        final RadioGroup rdg_duration = (RadioGroup)root.findViewById(R.id.rdg_duration);
+        final RadioGroup rdg_foodInstruction = (RadioGroup)root.findViewById(R.id.rdg_foodInstruction);
+        final RadioButton rd_reminderdaytime = (RadioButton)root.findViewById(R.id.rd_daytime);
+        final EditText edit_name = (EditText)root.findViewById(R.id.edit_name);
+        final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+        //alertBuilder.setTitle("Erfassung nicht vollständig!");
             btn_save.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (isEmpty(txt_reminder)){
-                        Toast.makeText(getActivity(),"Einnahmezeit ausüllen", Toast.LENGTH_LONG).show();
-                    } else if (isEmpty(txt_duration)){
-                        Toast.makeText(getActivity(),"Einnahme ausüllen", Toast.LENGTH_LONG).show();
-                    } else if (isEmpty(txt_dosage)){
-                        Toast.makeText(getActivity(),"Dosierung ausüllen", Toast.LENGTH_LONG).show();
-                    } else if (isEmpty(txt_foodInstruction)){
-                        Toast.makeText(getActivity(),"Einnahme ausüllen", Toast.LENGTH_LONG).show();
+                    if (edit_name.getText().toString().trim().length() == 0){
+                        alertBuilder.setMessage("Bitte gib einen Namen ein!");
+                        alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                    } else if (rdg_reminder.getCheckedRadioButtonId() == -1){
+                        alertBuilder.setMessage("Bitte wähle eine Einnahmezeit aus!");
+                        alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                    } else if (rdg_duration.getCheckedRadioButtonId() == -1){
+                        alertBuilder.setMessage("Bitte wähle eine Dauer der Einnahme aus!");
+                        alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        });
+                    } else if (rd_reminderdaytime.isChecked() &&numberofCheckedItems == 0) {
+                        alertBuilder.setMessage("Bitte wähle mindestens 1 Einnahmezeit aus!");
+                        alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        });
+                    } else if (rd_reminderdaytime.isChecked() && rdg_foodInstruction.getCheckedRadioButtonId() == -1){
+                        alertBuilder.setMessage("Bitte wähle eine Ernährungsanweisung der Einnahme aus!");
+                        alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //cv_reminder.requestFocus();
+                            }
+                        });
                     } else {
                         Toast.makeText(getActivity()," Ihr Medikament wurde gespeichert",Toast.LENGTH_LONG).show();
                     }
-
+                    alertBuilder.show();
                 }
             });
         }
-
-
-    private boolean isEmpty(TextView textView){
-        if (textView.getText().toString().trim().length()>0){
-            return false;
-        } else {
-            return true;
-        }
-    }
 
 }

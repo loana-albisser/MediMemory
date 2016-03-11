@@ -24,7 +24,7 @@
     <string name="rd_reminderWeekly">wöchentlich</string>
     <string name="btn_selectPhoto">Foto auswählen</string>
     <string name="nav_registration">Erfassung</string>
-    <string name="nav_edit">Bearbeiten</string>
+    <string name="nav_edit">Bearbeitung</string>
     <string name="nav_list">Übersicht</string>
     <string name="nav_settings">Einstellungen</string>
     <string name="nav_help">Hilfe</string>

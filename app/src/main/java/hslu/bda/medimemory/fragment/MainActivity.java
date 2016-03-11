@@ -20,12 +20,10 @@ import hslu.bda.medimemory.R;
 public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawer;
     private Fragment fragment = null;
-    private FragmentRegistration fragmentRegistration;
     private Class fragmentClass;
+    private FragmentRegistration fragmentRegistration;
     private FloatingActionButton fab;
-    private MenuItem registrationMenuItem;
     private NavigationView nvDrawer;
-    private TextView txt_duration = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +42,7 @@ public class MainActivity extends AppCompatActivity{
         }
         getFragmentManager().beginTransaction().replace(R.id.main, fragment, "Fragment_Overview").commit();
 
-        txt_duration = new TextView(this);
+        TextView txt_duration = new TextView(this);
         drawer = (DrawerLayout) findViewById(R.id.activity_main);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -150,22 +148,8 @@ public class MainActivity extends AppCompatActivity{
                 fab.show();
                 break;
             case R.id.nav_registration:
-                try {
-                    fragment = (Fragment) fragmentClass.newInstance();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                changeRegistrationFragment(fragment);
-                if (fragmentRegistration == null) {
-                    fragmentRegistration = new FragmentRegistration();
-                    getFragmentManager().beginTransaction()
-                            .replace(R.id.main, fragmentRegistration ,"Fragment_Registration")
-                            .commit();
-                    changeRegistrationFragment(fragment);
-                }else{
-                    FragmentManager manager = getFragmentManager();
-                    fragmentRegistration = (FragmentRegistration) manager.findFragmentByTag("Fragment_Registration");
-                }
+                fragmentRegistration = new FragmentRegistration();
+                fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration ,"Fragment_Registration").commit();
                 fab.hide();
                 break;
             case R.id.nav_edit:
