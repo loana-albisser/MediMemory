@@ -5,9 +5,12 @@ import android.content.ContentValues;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
 
 /**
@@ -25,11 +28,11 @@ public class Data implements DbObject{
     private Calendar createDate;
     private String note;
     private int active;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private List<Consumed> allConsumed = new ArrayList<Consumed>();
-    private List<ConsumeIndividual> allConsumeIndividual = new ArrayList<ConsumeIndividual>();
-    private List<ConsumeInterval> allConsumeInterval = new ArrayList<ConsumeInterval>();
+    private Collection<Consumed> allConsumed = new ArrayList<Consumed>();
+    private Collection<ConsumeIndividual> allConsumeIndividual = new ArrayList<ConsumeIndividual>();
+    private Collection<ConsumeInterval> allConsumeInterval = new ArrayList<ConsumeInterval>();
 
     public int getId() {
         return id;
@@ -111,27 +114,27 @@ public class Data implements DbObject{
         this.active = active;
     }
 
-    public List<Consumed> getAllConsumed() {
+    public Collection<Consumed> getAllConsumed() {
         return allConsumed;
     }
 
-    public void setAllConsumed(List<Consumed> allConsumed) {
+    public void setAllConsumed(Collection<Consumed> allConsumed) {
         this.allConsumed = allConsumed;
     }
 
-    public List<ConsumeIndividual> getAllConsumeIndividual() {
+    public Collection<ConsumeIndividual> getAllConsumeIndividual() {
         return allConsumeIndividual;
     }
 
-    public void setAllConsumeIndividual(List<ConsumeIndividual> allConsumeIndividual) {
+    public void setAllConsumeIndividual(Collection<ConsumeIndividual> allConsumeIndividual) {
         this.allConsumeIndividual = allConsumeIndividual;
     }
 
-    public List<ConsumeInterval> getAllConsumeInterval() {
+    public Collection<ConsumeInterval> getAllConsumeInterval() {
         return allConsumeInterval;
     }
 
-    public void setAllConsumeInterval(List<ConsumeInterval> allConsumeInterval) {
+    public void setAllConsumeInterval(Collection<ConsumeInterval> allConsumeInterval) {
         this.allConsumeInterval = allConsumeInterval;
     }
 
@@ -167,4 +170,38 @@ public class Data implements DbObject{
     public String getPrimaryFieldValue() {
         return String.valueOf(getId());
     }
+
+    private static Data copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+        Data data = new Data();
+        data.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
+        data.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));
+        data.setDuration(contentValues.getAsInteger(DbHelper.COLUMN_DURATION));
+        data.setAmount(contentValues.getAsInteger(DbHelper.COLUMN_AMOUNT));
+        data.setWidth(contentValues.getAsInteger(DbHelper.COLUMN_WIDTH));
+        data.setLength(contentValues.getAsInteger(DbHelper.COLUMN_LENGTH));
+        data.setPicture(contentValues.getAsString(DbHelper.COLUMN_PICTURE));
+        try{
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(simpleDateFormat.parse(contentValues.getAsString(DbHelper.COLUMN_CREATEDATE)));
+            data.setCreateDate(calendar);
+        }catch(Exception e) {data.setCreateDate(null);}
+        data.setNote(contentValues.getAsString(DbHelper.COLUMN_NOTE));
+        data.setActive(contentValues.getAsInteger(DbHelper.COLUMN_ACTIVE));
+        return data;
+    }
+
+    public static Data getDataById(String id, DbAdapter dbAdapter) {
+        Data data = new Data();
+        data.setId(Integer.parseInt(id));
+        ContentValues contentValues = dbAdapter.getByObject(data);
+        if(contentValues!= null) {
+            data = copyContentValuesToObject(contentValues, dbAdapter);
+        }else{data=null;}
+
+        data.setAllConsumed(Consumed.getAllConsumedByMedid(dbAdapter, data.getId()));
+        data.setAllConsumeIndividual(ConsumeIndividual.getAllConsumedByMedid(dbAdapter, data.getId()));
+        data.setAllConsumeInterval(ConsumeInterval.getAllConsumedByMedid(dbAdapter, data.getId()));
+        return data;
+    }
 }
+

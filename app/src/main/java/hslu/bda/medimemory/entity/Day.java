@@ -3,6 +3,7 @@ package hslu.bda.medimemory.entity;
 import android.content.ContentValues;
 
 import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
 
 /**
@@ -83,5 +84,23 @@ public class Day implements DbObject{
     @Override
     public String getPrimaryFieldValue() {
         return String.valueOf(getId());
+    }
+
+    public static Day getDayById(String id, DbAdapter dbAdapter) {
+        Day day = new Day();
+        day.setId(Integer.parseInt(id));
+        ContentValues contentValues = dbAdapter.getByObject(day);
+        if(contentValues!= null) {
+            day = copyContentValuesToObject(contentValues, dbAdapter);
+        }else{day=null;}
+
+        return day;
+    }
+
+    private static Day copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+        Day day = new Day();
+        day.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
+        day.setDescription(contentValues.getAsString(DbHelper.COLUMN_MEDIID));
+        return day;
     }
 }

@@ -3,9 +3,14 @@ package hslu.bda.medimemory.entity;
 import android.content.ContentValues;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.GregorianCalendar;
 
 import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
 
 /**
@@ -16,7 +21,7 @@ public class Consumed implements DbObject {
     private int mediid;
     private Calendar pointInTime;
     private Status status;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public Consumed(){}
 
@@ -50,8 +55,6 @@ public class Consumed implements DbObject {
     public Calendar getPointInTime() {
         return pointInTime;
     }
-
-
 
     /**
      * Use GregorianCalendar
@@ -93,5 +96,32 @@ public class Consumed implements DbObject {
     @Override
     public String getPrimaryFieldValue() {
         return String.valueOf(getId());
+    }
+
+    public static Collection<Consumed> getAllConsumedByMedid(DbAdapter dbAdapter, int medid){
+        Collection<Consumed> allConsumed = new ArrayList<Consumed>();
+        Collection<ContentValues> allContentValues =
+                dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_CONSUMED,
+                        new String[]{DbHelper.COLUMN_MEDIID},new String[]{String.valueOf(medid)});
+        if(allContentValues!=null) {
+            for(ContentValues contentValues:allContentValues){
+                allConsumed.add(copyContentValuesToObject(contentValues, dbAdapter));
+            }
+        }
+
+        return allConsumed;
+    }
+
+    private static Consumed copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+        Consumed consumed = new Consumed();
+        consumed.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
+        consumed.setMediid(contentValues.getAsInteger(DbHelper.COLUMN_MEDIID));
+        try{
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(simpleDateFormat.parse(contentValues.getAsString(DbHelper.COLUMN_POINTINTIME)));
+            consumed.setPointInTime(calendar);
+        }catch(Exception e) {consumed.setPointInTime(null);}
+        consumed.setStatus(Status.getStatusById(contentValues.getAsString(DbHelper.COLUMN_STATUS),dbAdapter));
+        return  consumed;
     }
 }

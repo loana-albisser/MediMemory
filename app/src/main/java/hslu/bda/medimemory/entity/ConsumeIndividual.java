@@ -3,9 +3,13 @@ package hslu.bda.medimemory.entity;
 import android.content.ContentValues;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.GregorianCalendar;
 
 import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
 
 /**
@@ -18,7 +22,7 @@ public class ConsumeIndividual implements DbObject {
     private Calendar consumeTime;
     private Day daypart;
     private Eat eatpart;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
     /**
      * empty Constructor
      */
@@ -99,4 +103,33 @@ public class ConsumeIndividual implements DbObject {
     public String getPrimaryFieldValue() {
         return String.valueOf(getId());
     }
+
+    public static Collection<ConsumeIndividual> getAllConsumedByMedid(DbAdapter dbAdapter, int medid){
+        Collection<ConsumeIndividual> allConsumeIndividuals = new ArrayList<ConsumeIndividual>();
+        Collection<ContentValues> allContentValues =
+                dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_CONSINDIV,
+                        new String[]{DbHelper.COLUMN_MEDIID},new String[]{String.valueOf(medid)});
+        if(allContentValues!=null) {
+            for(ContentValues contentValues:allContentValues){
+                allConsumeIndividuals.add(copyContentValuesToObject(contentValues, dbAdapter));
+            }
+        }
+
+        return allConsumeIndividuals;
+    }
+
+    private static ConsumeIndividual copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+        ConsumeIndividual consumeIndividual = new ConsumeIndividual();
+        consumeIndividual.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
+        consumeIndividual.setMediid(contentValues.getAsInteger(DbHelper.COLUMN_MEDIID));
+        try{
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(simpleDateFormat.parse(contentValues.getAsString(DbHelper.COLUMN_CONSTIME)));
+            consumeIndividual.setConsumeTime(calendar);
+        }catch(Exception e) {consumeIndividual.setConsumeTime(null);}
+        consumeIndividual.setDaypart(Day.getDayById(contentValues.getAsString(DbHelper.COLUMN_DAYPART), dbAdapter));
+        consumeIndividual.setEatpart(Eat.getEatById(contentValues.getAsString(DbHelper.COLUMN_EATPART), dbAdapter));
+        return  consumeIndividual;
+    }
 }
+

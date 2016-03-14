@@ -3,9 +3,13 @@ package hslu.bda.medimemory.entity;
 import android.content.ContentValues;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.GregorianCalendar;
 
 import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
 
 /**
@@ -19,7 +23,7 @@ public class ConsumeInterval implements DbObject{
     private Calendar endTime;
     private int interval;
     private int weekday;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
 
     public ConsumeInterval(){};
 
@@ -123,5 +127,38 @@ public class ConsumeInterval implements DbObject{
     @Override
     public String getPrimaryFieldValue() {
         return String.valueOf(getId());
+    }
+
+    public static Collection<ConsumeInterval> getAllConsumedByMedid(DbAdapter dbAdapter, int medid){
+        Collection<ConsumeInterval> allConsumeInterval = new ArrayList<ConsumeInterval>();
+        Collection<ContentValues> allContentValues =
+                dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_CONSINTER,
+                        new String[]{DbHelper.COLUMN_MEDIID},new String[]{String.valueOf(medid)});
+        if(allContentValues!=null) {
+            for(ContentValues contentValues:allContentValues){
+                allConsumeInterval.add(copyContentValuesToObject(contentValues, dbAdapter));
+            }
+        }
+
+        return allConsumeInterval;
+    }
+
+    private static ConsumeInterval copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+        ConsumeInterval consumeInterval = new ConsumeInterval();
+        consumeInterval.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
+        consumeInterval.setMediid(contentValues.getAsInteger(DbHelper.COLUMN_MEDIID));
+        try{
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(simpleDateFormat.parse(contentValues.getAsString(DbHelper.COLUMN_STARTTIME)));
+            consumeInterval.setStartTime(calendar);
+        }catch(Exception e) {consumeInterval.setStartTime(null);}
+        try{
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(simpleDateFormat.parse(contentValues.getAsString(DbHelper.COLUMN_ENDTIME)));
+            consumeInterval.setEndTime(calendar);
+        }catch(Exception e) {consumeInterval.setStartTime(null);}
+        consumeInterval.setInterval(contentValues.getAsInteger(DbHelper.COLUMN_INTERVAL));
+        consumeInterval.setWeekday(contentValues.getAsInteger(DbHelper.COLUMN_WEEKDAY));
+        return  consumeInterval;
     }
 }

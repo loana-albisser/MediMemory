@@ -3,6 +3,7 @@ package hslu.bda.medimemory.entity;
 import android.content.ContentValues;
 
 import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
 
 /**
@@ -83,5 +84,23 @@ public class Eat implements DbObject{
     @Override
     public String getPrimaryFieldValue() {
         return String.valueOf(getId());
+    }
+
+    public static Eat getEatById(String id, DbAdapter dbAdapter) {
+        Eat eat = new Eat();
+        eat.setId(Integer.parseInt(id));
+        ContentValues contentValues = dbAdapter.getByObject(eat);
+        if(contentValues!= null) {
+            eat = copyContentValuesToObject(contentValues, dbAdapter);
+        }else{eat=null;}
+
+        return eat;
+    }
+
+    private static Eat copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+        Eat eat = new Eat();
+        eat.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
+        eat.setDescription(contentValues.getAsString(DbHelper.COLUMN_MEDIID));
+        return  eat;
     }
 }

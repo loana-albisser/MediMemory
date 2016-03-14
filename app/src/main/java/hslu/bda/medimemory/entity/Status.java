@@ -3,6 +3,7 @@ package hslu.bda.medimemory.entity;
 import android.content.ContentValues;
 
 import hslu.bda.medimemory.contract.DbObject;
+import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
 
 /**
@@ -84,4 +85,24 @@ public class Status implements DbObject{
     public String getPrimaryFieldValue() {
         return String.valueOf(getId());
     }
+
+    public static Status getStatusById(String id, DbAdapter dbAdapter) {
+        Status status = new Status();
+        status.setId(Integer.parseInt(id));
+        ContentValues contentValues = dbAdapter.getByObject(status);
+        if(contentValues!= null) {
+            status = copyContentValuesToObject(contentValues, dbAdapter);
+        }else{status=null;}
+
+        return status;
+    }
+
+    private static Status copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+        Status status = new Status();
+        status.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
+        status.setDescription(contentValues.getAsString(DbHelper.COLUMN_MEDIID));
+        return  status;
+    }
+
+
 }

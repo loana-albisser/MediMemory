@@ -58,10 +58,10 @@ public class DbAdapter {
         ContentValues contentValues = new ContentValues();
 
         if(dbObject.getPrimaryFieldValue()!=null) {
-            String dbQuery = "Select * from " + dbObject.getTableName()+" WHERE " +
-                    dbObject.getPrimaryFieldName() + " =?";
+            String selection = dbObject.getPrimaryFieldName() + " =?";
             String [] args = new String[]{dbObject.getPrimaryFieldValue()};
-            Cursor result = db.rawQuery(dbQuery, args);
+            Cursor result = db.query(dbObject.getTableName(),null,selection,args,null,null
+                    ,dbObject.getPrimaryFieldName());
             if(result.moveToFirst()) {
                 for(int i =0; i<result.getColumnCount(); i++){
                     contentValues.put(result.getColumnName(i), result.getString(i));
@@ -75,9 +75,7 @@ public class DbAdapter {
     public Collection<ContentValues> getAllByTable(String table){
         Collection<ContentValues> allContentValues = new ArrayList<>();;
         try {
-            String selectQuery = "Select * from " + table;
-
-            Cursor result = db.rawQuery(selectQuery, null);
+            Cursor result = db.query(table, null,null, null, null, null, DbHelper.COLUMN_ID);
             if (result.moveToFirst()) {
 
                 do {
@@ -104,4 +102,37 @@ public class DbAdapter {
                 "=" + dbObject.getPrimaryFieldValue(), null)>0;
     }
 
+    public Collection<ContentValues> getAllByTable(String table, String[] selectionField,
+                                                   String[] selectionValue){
+        Collection<ContentValues> allContentValues = new ArrayList<>();
+        try {
+            String selection = null;
+            if(selectionField !=null){
+                selection = "";
+                for (String field:selectionField){
+                    if(selection.length()>0)
+                    {
+                        selection += " AND ";
+                    }
+                    selection +=selection+" =?";
+                }
+            }
+            Cursor result =
+                    db.query(table, null, selection + " =?", selectionValue, null, null,
+                            DbHelper.COLUMN_ID);
+            if (result.moveToFirst()) {
+
+                do {
+                    ContentValues contentValues = new ContentValues();
+                    for (int i = 0; i < result.getColumnCount(); i++) {
+                        contentValues.put(result.getColumnName(i), result.getString(i));
+                    }
+                    allContentValues.add(contentValues);
+                } while (result.moveToNext());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return allContentValues;
+    }
 }
