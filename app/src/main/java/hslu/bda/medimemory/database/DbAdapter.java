@@ -21,7 +21,7 @@ public class DbAdapter {
     public DbAdapter(final Context context) {dbHelper = new DbHelper(context); }
 
     public void open() {
-        if(db == null | !db.isOpen())
+        if(db == null || !db.isOpen())
         {
             db = dbHelper.getWritableDatabase();
         }

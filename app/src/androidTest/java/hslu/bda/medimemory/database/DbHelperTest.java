@@ -17,7 +17,7 @@ public class DbHelperTest extends AndroidTestCase{
         context = new RenamingDelegatingContext(getContext(), "test_");
     }
 
-    public void createTest(){
+    public void testCreateTest(){
         dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         assertTrue(db.isOpen());

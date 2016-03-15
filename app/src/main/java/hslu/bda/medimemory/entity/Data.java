@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+
 import hslu.bda.medimemory.contract.DbObject;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
@@ -16,7 +17,7 @@ import hslu.bda.medimemory.database.DbHelper;
 /**
  * Created by manager on 07.03.2016.
  */
-public class Data implements DbObject{
+public class Data implements DbObject {
 
     private int id;
     private String description;
@@ -146,7 +147,7 @@ public class Data implements DbObject{
         values.put(DbHelper.COLUMN_DESC, getDescription());
         values.put(DbHelper.COLUMN_DURATION, getDuration());
         values.put(DbHelper.COLUMN_AMOUNT, getAmount());
-        values.put(DbHelper.COLUMN_WIDTH, getAmount());
+        values.put(DbHelper.COLUMN_WIDTH, getWidth());
         values.put(DbHelper.COLUMN_LENGTH, getLength());
         values.put(DbHelper.COLUMN_PICTURE, getPicture());
         values.put(DbHelper.COLUMN_CREATEDATE, simpleDateFormat.format(getCreateDate()));
