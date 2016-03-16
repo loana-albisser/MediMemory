@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity{
         }
         getFragmentManager().beginTransaction().replace(R.id.main, fragment, "Fragment_Overview").commit();
 
-        TextView txt_duration = new TextView(this);
         drawer = (DrawerLayout) findViewById(R.id.activity_main);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);

@@ -101,11 +101,11 @@ public class FragmentRegistration extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_registration, container, false);
         setupShowImage();
-        setupDosageNumberPicker();
+        showReminderDetails();
         setDuration();
+        setupDosageNumberPicker();
         setDosage();
         setFoodInstruction();
-        showReminderDetails();
         save();
         return root;
     }
@@ -113,7 +113,6 @@ public class FragmentRegistration extends Fragment {
     private void setupShowImage() {
         Button btn_select = (Button) root.findViewById(R.id.btn_SelectPhoto);
         btn_select.setOnClickListener(new OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 selectImage();
@@ -167,10 +166,8 @@ public class FragmentRegistration extends Fragment {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         assert thumbnail != null;
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-
         File destination = new File(Environment.getExternalStorageDirectory(),
                 System.currentTimeMillis() + ".jpg");
-
         FileOutputStream fo;
         try {
             destination.createNewFile();
@@ -180,7 +177,6 @@ public class FragmentRegistration extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         ivImage.setImageBitmap(thumbnail);
     }
 
@@ -235,9 +231,7 @@ public class FragmentRegistration extends Fragment {
                 }
             }
         });
-
     }
-
 
     public void showReminderDaytimeDialog(){
         daytimes = Arrays.asList(getResources().getStringArray(R.array.array_daytime));
@@ -252,14 +246,11 @@ public class FragmentRegistration extends Fragment {
                         if (isChecked) {
                             if (which == daytimes.indexOf(getString(R.string.morning))) {
                                 checkItems[which] = true;
-                            }
-                            if (which == daytimes.indexOf(getString(R.string.noon))) {
+                            } if (which == daytimes.indexOf(getString(R.string.noon))) {
                                 checkItems[which] = true;
-                            }
-                            if (which == daytimes.indexOf(getString(R.string.evening))) {
+                            } if (which == daytimes.indexOf(getString(R.string.evening))) {
                                 checkItems[which] = true;
-                            }
-                            if (which == daytimes.indexOf(getString(R.string.night))) {
+                            } if (which == daytimes.indexOf(getString(R.string.night))) {
                                 checkItems[which] = true;
                             }
                         }
@@ -303,10 +294,7 @@ public class FragmentRegistration extends Fragment {
                         intervalbuilder.append(getResources().getString(R.string.everyHour));
                     } else if (selectedInterval.equals(getResources().getString(R.string.day))) {
                         intervalbuilder.append(getResources().getString(R.string.everyDay));
-                    }
-                    /*else if (selectedInterval == getResources().getString(R.string.day)) {
-                        intervalbuilder.append(getResources().getString(R.string.everyDay));
-                    }*/else if (selectedInterval.equals(getResources().getString(R.string.week))) {
+                    } else if (selectedInterval.equals(getResources().getString(R.string.week))) {
                         intervalbuilder.append(getResources().getString(R.string.everyWeek));
                     }
                 } else {
@@ -396,7 +384,6 @@ public class FragmentRegistration extends Fragment {
         btn_endtime.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 final StringBuilder endString = new StringBuilder();
                 tp_startEndTimeInterval = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
@@ -422,8 +409,6 @@ public class FragmentRegistration extends Fragment {
 
     private void showTimeDialog(String title){
         final Calendar c = Calendar.getInstance();
-        int selectedHour = c.get(Calendar.HOUR_OF_DAY);
-        int selectedMinute = c.get(Calendar.MINUTE);
         tp_startEndTimeInterval.setTitle(title);
         tp_startEndTimeInterval.show();
     }
@@ -502,8 +487,6 @@ public class FragmentRegistration extends Fragment {
         dialog.show();
     }
 
-
-
     private void setDosage(){
         final ViewGroup ln_dosage = (ViewGroup) root.findViewById(R.id.ln_dosage);
         txt_dosage = new TextView(getActivity());
@@ -557,10 +540,6 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
-
-
-
-
     private void save(){
         Button btn_save = (Button)root.findViewById(R.id.btn_save);
         final RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
@@ -569,54 +548,56 @@ public class FragmentRegistration extends Fragment {
         final RadioButton rd_reminderdaytime = (RadioButton)root.findViewById(R.id.rd_daytime);
         final EditText edit_name = (EditText)root.findViewById(R.id.edit_name);
         final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
-        //alertBuilder.setTitle("Erfassung nicht vollständig!");
-            btn_save.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (edit_name.getText().toString().trim().length() == 0){
-                        alertBuilder.setMessage("Bitte gib einen Namen ein!");
-                        alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-                    } else if (rdg_reminder.getCheckedRadioButtonId() == -1){
-                        alertBuilder.setMessage("Bitte wähle eine Einnahmezeit aus!");
-                        alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-                    } else if (rdg_duration.getCheckedRadioButtonId() == -1){
-                        alertBuilder.setMessage("Bitte wähle eine Dauer der Einnahme aus!");
-                        alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        });
-                    } else if (rd_reminderdaytime.isChecked() &&numberofCheckedItems == 0) {
-                        alertBuilder.setMessage("Bitte wähle mindestens 1 Einnahmezeit aus!");
-                        alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        });
-                    } else if (rd_reminderdaytime.isChecked() && rdg_foodInstruction.getCheckedRadioButtonId() == -1){
-                        alertBuilder.setMessage("Bitte wähle eine Ernährungsanweisung der Einnahme aus!");
-                        alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //cv_reminder.requestFocus();
-                            }
-                        });
-                    } else {
-                        Toast.makeText(getActivity()," Ihr Medikament wurde gespeichert",Toast.LENGTH_LONG).show();
-                    }
+        btn_save.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (edit_name.getText().toString().trim().length() == 0){
+                    alertBuilder.setMessage("Bitte gib einen Namen ein!");
+                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
                     alertBuilder.show();
-                }
-            });
-        }
+                } else if (rdg_reminder.getCheckedRadioButtonId() == -1){
+                    alertBuilder.setMessage("Bitte wähle eine Einnahmezeit aus!");
+                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    alertBuilder.show();
+                } else if (rdg_duration.getCheckedRadioButtonId() == -1){
+                    alertBuilder.setMessage("Bitte wähle eine Dauer der Einnahme aus!");
+                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
+                        }
+                    });
+                    alertBuilder.show();
+                } else if (rd_reminderdaytime.isChecked() &&numberofCheckedItems == 0) {
+                    alertBuilder.setMessage("Bitte wähle mindestens 1 Einnahmezeit aus!");
+                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    alertBuilder.show();
+                } else if (rd_reminderdaytime.isChecked() && rdg_foodInstruction.getCheckedRadioButtonId() == -1){
+                    alertBuilder.setMessage("Bitte wähle eine Ernährungsanweisung der Einnahme aus!");
+                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //cv_reminder.requestFocus();
+                        }
+                    });
+                    alertBuilder.show();
+                } else {
+                    Toast.makeText(getActivity()," Ihr Medikament wurde gespeichert",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
 }
