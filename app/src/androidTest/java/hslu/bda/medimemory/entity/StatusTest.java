@@ -7,15 +7,16 @@ import android.test.RenamingDelegatingContext;
 import hslu.bda.medimemory.database.DbAdapter;
 
 /**
- * Created by manager on 07.03.2016.
+ * Created by Andy on 18.03.2016.
  */
-public class EatTest extends AndroidTestCase {
-    private Eat eat;
+public class StatusTest extends AndroidTestCase {
+
+    private Status status;
     private DbAdapter dbAdapter;
     private Context context;
     private int id = 99;
-    private String desc ="Test Eatpart";
-    private String descUpdated = "Test Eatpart Updated";
+    private String desc ="Test Status";
+    private String descUpdated = "Test Status Updated";
     private int newID = 0;
 
     @Override
@@ -28,25 +29,25 @@ public class EatTest extends AndroidTestCase {
     public void testCRUD(){
 
         //CRUD - TEST CREATED
-        eat = new Eat();
-        eat.setId(id);
-        eat.setDescription(desc);
-        newID = (int) dbAdapter.CreateDbObject(eat);
+        status = new Status();
+        status.setId(id);
+        status.setDescription(desc);
+        newID = (int) dbAdapter.CreateDbObject(status);
         assertTrue(newID > 0);
 
         //CRUD - TEST READ
-        eat = null;
-        eat = Eat.getEatById(String.valueOf(newID), dbAdapter);
-        assertEquals(eat.getDescription(),desc);
+        status = null;
+        status = Status.getStatusById(String.valueOf(newID), dbAdapter);
+        assertEquals(status.getDescription(),desc);
 
 
         //CRUD - TEST UPDATED
-        eat.setDescription(descUpdated);
-        assertTrue(dbAdapter.updateDbObject(eat));
+        status.setDescription(descUpdated);
+        assertTrue(dbAdapter.updateDbObject(status));
 
         //CRUD - TEST DELETED
-        eat = Eat.getEatById(String.valueOf(newID), dbAdapter);
-        assertTrue(dbAdapter.deleteDbObject(eat));
+        status = Status.getStatusById(String.valueOf(newID), dbAdapter);
+        assertTrue(dbAdapter.deleteDbObject(status));
     }
 
     @Override

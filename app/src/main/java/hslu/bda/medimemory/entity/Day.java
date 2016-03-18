@@ -100,7 +100,7 @@ public class Day implements DbObject{
     private static Day copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
         Day day = new Day();
         day.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
-        day.setDescription(contentValues.getAsString(DbHelper.COLUMN_MEDIID));
+        day.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));
         return day;
     }
 }

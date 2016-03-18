@@ -155,6 +155,7 @@ public class DbHelper extends SQLiteOpenHelper{
                 "FOREIGN KEY("+ this.COLUMN_STATUS +") REFERENCES "+
                 this.TABLE_MEDI_STATUS+"("+this.COLUMN_ID+")  ON DELETE SET NULL" +
                 ");";
+        db.execSQL(CREATE_CONSUME_TABLE);
     }
 
     @Override

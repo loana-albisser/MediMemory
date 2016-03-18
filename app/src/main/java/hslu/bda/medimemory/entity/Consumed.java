@@ -77,7 +77,7 @@ public class Consumed implements DbObject {
         final ContentValues values = new ContentValues();
         values.put(DbHelper.COLUMN_ID,getId());
         values.put(DbHelper.COLUMN_MEDIID, getMediid());
-        values.put(DbHelper.COLUMN_POINTINTIME, simpleDateFormat.format(getPointInTime()));
+        values.put(DbHelper.COLUMN_POINTINTIME, simpleDateFormat.format(getPointInTime().getTime()));
         values.put(DbHelper.COLUMN_STATUS, getStatus().getId());
 
         return values;
@@ -98,7 +98,7 @@ public class Consumed implements DbObject {
         return String.valueOf(getId());
     }
 
-    public static Collection<Consumed> getAllConsumedByMedid(DbAdapter dbAdapter, int medid){
+    public static Collection<Consumed> getAllConsumedByMedid(int medid, DbAdapter dbAdapter){
         Collection<Consumed> allConsumed = new ArrayList<Consumed>();
         Collection<ContentValues> allContentValues =
                 dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_CONSUMED,

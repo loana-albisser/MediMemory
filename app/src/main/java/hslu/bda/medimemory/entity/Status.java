@@ -100,7 +100,7 @@ public class Status implements DbObject{
     private static Status copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
         Status status = new Status();
         status.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
-        status.setDescription(contentValues.getAsString(DbHelper.COLUMN_MEDIID));
+        status.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));
         return  status;
     }
 

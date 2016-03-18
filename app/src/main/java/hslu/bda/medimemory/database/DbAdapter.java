@@ -33,18 +33,22 @@ public class DbAdapter {
         db = null;
     }
 
-    public long CreateDbObject(DbObject dbObject) {
+    public int CreateDbObject(DbObject dbObject) {
 
-        long i=-1;
-        if(db.isOpen() && !db.isReadOnly()) {
-            db = dbHelper.getWritableDatabase();
-            try {
-                ContentValues contentValues = dbObject.getContentValues();
-                contentValues.remove(DbHelper.COLUMN_ID);
-                i = db.insert(dbObject.getTableName(), null, contentValues);
-            } catch (Exception e) {
-                e.printStackTrace();
+        int i=-1;
+        try {
+            if (db.isOpen() && !db.isReadOnly()) {
+                db = dbHelper.getWritableDatabase();
+                try {
+                    ContentValues contentValues = dbObject.getContentValues();
+                    contentValues.remove(DbHelper.COLUMN_ID);
+                    i = (int)db.insert(dbObject.getTableName(), null, contentValues);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+        }catch(Exception e){
+            System.out.printf(e.getMessage());
         }
         return i;
     }
@@ -114,12 +118,13 @@ public class DbAdapter {
                     {
                         selection += " AND ";
                     }
-                    selection +=selection+" =?";
+                    selection += field+" =?";
                 }
             }
             Cursor result =
-                    db.query(table, null, selection + " =?", selectionValue, null, null,
+                    db.query(table, null, selection, selectionValue, null, null,
                             DbHelper.COLUMN_ID);
+            int count = result.getCount();
             if (result.moveToFirst()) {
 
                 do {

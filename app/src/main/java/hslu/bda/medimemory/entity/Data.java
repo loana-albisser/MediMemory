@@ -150,7 +150,7 @@ public class Data implements DbObject {
         values.put(DbHelper.COLUMN_WIDTH, getWidth());
         values.put(DbHelper.COLUMN_LENGTH, getLength());
         values.put(DbHelper.COLUMN_PICTURE, getPicture());
-        values.put(DbHelper.COLUMN_CREATEDATE, simpleDateFormat.format(getCreateDate()));
+        values.put(DbHelper.COLUMN_CREATEDATE, simpleDateFormat.format(getCreateDate().getTime()));
         values.put(DbHelper.COLUMN_NOTE, getNote());
         values.put(DbHelper.COLUMN_ACTIVE, getActive());
 
@@ -199,7 +199,7 @@ public class Data implements DbObject {
             data = copyContentValuesToObject(contentValues, dbAdapter);
         }else{data=null;}
 
-        data.setAllConsumed(Consumed.getAllConsumedByMedid(dbAdapter, data.getId()));
+        data.setAllConsumed(Consumed.getAllConsumedByMedid(data.getId(),dbAdapter));
         data.setAllConsumeIndividual(ConsumeIndividual.getAllConsumedByMedid(dbAdapter, data.getId()));
         data.setAllConsumeInterval(ConsumeInterval.getAllConsumedByMedid(dbAdapter, data.getId()));
         return data;

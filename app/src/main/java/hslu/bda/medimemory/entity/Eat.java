@@ -100,7 +100,7 @@ public class Eat implements DbObject{
     private static Eat copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
         Eat eat = new Eat();
         eat.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
-        eat.setDescription(contentValues.getAsString(DbHelper.COLUMN_MEDIID));
+        eat.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));
         return  eat;
     }
 }

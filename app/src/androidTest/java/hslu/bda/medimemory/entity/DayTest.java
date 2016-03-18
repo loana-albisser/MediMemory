@@ -7,10 +7,10 @@ import android.test.RenamingDelegatingContext;
 import hslu.bda.medimemory.database.DbAdapter;
 
 /**
- * Created by manager on 07.03.2016.
+ * Created by Andy on 18.03.2016.
  */
-public class EatTest extends AndroidTestCase {
-    private Eat eat;
+public class DayTest extends AndroidTestCase {
+    private Day day;
     private DbAdapter dbAdapter;
     private Context context;
     private int id = 99;
@@ -28,25 +28,25 @@ public class EatTest extends AndroidTestCase {
     public void testCRUD(){
 
         //CRUD - TEST CREATED
-        eat = new Eat();
-        eat.setId(id);
-        eat.setDescription(desc);
-        newID = (int) dbAdapter.CreateDbObject(eat);
+        day = new Day();
+        day.setId(id);
+        day.setDescription(desc);
+        newID = (int) dbAdapter.CreateDbObject(day);
         assertTrue(newID > 0);
 
         //CRUD - TEST READ
-        eat = null;
-        eat = Eat.getEatById(String.valueOf(newID), dbAdapter);
-        assertEquals(eat.getDescription(),desc);
+        day = null;
+        day = Day.getDayById(String.valueOf(newID), dbAdapter);
+        assertEquals(day.getDescription(),desc);
 
 
         //CRUD - TEST UPDATED
-        eat.setDescription(descUpdated);
-        assertTrue(dbAdapter.updateDbObject(eat));
+        day.setDescription(descUpdated);
+        assertTrue(dbAdapter.updateDbObject(day));
 
         //CRUD - TEST DELETED
-        eat = Eat.getEatById(String.valueOf(newID), dbAdapter);
-        assertTrue(dbAdapter.deleteDbObject(eat));
+        day = Day.getDayById(String.valueOf(newID), dbAdapter);
+        assertTrue(dbAdapter.deleteDbObject(day));
     }
 
     @Override
