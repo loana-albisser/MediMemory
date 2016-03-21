@@ -140,4 +140,18 @@ public class DbAdapter {
         }
         return allContentValues;
     }
+
+    public void startTransaction(){
+        db.beginTransaction();
+    }
+
+    public void endTransaction(){
+        db.endTransaction();
+    }
+
+    public void setTransactionSuccessful(){
+        db.setTransactionSuccessful();
+    }
+
+
 }
