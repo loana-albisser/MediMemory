@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 
 import hslu.bda.medimemory.contract.DbObject;
@@ -200,8 +199,8 @@ public class Data implements DbObject {
         }else{data=null;}
 
         data.setAllConsumed(Consumed.getAllConsumedByMedid(data.getId(),dbAdapter));
-        data.setAllConsumeIndividual(ConsumeIndividual.getAllConsumedByMedid(dbAdapter, data.getId()));
-        data.setAllConsumeInterval(ConsumeInterval.getAllConsumedByMedid(dbAdapter, data.getId()));
+        data.setAllConsumeIndividual(ConsumeIndividual.getAllConsumeIndividualByMedid(data.getId(),dbAdapter));
+        data.setAllConsumeInterval(ConsumeInterval.getAllConsumeIntervalByMedid(data.getId(), dbAdapter));
         return data;
     }
 }

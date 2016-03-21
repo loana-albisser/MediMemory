@@ -129,7 +129,7 @@ public class ConsumeInterval implements DbObject{
         return String.valueOf(getId());
     }
 
-    public static Collection<ConsumeInterval> getAllConsumedByMedid(DbAdapter dbAdapter, int medid){
+    public static Collection<ConsumeInterval> getAllConsumeIntervalByMedid(int medid, DbAdapter dbAdapter){
         Collection<ConsumeInterval> allConsumeInterval = new ArrayList<ConsumeInterval>();
         Collection<ContentValues> allContentValues =
                 dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_CONSINTER,

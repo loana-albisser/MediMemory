@@ -110,12 +110,13 @@ public class DbHelper extends SQLiteOpenHelper{
                 this.COLUMN_EATPART + " INTEGER, "+
                 this.COLUMN_DAYPART + " INTEGER, "+
                 "FOREIGN KEY("+ this.COLUMN_EATPART +") REFERENCES "+
-                this.TABLE_MEDI_EAT+"("+this.COLUMN_ID+")  ON DELETE CASCADE"+
+                this.TABLE_MEDI_EAT+"("+this.COLUMN_ID+")  ON DELETE CASCADE "+
                 "FOREIGN KEY("+ this.COLUMN_MEDIID +") REFERENCES "+
-                this.TABLE_MEDI_DATA+"("+this.COLUMN_ID+")  ON DELETE CASCADE"+
+                this.TABLE_MEDI_DATA+"("+this.COLUMN_ID+")  ON DELETE CASCADE "+
                 "FOREIGN KEY("+ this.COLUMN_DAYPART +") REFERENCES "+
-                this.TABLE_MEDI_DAY+"("+this.COLUMN_ID+")  ON DELETE CASCADE"+
+                this.TABLE_MEDI_DAY+"("+this.COLUMN_ID+")  ON DELETE CASCADE "+
                 ");";
+        db.execSQL(CREATE_ConsIndiv_TABLE);
     }
 
     public void createConsumeIntervalTable(SQLiteDatabase db){
@@ -129,6 +130,7 @@ public class DbHelper extends SQLiteOpenHelper{
                 "FOREIGN KEY("+ this.COLUMN_MEDIID +") REFERENCES "+
                 this.TABLE_MEDI_DATA+"("+this.COLUMN_ID+")  ON DELETE CASCADE"+
                 ");";
+        db.execSQL(CREATE_ConsInt_TABLE);
     }
 
     private void createStatusTable(SQLiteDatabase db) {

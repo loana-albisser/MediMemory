@@ -33,7 +33,7 @@ public class DbAdapter {
         db = null;
     }
 
-    public int CreateDbObject(DbObject dbObject) {
+    public int createDbObject(DbObject dbObject) {
 
         int i=-1;
         try {

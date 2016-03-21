@@ -104,7 +104,7 @@ public class ConsumeIndividual implements DbObject {
         return String.valueOf(getId());
     }
 
-    public static Collection<ConsumeIndividual> getAllConsumedByMedid(DbAdapter dbAdapter, int medid){
+    public static Collection<ConsumeIndividual> getAllConsumeIndividualByMedid(int medid, DbAdapter dbAdapter){
         Collection<ConsumeIndividual> allConsumeIndividuals = new ArrayList<ConsumeIndividual>();
         Collection<ContentValues> allContentValues =
                 dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_CONSINDIV,

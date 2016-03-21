@@ -31,7 +31,7 @@ public class DayTest extends AndroidTestCase {
         day = new Day();
         day.setId(id);
         day.setDescription(desc);
-        newID = (int) dbAdapter.CreateDbObject(day);
+        newID = (int) dbAdapter.createDbObject(day);
         assertTrue(newID > 0);
 
         //CRUD - TEST READ

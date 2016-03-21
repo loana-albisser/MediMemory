@@ -32,7 +32,7 @@ public class StatusTest extends AndroidTestCase {
         status = new Status();
         status.setId(id);
         status.setDescription(desc);
-        newID = (int) dbAdapter.CreateDbObject(status);
+        newID = (int) dbAdapter.createDbObject(status);
         assertTrue(newID > 0);
 
         //CRUD - TEST READ

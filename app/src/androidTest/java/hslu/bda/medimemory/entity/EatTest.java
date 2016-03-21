@@ -31,7 +31,7 @@ public class EatTest extends AndroidTestCase {
         eat = new Eat();
         eat.setId(id);
         eat.setDescription(desc);
-        newID = (int) dbAdapter.CreateDbObject(eat);
+        newID = (int) dbAdapter.createDbObject(eat);
         assertTrue(newID > 0);
 
         //CRUD - TEST READ
