@@ -75,7 +75,13 @@ public class CreateMediServiceTest extends AndroidTestCase {
     }
 
     public void testMediCreateFails(){
-
+        try {
+            newID = CreateMediService.addNewMedi(data, dbAdapter);
+        }catch (Throwable e){
+            e.printStackTrace();
+            assertTrue(false);
+        }
+        assertFalse(newID>0);
     }
 
     @Override
