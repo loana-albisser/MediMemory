@@ -2,6 +2,8 @@ package hslu.bda.medimemory.entity;
 
 import android.content.ContentValues;
 
+import java.util.Collection;
+
 import hslu.bda.medimemory.contract.DbObject;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
@@ -91,13 +93,28 @@ public class Status implements DbObject{
         status.setId(Integer.parseInt(id));
         ContentValues contentValues = dbAdapter.getByObject(status);
         if(contentValues!= null) {
-            status = copyContentValuesToObject(contentValues, dbAdapter);
+            status = copyContentValuesToObject(contentValues);
         }else{status=null;}
 
         return status;
     }
 
-    private static Status copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+    public static Collection<Status> getAllStatusValues(DbAdapter dbAdapter){
+        Collection<Status> allStatusValues =null;
+        try{
+            Collection<ContentValues> allContentValues = dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_STATUS);
+            for(ContentValues contentValues : allContentValues){
+                Status status = copyContentValuesToObject(contentValues);
+                allStatusValues.add(status);
+            }
+        }catch (Exception e){
+            System.console().printf(e.getMessage());
+        }
+
+        return allStatusValues;
+    }
+
+    private static Status copyContentValuesToObject(ContentValues contentValues) {
         Status status = new Status();
         status.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
         status.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));

@@ -2,6 +2,9 @@ package hslu.bda.medimemory.entity;
 
 import android.content.ContentValues;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import hslu.bda.medimemory.contract.DbObject;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
@@ -91,13 +94,28 @@ public class Day implements DbObject{
         day.setId(Integer.parseInt(id));
         ContentValues contentValues = dbAdapter.getByObject(day);
         if(contentValues!= null) {
-            day = copyContentValuesToObject(contentValues, dbAdapter);
+            day = copyContentValuesToObject(contentValues);
         }else{day=null;}
 
         return day;
     }
 
-    private static Day copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+    public static Collection<Day> getAllDayValues(DbAdapter dbAdapter){
+        Collection<Day> allDayValues =null;
+        try{
+            Collection<ContentValues> allContentValues = dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_DAY);
+            for(ContentValues contentValues : allContentValues){
+                Day day = copyContentValuesToObject(contentValues);
+                allDayValues.add(day);
+            }
+        }catch (Exception e){
+            System.console().printf(e.getMessage());
+        }
+
+        return allDayValues;
+    }
+
+    private static Day copyContentValuesToObject(ContentValues contentValues) {
         Day day = new Day();
         day.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
         day.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));

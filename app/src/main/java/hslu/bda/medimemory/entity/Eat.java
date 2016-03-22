@@ -2,6 +2,8 @@ package hslu.bda.medimemory.entity;
 
 import android.content.ContentValues;
 
+import java.util.Collection;
+
 import hslu.bda.medimemory.contract.DbObject;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
@@ -91,13 +93,28 @@ public class Eat implements DbObject{
         eat.setId(Integer.parseInt(id));
         ContentValues contentValues = dbAdapter.getByObject(eat);
         if(contentValues!= null) {
-            eat = copyContentValuesToObject(contentValues, dbAdapter);
+            eat = copyContentValuesToObject(contentValues);
         }else{eat=null;}
 
         return eat;
     }
 
-    private static Eat copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+    public static Collection<Eat> getAllEatValues(DbAdapter dbAdapter){
+        Collection<Eat> allEatValues =null;
+        try{
+            Collection<ContentValues> allContentValues = dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_EAT);
+            for(ContentValues contentValues : allContentValues){
+                Eat eat = copyContentValuesToObject(contentValues);
+                allEatValues.add(eat);
+            }
+        }catch (Exception e){
+            System.console().printf(e.getMessage());
+        }
+
+        return allEatValues;
+    }
+
+    private static Eat copyContentValuesToObject(ContentValues contentValues) {
         Eat eat = new Eat();
         eat.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
         eat.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));
