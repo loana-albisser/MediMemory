@@ -49,6 +49,9 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import hslu.bda.medimemory.R;
+import hslu.bda.medimemory.database.DbAdapter;
+import hslu.bda.medimemory.entity.Data;
+import hslu.bda.medimemory.services.CreateMediService;
 
 /**
  * Created by Loana on 29.02.2016.
@@ -88,12 +91,14 @@ public class FragmentRegistration extends Fragment {
     private NumberPicker np_dosage;
 
     private TextView txt_foodInstruction = null;
+    private DbAdapter dbAdapter;
 
     public FragmentRegistration() {
         calendar = Calendar.getInstance();
         selectedYear = calendar.get(Calendar.YEAR);
         selectedMonth = calendar.get(Calendar.MONTH);
         selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
+        dbAdapter= new DbAdapter(getActivity().getApplicationContext());
     }
 
 
