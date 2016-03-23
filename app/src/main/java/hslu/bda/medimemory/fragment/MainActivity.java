@@ -13,7 +13,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import hslu.bda.medimemory.R;
 
@@ -24,12 +23,14 @@ public class MainActivity extends AppCompatActivity{
     private FragmentRegistration fragmentRegistration;
     private FloatingActionButton fab;
     private NavigationView nvDrawer;
+    private int currentMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         fab =(FloatingActionButton)findViewById(R.id.fab);
         fab.hide();
         setSupportActionBar(toolbar);
@@ -76,6 +77,10 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
+    public FloatingActionButton getFab(){
+        return fab;
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.activity_main);
@@ -111,8 +116,6 @@ public class MainActivity extends AppCompatActivity{
         fragmentRegistration.showDateDialog();
     }
 
-
-
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -137,6 +140,10 @@ public class MainActivity extends AppCompatActivity{
                 });
     }
 
+    public int getCurrentMenuItem(){
+        return currentMenuItem;
+    }
+
     private void selectDrawerItem(MenuItem menuItem) {
         Fragment fragment = null;
         FragmentManager fragmentManager = getFragmentManager();
@@ -145,26 +152,31 @@ public class MainActivity extends AppCompatActivity{
                 fragment = new FragmentOverview();
                 fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Overview").commit();
                 fab.show();
+                currentMenuItem = R.id.nav_list;
                 break;
             case R.id.nav_registration:
                 fragmentRegistration = new FragmentRegistration();
-                fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration ,"Fragment_Registration").commit();
+                fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
                 fab.hide();
+                currentMenuItem = R.id.nav_registration;
                 break;
             case R.id.nav_edit:
                 fragment = new FragmentEdit();
                 fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Edit").commit();
                 fab.show();
+                currentMenuItem = R.id.nav_edit;
                 break;
             case R.id.nav_settings:
                 fragment = new FragmentSettings();
                 fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Settings").commit();
                 fab.show();
+                currentMenuItem = R.id.nav_settings;
                 break;
             case R.id.nav_help:
                 fragment = new FragmentHelp();
                 fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Help").commit();
                 fab.show();
+                currentMenuItem = R.id.nav_help;
                 break;
         }
 

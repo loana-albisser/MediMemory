@@ -19,5 +19,6 @@
     <string name="btn_mediSafe">Save</string>
     <string name="title_intervalDialog">Wie oft möchten Sie das Medikament einnehmen?</string>
     <string name="d_per">mal pro</string>
+    <string name="btn_delete">Löschen</string>
 
 </resources>

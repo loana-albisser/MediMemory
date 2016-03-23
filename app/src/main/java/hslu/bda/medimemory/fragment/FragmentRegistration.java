@@ -16,6 +16,7 @@ import android.provider.MediaStore;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,9 +32,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
@@ -50,7 +53,11 @@ import android.widget.Toast;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
+import hslu.bda.medimemory.entity.ConsumeIndividual;
+import hslu.bda.medimemory.entity.ConsumeInterval;
 import hslu.bda.medimemory.entity.Data;
+import hslu.bda.medimemory.entity.Day;
+import hslu.bda.medimemory.entity.Eat;
 import hslu.bda.medimemory.services.CreateMediService;
 
 /**
@@ -58,9 +65,11 @@ import hslu.bda.medimemory.services.CreateMediService;
  */
 public class FragmentRegistration extends Fragment {
     private ViewGroup root;
+    private EditText edit_name;
     private final int REQUEST_CAMERA = 0;
     private final int SELECT_FILE = 1;
     private ImageView ivImage;
+    private String imagePath;
 
     private TextView txt_reminder;
     private View dialogView;
@@ -72,12 +81,15 @@ public class FragmentRegistration extends Fragment {
     private TimePickerDialog tp_startEndTimeInterval;
     private StringBuilder daytimebuilder;
     private List<String> daytimes;
+    private SimpleDateFormat startTime;
+    private Date startTimeDate;
+    private SimpleDateFormat endTime;
     private NumberPicker np_reminderInterval;
     private StringBuilder intervalbuilder;
     private int selectedValue = 1;
     private String selectedInterval;
     private CardView cv_foodInstruction;
-
+    private RadioGroup radioGroupDuration;
     private TextView txt_duration = null;
     private StringBuilder numberOfBlisterString;
     private final Calendar calendar;
@@ -93,18 +105,23 @@ public class FragmentRegistration extends Fragment {
     private TextView txt_foodInstruction = null;
     private DbAdapter dbAdapter;
 
+    private RadioGroup rdg_foodInstruction;
+    private SimpleDateFormat endDate;
+
+    private EditText edit_notes;
+
     public FragmentRegistration() {
         calendar = Calendar.getInstance();
         selectedYear = calendar.get(Calendar.YEAR);
         selectedMonth = calendar.get(Calendar.MONTH);
         selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
-        dbAdapter= new DbAdapter(getActivity().getApplicationContext());
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_registration, container, false);
+        dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         setupShowImage();
         showReminderDetails();
         setDuration();
@@ -112,7 +129,30 @@ public class FragmentRegistration extends Fragment {
         setDosage();
         setFoodInstruction();
         save();
+        showDeleteButtonVisibility();
         return root;
+    }
+
+
+
+
+    public void showDeleteButtonVisibility(){
+        Button btn_delete = (Button)root.findViewById(R.id.btn_delete);
+        if (((MainActivity)getActivity()).getCurrentMenuItem() == R.id.nav_registration){
+            btn_delete.setVisibility(View.GONE);
+        } else if (((MainActivity)getActivity()).getCurrentMenuItem() == R.id.nav_edit){
+            btn_delete.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private String getName(){
+        edit_name = (EditText) root.findViewById(R.id.edit_name);
+        Log.i("Name", String.valueOf(edit_name.getText()));
+        return String.valueOf(edit_name.getText());
+    }
+
+    public void setName(String name){
+        edit_name.setText(name);
     }
 
     private void setupShowImage() {
@@ -124,6 +164,7 @@ public class FragmentRegistration extends Fragment {
             }
         });
         ivImage = (ImageView) root.findViewById(R.id.iv_Image);
+
     }
 
     private void selectImage() {
@@ -159,10 +200,12 @@ public class FragmentRegistration extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == SELECT_FILE)
+            if (requestCode == SELECT_FILE) {
                 onSelectFromGalleryResult(data);
-            else if (requestCode == REQUEST_CAMERA)
+            } else if (requestCode == REQUEST_CAMERA){
                 onCaptureImageResult(data);
+            }
+            getPicturePath();
         }
     }
 
@@ -171,8 +214,8 @@ public class FragmentRegistration extends Fragment {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         assert thumbnail != null;
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-        File destination = new File(Environment.getExternalStorageDirectory(),
-                System.currentTimeMillis() + ".jpg");
+        File destination = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
+        imagePath = destination.toString();
         FileOutputStream fo;
         try {
             destination.createNewFile();
@@ -192,13 +235,12 @@ public class FragmentRegistration extends Fragment {
         assert cursor != null;
         int column_index = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
         cursor.moveToFirst();
-
-        String selectedImagePath = cursor.getString(column_index);
+        imagePath = cursor.getString(column_index);
         cursor.close();
         Bitmap bm;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(selectedImagePath, options);
+        BitmapFactory.decodeFile(imagePath, options);
         final int REQUIRED_SIZE = 200;
         int scale = 1;
         while (options.outWidth / scale / 2 >= REQUIRED_SIZE
@@ -206,9 +248,14 @@ public class FragmentRegistration extends Fragment {
             scale *= 2;
         options.inSampleSize = scale;
         options.inJustDecodeBounds = false;
-        bm = BitmapFactory.decodeFile(selectedImagePath, options);
+        bm = BitmapFactory.decodeFile(imagePath, options);
 
         ivImage.setImageBitmap(bm);
+    }
+
+    private String getPicturePath(){
+        Log.i("Name", imagePath);
+        return imagePath;
     }
 
     private void showInfoTextField(TextView textView, ViewGroup viewGroup) {
@@ -251,11 +298,14 @@ public class FragmentRegistration extends Fragment {
                         if (isChecked) {
                             if (which == daytimes.indexOf(getString(R.string.morning))) {
                                 checkItems[which] = true;
-                            } if (which == daytimes.indexOf(getString(R.string.noon))) {
+                            }
+                            if (which == daytimes.indexOf(getString(R.string.noon))) {
                                 checkItems[which] = true;
-                            } if (which == daytimes.indexOf(getString(R.string.evening))) {
+                            }
+                            if (which == daytimes.indexOf(getString(R.string.evening))) {
                                 checkItems[which] = true;
-                            } if (which == daytimes.indexOf(getString(R.string.night))) {
+                            }
+                            if (which == daytimes.indexOf(getString(R.string.night))) {
                                 checkItems[which] = true;
                             }
                         }
@@ -378,7 +428,12 @@ public class FragmentRegistration extends Fragment {
                 tp_startEndTimeInterval = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        startString.append(new DecimalFormat("00").format(hourOfDay)).append(":").append(new DecimalFormat("00").format(minute));
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        startTime = new SimpleDateFormat("kk:mm");
+                        startTimeDate = calendar.getTime();
+                        String timeString = startTime.format(calendar.getTime());
+                        startString.append(timeString);
                         btn_starttime.setText(startString);
                     }
                 }, 0, 0, true);
@@ -393,7 +448,11 @@ public class FragmentRegistration extends Fragment {
                 tp_startEndTimeInterval = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        endString.append(new DecimalFormat("00").format(hourOfDay)).append(":").append(new DecimalFormat("00").format(minute));
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        SimpleDateFormat endTime = new SimpleDateFormat("kk:mm");
+                        String timeString = endTime.format(calendar.getTime());
+                        endString.append(timeString);
                         btn_endtime.setText(endString);
                     }
                 }, 23, 59, true);
@@ -413,18 +472,54 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void showTimeDialog(String title){
-        final Calendar c = Calendar.getInstance();
         tp_startEndTimeInterval.setTitle(title);
         tp_startEndTimeInterval.show();
     }
 
+    private Day getDaypart(){
+        return null;
+    }
+
+    private int getIntervalValue(){
+        NumberPicker np_reminderInterval = (NumberPicker)root.findViewById(R.id.np_reminderInterval);
+        return np_reminderInterval.getValue();
+    }
+
+    private Object getInterval(){
+        Spinner sp_reminderInterval = (Spinner)root.findViewById(R.id.sp_reminderInterval);
+        return sp_reminderInterval.getSelectedItem();
+    }
+
+    private Date getStartTime(){
+        return startTimeDate;
+    }
+
+    private SimpleDateFormat getEndTime(){
+        return endTime;
+    }
+
+    private Collection<ConsumeInterval> getReminderInterval(){
+        ConsumeInterval consumeInterval = new ConsumeInterval();
+        /*consumeInterval.setStartTime(getStartTime());
+        consumeInterval.setEndTime(getEndTime());
+        consumeInterval.setInterval(getInterval());*/
+        return null;
+    }
+
+    private Collection<ConsumeIndividual> getReminderDayTime(){
+        ConsumeIndividual consumeIndividual = new ConsumeIndividual();
+        consumeIndividual.setEatpart(getFoodInstruction());
+        consumeIndividual.setDaypart(getDaypart());
+        return null;
+    }
+
     private void setDuration() {
-        RadioGroup radioGroup = (RadioGroup)root.findViewById(R.id.rdg_duration);
+        radioGroupDuration = (RadioGroup)root.findViewById(R.id.rdg_duration);
         final LinearLayout ln_duration = (LinearLayout) root.findViewById(R.id.ln_duration);
         txt_duration = new TextView(getActivity());
         showInfoTextField(txt_duration, ln_duration);
         txt_duration.setVisibility(View.GONE);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        radioGroupDuration.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 StringBuilder durationString = new StringBuilder();
@@ -437,6 +532,42 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
+    private long getSelectedDate(){
+        Log.i("Selected Date", String.valueOf(calendar.getTimeInMillis()));
+        return calendar.getTimeInMillis();
+
+    }
+
+    private long getCurrentSystemTime(){
+        Calendar currentDateCal = Calendar.getInstance();
+        long currentDate = currentDateCal.getTimeInMillis();
+        Log.i("Current Date", String.valueOf(currentDate));
+        return currentDate;
+    }
+
+    private int calculateDays(){
+        int days = ((int)getSelectedDate()/(24*60*60*1000))-((int)getCurrentSystemTime()/(24*60*60*1000));
+        Log.i("Number Of Days", String.valueOf(days));
+        return days;
+    }
+
+    private int getDuration(){
+        int numberOfIntakes = -1;
+        RadioButton rd_numberOfDays = (RadioButton)root.findViewById(R.id.rd_numberOfDays);
+        RadioButton rd_always = (RadioButton)root.findViewById(R.id.rd_always);
+        RadioButton rd_packageEnd = (RadioButton)root.findViewById(R.id.rd_packageEnd);
+        if (rd_numberOfDays.isChecked()){
+
+        } else if (rd_always.isChecked()){
+            numberOfIntakes = -1;
+        } else if (rd_packageEnd.isChecked()){
+            int numberOFBlisters = np_numberofBlisters.getValue();
+            //// TODO: 23.03.2016 abrunden 
+            //numberOfIntakes = (getReminderTime())/numberOFBlisters;
+        }
+        return numberOfIntakes;
+    }
+
     public void setCurrentNumberOfBlistersValue(){
         np_numberofBlisters.setValue(numberOfBlisters);
     }
@@ -446,9 +577,15 @@ public class FragmentRegistration extends Fragment {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 StringBuilder numDaysString = new StringBuilder();
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, monthOfYear);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                endDate = new SimpleDateFormat("dd.MM.yyyy");
+                String dateString = endDate.format(calendar.getTime());
                 monthOfYear = monthOfYear+1;
                 numDaysString.append(getResources().getString(R.string.taking)).append(" ");
-                numDaysString.append(getResources().getString(R.string.till)).append(" ").append(dayOfMonth).append(".").append(monthOfYear).append(".").append(year);
+
+                numDaysString.append(dateString);
                 txt_duration.setText(numDaysString);
                 selectedYear = year;
                 selectedMonth = monthOfYear-1;
@@ -513,6 +650,14 @@ public class FragmentRegistration extends Fragment {
         showInfoTextField(txt_dosage, ln_dosage);
     }
 
+    private int getDosage(){
+        return np_dosage.getValue();
+    }
+
+    private void setDosage(int value){
+        np_dosage.setValue(value);
+    }
+
     private void setupDosageNumberPicker(){
         np_dosage = (NumberPicker)root.findViewById(R.id.np_dosage);
         np_dosage.setMinValue(1);
@@ -521,12 +666,31 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void setFoodInstruction(){
-        RadioGroup radioGroup = (RadioGroup)root.findViewById(R.id.rdg_foodInstruction);
+        rdg_foodInstruction = (RadioGroup)root.findViewById(R.id.rdg_foodInstruction);
         final ViewGroup ln_foodInstruction = (ViewGroup)root.findViewById(R.id.ln_foodInstruction);
+        LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT);
         txt_foodInstruction = new TextView(getActivity());
         txt_foodInstruction.setVisibility(View.GONE);
         showInfoTextField(txt_foodInstruction, ln_foodInstruction);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        //ArrayList<Eat> allFoodI = new ArrayList<>(Eat.getAllEatValues(dbAdapter));
+        /*Iterator<Eat> iterator = getAllEatValues(dbAdapter).iterator();
+        while(iterator.hasNext()){
+            Eat elem = iterator.next();
+            String description = elem.getDescription();
+            RadioButton newRd = new RadioButton(getActivity());
+            newRd.setText(description);
+            newRd.setId(elem.getId());
+            radioGroup.addView(newRd, layoutParams);
+        }*/
+        for (Eat elem: Eat.getAllEatValues(dbAdapter)){
+            String description = elem.getDescription();
+            RadioButton newRD = new RadioButton(getActivity());
+            newRD.setText(description);
+            rdg_foodInstruction.addView(newRD, layoutParams);
+        }
+
+
+        /*radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 StringBuilder eatString = new StringBuilder();
@@ -542,7 +706,21 @@ public class FragmentRegistration extends Fragment {
                     txt_foodInstruction.setText(eatString);
                 }
             }
-        });
+        });*/
+    }
+
+
+    private Eat getFoodInstruction(){
+        return Eat.getEatById(String.valueOf(rdg_foodInstruction.getCheckedRadioButtonId()), dbAdapter);
+    }
+
+    private String getNotes(){
+        edit_notes = (EditText)root.findViewById(R.id.edit_notes);
+        return String.valueOf(edit_notes.getText());
+    }
+
+    private void setNotes(String text){
+        edit_notes.setText(text);
     }
 
     private void save(){
@@ -556,7 +734,7 @@ public class FragmentRegistration extends Fragment {
         btn_save.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (edit_name.getText().toString().trim().length() == 0){
+                if (edit_name.getText().toString().trim().length() == 0) {
                     alertBuilder.setMessage("Bitte gib einen Namen ein!");
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
@@ -564,7 +742,7 @@ public class FragmentRegistration extends Fragment {
                         }
                     });
                     alertBuilder.show();
-                } else if (rdg_reminder.getCheckedRadioButtonId() == -1){
+                } else if (rdg_reminder.getCheckedRadioButtonId() == -1) {
                     alertBuilder.setMessage("Bitte wähle eine Einnahmezeit aus!");
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
@@ -572,7 +750,7 @@ public class FragmentRegistration extends Fragment {
                         }
                     });
                     alertBuilder.show();
-                } else if (rdg_duration.getCheckedRadioButtonId() == -1){
+                } else if (rdg_duration.getCheckedRadioButtonId() == -1) {
                     alertBuilder.setMessage("Bitte wähle eine Dauer der Einnahme aus!");
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
@@ -581,7 +759,7 @@ public class FragmentRegistration extends Fragment {
                         }
                     });
                     alertBuilder.show();
-                } else if (rd_reminderdaytime.isChecked() &&numberofCheckedItems == 0) {
+                } else if (rd_reminderdaytime.isChecked() && numberofCheckedItems == 0) {
                     alertBuilder.setMessage("Bitte wähle mindestens 1 Einnahmezeit aus!");
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
@@ -590,7 +768,7 @@ public class FragmentRegistration extends Fragment {
                         }
                     });
                     alertBuilder.show();
-                } else if (rd_reminderdaytime.isChecked() && rdg_foodInstruction.getCheckedRadioButtonId() == -1){
+                } else if (rd_reminderdaytime.isChecked() && rdg_foodInstruction.getCheckedRadioButtonId() == -1) {
                     alertBuilder.setMessage("Bitte wähle eine Ernährungsanweisung der Einnahme aus!");
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
@@ -600,9 +778,33 @@ public class FragmentRegistration extends Fragment {
                     });
                     alertBuilder.show();
                 } else {
-                    Toast.makeText(getActivity()," Ihr Medikament wurde gespeichert",Toast.LENGTH_LONG).show();
+                    //saveDatatoDB();
+                    Toast.makeText(getActivity(), " Ihr Medikament wurde gespeichert", Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
+
+    private void saveDatatoDB(){
+        RadioButton rd_reminderDayTime = (RadioButton)root.findViewById(R.id.rd_daytime);
+        Data data = new Data();
+        data.setDescription(getName());
+        data.setPicture(getPicturePath());
+        if (rd_reminderInterval.isChecked()){
+            data.setAllConsumeIndividual(getReminderDayTime());
+
+        } else if (rd_reminderDayTime.isChecked()){
+            data.setAllConsumeInterval(getReminderInterval());
+        }
+        data.setDuration(getDuration());
+        data.setAmount(getDosage());
+        data.setNote(getNotes());
+        try {
+            CreateMediService.addNewMedi(data, dbAdapter);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+
 }
