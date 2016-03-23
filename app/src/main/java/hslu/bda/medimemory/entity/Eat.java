@@ -2,6 +2,7 @@ package hslu.bda.medimemory.entity;
 
 import android.content.ContentValues;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import hslu.bda.medimemory.contract.DbObject;
@@ -100,7 +101,7 @@ public class Eat implements DbObject{
     }
 
     public static Collection<Eat> getAllEatValues(DbAdapter dbAdapter){
-        Collection<Eat> allEatValues =null;
+        Collection<Eat> allEatValues = new ArrayList<Eat>();
         try{
             Collection<ContentValues> allContentValues = dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_EAT);
             for(ContentValues contentValues : allContentValues){
