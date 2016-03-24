@@ -121,4 +121,9 @@ public class Day implements DbObject{
         day.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));
         return day;
     }
+
+    @Override
+    public String toString(){
+        return this.getDescription();
+    }
 }

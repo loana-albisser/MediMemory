@@ -33,10 +33,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
@@ -50,6 +52,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import com.google.common.collect.Iterables;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
@@ -75,12 +79,13 @@ public class FragmentRegistration extends Fragment {
     private View dialogView;
     private int selectedIntervalPosition;
     private final boolean [] checkItems = {false,false,false,false};
+    private ArrayList<Integer> selList = new ArrayList<Integer>();
     private Spinner sp_reminderInterval;
     private int numberofCheckedItems;
     private RadioButton rd_reminderInterval;
     private TimePickerDialog tp_startEndTimeInterval;
     private StringBuilder daytimebuilder;
-    private List<String> daytimes;
+    private CharSequence[] daytimes;
     private SimpleDateFormat startTime;
     private Date startTimeDate;
     private SimpleDateFormat endTime;
@@ -110,6 +115,9 @@ public class FragmentRegistration extends Fragment {
 
     private EditText edit_notes;
 
+    private Collection<Day> allDayTimes;
+    private Collection<Day> selectedDayTimes = new ArrayList<Day>();
+
     public FragmentRegistration() {
         calendar = Calendar.getInstance();
         selectedYear = calendar.get(Calendar.YEAR);
@@ -122,6 +130,7 @@ public class FragmentRegistration extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_registration, container, false);
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
+        dbAdapter.open();
         setupShowImage();
         showReminderDetails();
         setDuration();
@@ -131,6 +140,12 @@ public class FragmentRegistration extends Fragment {
         save();
         showDeleteButtonVisibility();
         return root;
+    }
+
+    @Override
+    public void onStop(){
+        dbAdapter.close();
+        super.onStop();
     }
 
 
@@ -285,6 +300,7 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
+    /*
     public void showReminderDaytimeDialog(){
         daytimes = Arrays.asList(getResources().getStringArray(R.array.array_daytime));
         daytimebuilder = new StringBuilder();
@@ -329,8 +345,48 @@ public class FragmentRegistration extends Fragment {
         });
         Dialog dialog = reminderDaytimeDialog.create();
         dialog.show();
-    }
+    }*/
 
+    public void showReminderDaytimeDialog(){
+        selList = new ArrayList<Integer>();
+        allDayTimes = Day.getAllDayValues(dbAdapter);
+        ArrayList<String> strDayTimes = new ArrayList<String>();
+        for(Day day:allDayTimes){
+            strDayTimes.add(day.getDescription());
+        }
+        daytimes = strDayTimes.toArray(new CharSequence[allDayTimes.size()]);
+        daytimebuilder = new StringBuilder();
+        AlertDialog.Builder reminderDaytimeDialog = new AlertDialog.Builder(getActivity());
+        daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
+        reminderDaytimeDialog.setCancelable(false);
+        reminderDaytimeDialog.setTitle(getResources().getString(R.string.title_reminderDaytime));
+        reminderDaytimeDialog.setMultiChoiceItems(daytimes, null, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            selList.add(which);
+                        }
+                        else if(selList.contains(which)){
+                            selList.remove(which);
+                        }
+                    }
+                }
+        );
+        reminderDaytimeDialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                for(int id : selList){
+                    selectedDayTimes.add(Iterables.get(allDayTimes,id));
+                    daytimebuilder.append(daytimes[id]).append(" ");
+                }
+                if (selectedDayTimes.size()> 0) {
+                    txt_reminder.setText(daytimebuilder);
+                }
+            }
+        });
+        Dialog dialog = reminderDaytimeDialog.create();
+        dialog.show();
+    }
     public void showReminderIntervalDialog(){
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();

@@ -64,11 +64,10 @@ public class DbHelper extends SQLiteOpenHelper{
         db.execSQL(CREATE_DAY_TABLE);
 
         String CREATE_INIT_VALUES = "INSERT INTO "+this.TABLE_MEDI_DAY + " "+
-                "Select 0, 'vorher'"+
-                "UNION SELECT 1, 'Morgens'"+
-                "UNION SELECT 2, 'Mittags'"+
-                "UNION SELECT 3, 'Abends'" +
-                "UNION SELECT 4, 'Nachts';";
+                "SELECT 0, 'Morgens'"+
+                "UNION SELECT 1, 'Mittags'"+
+                "UNION SELECT 2, 'Abends'" +
+                "UNION SELECT 3, 'Nachts';";
         db.execSQL(CREATE_INIT_VALUES);
     }
 
@@ -79,10 +78,9 @@ public class DbHelper extends SQLiteOpenHelper{
         db.execSQL(CREATE_EAT_TABLE);
 
         String CREATE_INIT_VALUES = "INSERT INTO "+this.TABLE_MEDI_EAT + " "+
-                "Select 0, 'vorher'"+
-                "UNION SELECT 1, 'nachher'"+
-                "UNION SELECT 2, 'vorher'"+
-                "UNION SELECT 3, 'mit';";
+                "SELECT 0, 'vorher'"+
+                "UNION SELECT 1, 'nahcher'"+
+                "UNION SELECT 2, 'mit';";
         db.execSQL(CREATE_INIT_VALUES);
     }
 
