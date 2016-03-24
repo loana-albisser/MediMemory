@@ -136,6 +136,9 @@
     <string name="minutes">Minuten</string>
     <string name="title_reminderDaytime">Tageszeit der Medikamenteneinnahme</string>
     <string name="btn_delete">Löschen</string>
+    <string name="monday">Montag</string>
+    <string name="on">am</string>
+    <string name="from">von</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>
