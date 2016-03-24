@@ -101,7 +101,7 @@ public class Day implements DbObject{
     }
 
     public static Collection<Day> getAllDayValues(DbAdapter dbAdapter){
-        Collection<Day> allDayValues =null;
+        Collection<Day> allDayValues = new ArrayList<Day>();
         try{
             Collection<ContentValues> allContentValues = dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_DAY);
             for(ContentValues contentValues : allContentValues){

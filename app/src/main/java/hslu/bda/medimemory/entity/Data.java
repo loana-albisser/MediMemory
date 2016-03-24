@@ -198,10 +198,24 @@ public class Data implements DbObject {
             data = copyContentValuesToObject(contentValues, dbAdapter);
         }else{data=null;}
 
-        data.setAllConsumed(Consumed.getAllConsumedByMedid(data.getId(),dbAdapter));
-        data.setAllConsumeIndividual(ConsumeIndividual.getAllConsumeIndividualByMedid(data.getId(),dbAdapter));
+        data.setAllConsumed(Consumed.getAllConsumedByMedid(data.getId(), dbAdapter));
+        data.setAllConsumeIndividual(ConsumeIndividual.getAllConsumeIndividualByMedid(data.getId(), dbAdapter));
         data.setAllConsumeInterval(ConsumeInterval.getAllConsumeIntervalByMedid(data.getId(), dbAdapter));
         return data;
+    }
+
+    public static Collection<Data> getAllDataFromTable(DbAdapter dbAdapter){
+        Collection<Data> allData = new ArrayList<Data>();
+        try{
+            Collection<ContentValues> allContentValues = dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_DATA);
+            for(ContentValues contentValues : allContentValues){
+                allData.add(copyContentValuesToObject(contentValues,dbAdapter));
+            }
+        }catch (Exception e) {
+            System.out.printf(e.getMessage());
+        }
+
+        return  allData;
     }
 }
 
