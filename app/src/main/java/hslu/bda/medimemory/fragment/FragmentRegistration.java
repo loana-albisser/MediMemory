@@ -387,6 +387,7 @@ public class FragmentRegistration extends Fragment {
         Dialog dialog = reminderDaytimeDialog.create();
         dialog.show();
     }
+
     public void showReminderIntervalDialog(){
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
