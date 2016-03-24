@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -38,7 +39,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
@@ -78,7 +78,7 @@ public class FragmentRegistration extends Fragment {
     private TextView txt_reminder;
     private View dialogView;
     private int selectedIntervalPosition;
-    private final boolean [] checkItems = {false,false,false,false};
+    private final boolean [] checkItems = {false,false,false,false,false};
     private ArrayList<Integer> selList = new ArrayList<Integer>();
     private Spinner sp_reminderInterval;
     private int numberofCheckedItems;
@@ -112,6 +112,7 @@ public class FragmentRegistration extends Fragment {
     private NumberPicker np_dosage;
 
     private TextView txt_foodInstruction = null;
+    private RadioButton rd_foodId;
     private DbAdapter dbAdapter;
 
     private RadioGroup rdg_foodInstruction;
@@ -124,6 +125,11 @@ public class FragmentRegistration extends Fragment {
 
     private Collection<Day> allDayTimes;
     private Collection<Day> selectedDayTimes = new ArrayList<Day>();
+    private Collection<Eat> allFoodInstructions;
+    private StringBuilder eatString;
+    private RadioButton rd_foodInstruction;
+    private int selectedFoodInstruction;
+    private int foodid;
 
     public FragmentRegistration() {
         dateCalendar = Calendar.getInstance();
@@ -140,10 +146,10 @@ public class FragmentRegistration extends Fragment {
         dbAdapter.open();
         setupShowImage();
         showReminderDetails();
-        setDuration();
+        showDuration();
         setupDosageNumberPicker();
         setDosage();
-        setFoodInstruction();
+        showFoodInstruction();
         save();
         showDeleteButtonVisibility();
         return root;
@@ -308,53 +314,6 @@ public class FragmentRegistration extends Fragment {
     }
 
     public void showReminderDaytimeDialog(){
-        daytimes = Arrays.asList(getResources().getStringArray(R.array.array_daytime));
-        daytimebuilder = new StringBuilder();
-        AlertDialog.Builder reminderDaytimeDialog = new AlertDialog.Builder(getActivity());
-        daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
-        reminderDaytimeDialog.setCancelable(false);
-        reminderDaytimeDialog.setTitle(getResources().getString(R.string.title_reminderDaytime));
-        reminderDaytimeDialog.setMultiChoiceItems(R.array.array_daytime, checkItems, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        if (isChecked) {
-                            if (which == daytimes.indexOf(getString(R.string.morning))) {
-                                checkItems[which] = true;
-                            }
-                            if (which == daytimes.indexOf(getString(R.string.noon))) {
-                                checkItems[which] = true;
-                            }
-                            if (which == daytimes.indexOf(getString(R.string.evening))) {
-                                checkItems[which] = true;
-                            }
-                            if (which == daytimes.indexOf(getString(R.string.night))) {
-                                checkItems[which] = true;
-                            }
-                        }
-                    }
-                }
-        );
-        reminderDaytimeDialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                numberofCheckedItems = 0;
-                for (int i = 0; i < checkItems.length; i++) {
-                    if (checkItems[i]) {
-                        numberofCheckedItems++;
-                        daytimebuilder.append(daytimes.get(i)).append(" ");
-                    }
-                }
-                if (numberofCheckedItems > 0) {
-                    txt_reminder.setText(daytimebuilder);
-                }
-            }
-        });
-        Dialog dialog = reminderDaytimeDialog.create();
-        dialog.show();
-    }*/
-
-    public void showReminderDaytimeDialog(){
-        selList = new ArrayList<Integer>();
         allDayTimes = Day.getAllDayValues(dbAdapter);
         ArrayList<String> strDayTimes = new ArrayList<String>();
         for(Day day:allDayTimes){
@@ -366,14 +325,15 @@ public class FragmentRegistration extends Fragment {
         daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
         reminderDaytimeDialog.setCancelable(false);
         reminderDaytimeDialog.setTitle(getResources().getString(R.string.title_reminderDaytime));
-        reminderDaytimeDialog.setMultiChoiceItems(daytimes, null, new DialogInterface.OnMultiChoiceClickListener() {
+        reminderDaytimeDialog.setMultiChoiceItems(daytimes, checkItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                         if (isChecked) {
                             selList.add(which);
-                        }
-                        else if(selList.contains(which)){
+                            checkItems[which] = true;
+                        } else if (selList.contains(which)) {
                             selList.remove(which);
+                            checkItems[which] = false;
                         }
                     }
                 }
@@ -381,11 +341,11 @@ public class FragmentRegistration extends Fragment {
         reminderDaytimeDialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                for(int id : selList){
-                    selectedDayTimes.add(Iterables.get(allDayTimes,id));
+                for (int id : selList) {
+                    selectedDayTimes.add(Iterables.get(allDayTimes, id));
                     daytimebuilder.append(daytimes[id]).append(" ");
                 }
-                if (selectedDayTimes.size()> 0) {
+                if (selectedDayTimes.size() > 0) {
                     txt_reminder.setText(daytimebuilder);
                 }
             }
@@ -394,13 +354,12 @@ public class FragmentRegistration extends Fragment {
         dialog.show();
     }
 
-    private Day getDaytime(){
-        return null;
+    private Collection<Day> getDaytimes(){
+        return selectedDayTimes;
     }
 
     private int countDayTime(){
-        //Anzahl Tageszeiten
-        return 0;
+        return selectedDayTimes.size();
     }
 
     public void showReminderIntervalDialog(){
@@ -438,11 +397,11 @@ public class FragmentRegistration extends Fragment {
                 }
                 txt_reminder.setText(intervalbuilder);
                 if (sp_reminderInterval.getSelectedItemPosition() == 0) {
-                    setStartEndTime();
+                    showStartEndTimeDialog();
                 } else if (sp_reminderInterval.getSelectedItemPosition() == 1){
                     txt_reminder.setText(intervalbuilder);
                 } else if (sp_reminderInterval.getSelectedItemPosition() == 2) {
-                    setWeekday();
+                    showWeekdayDialog();
                 }
             }
         });
@@ -489,7 +448,7 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
-    private void setWeekday(){
+    private void showWeekdayDialog(){
         weekdayString = getResources().getString(R.string.monday);
         weekdays = Arrays.asList(getResources().getStringArray(R.array.array_weekday));
         AlertDialog.Builder dialogWeekday = new AlertDialog.Builder(getActivity());
@@ -538,7 +497,11 @@ public class FragmentRegistration extends Fragment {
         return weekday;
     }
 
-    private void setStartEndTime(){
+    private void setWeekday(){
+
+    }
+
+    private void showStartEndTimeDialog(){
         startTimeCalendar = Calendar.getInstance();
         endTimeCalendar = Calendar.getInstance();
         final AlertDialog.Builder dialogStartEndTime = new AlertDialog.Builder(getActivity());
@@ -605,10 +568,6 @@ public class FragmentRegistration extends Fragment {
         tp_startEndTimeInterval.show();
     }
 
-    private Day getDaypart(){
-        return null;
-    }
-
     private int getIntervalValue(){
         NumberPicker np_reminderInterval = (NumberPicker)root.findViewById(R.id.np_reminderInterval);
         return np_reminderInterval.getValue();
@@ -643,11 +602,11 @@ public class FragmentRegistration extends Fragment {
     private Collection<ConsumeIndividual> getReminderDayTime(){
         ConsumeIndividual consumeIndividual = new ConsumeIndividual();
         consumeIndividual.setEatpart(getFoodInstruction());
-        consumeIndividual.setDaypart(getDaypart());
+        //consumeIndividual.setDaypart(getDaytimes());
         return null;
     }
 
-    private void setDuration() {
+    private void showDuration() {
         rdg_duration = (RadioGroup)root.findViewById(R.id.rdg_duration);
         final LinearLayout ln_duration = (LinearLayout) root.findViewById(R.id.ln_duration);
         txt_duration = new TextView(getActivity());
@@ -808,54 +767,55 @@ public class FragmentRegistration extends Fragment {
         np_dosage.setValue(1);
     }
 
-    private void setFoodInstruction(){
-        rdg_foodInstruction = (RadioGroup)root.findViewById(R.id.rdg_foodInstruction);
-        final ViewGroup ln_foodInstruction = (ViewGroup)root.findViewById(R.id.ln_foodInstruction);
+    private void showFoodInstruction() {
+        foodid = 0;
+        rdg_foodInstruction = (RadioGroup) root.findViewById(R.id.rdg_foodInstruction);
+        final ViewGroup ln_foodInstruction = (ViewGroup) root.findViewById(R.id.ln_foodInstruction);
         LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT);
+        eatString = new StringBuilder();
         txt_foodInstruction = new TextView(getActivity());
         txt_foodInstruction.setVisibility(View.GONE);
         showInfoTextField(txt_foodInstruction, ln_foodInstruction);
-        //ArrayList<Eat> allFoodI = new ArrayList<>(Eat.getAllEatValues(dbAdapter));
-        /*Iterator<Eat> iterator = getAllEatValues(dbAdapter).iterator();
-        while(iterator.hasNext()){
-            Eat elem = iterator.next();
-            String description = elem.getDescription();
-            RadioButton newRd = new RadioButton(getActivity());
-            newRd.setText(description);
-            newRd.setId(elem.getId());
-            radioGroup.addView(newRd, layoutParams);
-        }*/
-        for (Eat elem: Eat.getAllEatValues(dbAdapter)){
-            String description = elem.getDescription();
-            RadioButton newRD = new RadioButton(getActivity());
-            newRD.setText(description);
-            rdg_foodInstruction.addView(newRD, layoutParams);
+        allFoodInstructions = Eat.getAllEatValues(dbAdapter);
+        for (Eat eat : allFoodInstructions) {
+            rd_foodInstruction = new RadioButton(getActivity().getApplicationContext());
+            rd_foodInstruction.setId(foodid);
+            rd_foodInstruction.setText(eat.getDescription());
+            rd_foodInstruction.setTextColor(Color.BLACK);
+            //rd_foodInstruction.setSupportButtonTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
+            rdg_foodInstruction.addView(rd_foodInstruction, layoutParams);
+            foodid ++;
         }
 
-
-        /*radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        rdg_foodInstruction.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                StringBuilder eatString = new StringBuilder();
                 txt_foodInstruction.setVisibility(View.VISIBLE);
-                if (checkedId == R.id.rd_eatBefore) {
+                selectedFoodInstruction = checkedId;
+                if (checkedId == foodid) {
                     eatString.append(getResources().getString(R.string.txt_eatBefore));
                     txt_foodInstruction.setText(eatString);
-                } else if (checkedId == R.id.rd_eatDuring) {
+                } else if (checkedId == foodid) {
                     eatString.append(getResources().getString(R.string.txt_eatDuring));
                     txt_foodInstruction.setText(eatString);
-                } else if (checkedId == R.id.rd_eatAfter) {
+                } else if (checkedId == foodid) {
                     eatString.append(getResources().getString(R.string.txt_eatAfter));
                     txt_foodInstruction.setText(eatString);
                 }
+                txt_foodInstruction.setText(eatString);
             }
-        });*/
+        });
     }
 
 
     private Eat getFoodInstruction(){
-        return Eat.getEatById(String.valueOf(rdg_foodInstruction.getCheckedRadioButtonId()), dbAdapter);
+        return Iterables.get(allFoodInstructions, selectedFoodInstruction);
     }
+
+    private void setFoodInstruction(){
+        //rd_foodInstruction.setChecked(true);
+    }
+
 
     private String getNotes(){
         edit_notes = (EditText)root.findViewById(R.id.edit_notes);
