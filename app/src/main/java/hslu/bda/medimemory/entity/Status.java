@@ -2,6 +2,7 @@ package hslu.bda.medimemory.entity;
 
 import android.content.ContentValues;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import hslu.bda.medimemory.contract.DbObject;
@@ -100,7 +101,7 @@ public class Status implements DbObject{
     }
 
     public static Collection<Status> getAllStatusValues(DbAdapter dbAdapter){
-        Collection<Status> allStatusValues =null;
+        Collection<Status> allStatusValues =new ArrayList<Status>();
         try{
             Collection<ContentValues> allContentValues = dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_STATUS);
             for(ContentValues contentValues : allContentValues){
