@@ -78,9 +78,9 @@ public class DbHelper extends SQLiteOpenHelper{
         db.execSQL(CREATE_EAT_TABLE);
 
         String CREATE_INIT_VALUES = "INSERT INTO "+this.TABLE_MEDI_EAT + " "+
-                "SELECT 0, 'vorher'"+
-                "UNION SELECT 1, 'nahcher'"+
-                "UNION SELECT 2, 'mit';";
+                "SELECT 0, 'vor dem Essen'"+
+                "UNION SELECT 1, 'nach dem Essen'"+
+                "UNION SELECT 2, 'mit dem Essen';";
         db.execSQL(CREATE_INIT_VALUES);
     }
 
