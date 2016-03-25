@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +17,7 @@ import android.provider.MediaStore;
 
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Gravity;
@@ -112,10 +114,12 @@ public class FragmentRegistration extends Fragment {
     private NumberPicker np_dosage;
 
     private TextView txt_foodInstruction = null;
+    private RadioGroup rdg_foodInstruction;
+    private RadioButton[] rd_foodinstruction;
     private RadioButton rd_foodId;
     private DbAdapter dbAdapter;
 
-    private RadioGroup rdg_foodInstruction;
+
     private SimpleDateFormat endDate;
 
     private EditText edit_notes;
@@ -126,10 +130,13 @@ public class FragmentRegistration extends Fragment {
     private Collection<Day> allDayTimes;
     private Collection<Day> selectedDayTimes = new ArrayList<Day>();
     private Collection<Eat> allFoodInstructions;
+    private Collection<ConsumeInterval> consumeIntervals = new ArrayList<>();
+    private Collection<ConsumeIndividual> consumeIndividuals = new ArrayList<>();
     private StringBuilder eatString;
-    private RadioButton rd_foodInstruction;
+    //private RadioButton rd_foodInstruction;
     private int selectedFoodInstruction;
     private int foodid;
+
 
     public FragmentRegistration() {
         dateCalendar = Calendar.getInstance();
@@ -282,7 +289,6 @@ public class FragmentRegistration extends Fragment {
     }
 
     private String getPicturePath(){
-        Log.i("Name", imagePath);
         return imagePath;
     }
 
@@ -504,6 +510,8 @@ public class FragmentRegistration extends Fragment {
     private void showStartEndTimeDialog(){
         startTimeCalendar = Calendar.getInstance();
         endTimeCalendar = Calendar.getInstance();
+        startTimeString = "00:00";
+        endTimeString = "23:59";
         final AlertDialog.Builder dialogStartEndTime = new AlertDialog.Builder(getActivity());
         LayoutInflater inflaterStartEnd = getActivity().getLayoutInflater();
         View dialogViewStartEnd = inflaterStartEnd.inflate(R.layout.dialog_reminderstartendtime, null);
@@ -520,7 +528,7 @@ public class FragmentRegistration extends Fragment {
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         startTimeCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         startTimeCalendar.set(Calendar.MINUTE, minute);
-                        startTime = new SimpleDateFormat("kk:mm");
+                        startTime = new SimpleDateFormat("HH:mm");
                         startTimeDate = startTimeCalendar.getTime();
                         startTimeString = startTime.format(startTimeCalendar.getTime());
                         startString.append(startTimeString);
@@ -540,7 +548,7 @@ public class FragmentRegistration extends Fragment {
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         endTimeCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         endTimeCalendar.set(Calendar.MINUTE, minute);
-                        SimpleDateFormat endTime = new SimpleDateFormat("kk:mm");
+                        SimpleDateFormat endTime = new SimpleDateFormat("HH:mm");
                         endTimeString = endTime.format(endTimeCalendar.getTime());
                         endString.append(endTimeString);
                         btn_endtime.setText(endString);
@@ -596,14 +604,18 @@ public class FragmentRegistration extends Fragment {
         consumeInterval.setEndTime(getEndTime());
         consumeInterval.setInterval(getIntervalValue());
         consumeInterval.setWeekday(getWeekday());
-        return null;
+        consumeIntervals.add(consumeInterval);
+        return consumeIntervals;
     }
 
     private Collection<ConsumeIndividual> getReminderDayTime(){
-        ConsumeIndividual consumeIndividual = new ConsumeIndividual();
-        consumeIndividual.setEatpart(getFoodInstruction());
-        //consumeIndividual.setDaypart(getDaytimes());
-        return null;
+        for (Day day : getDaytimes()){
+            ConsumeIndividual consumeIndividual = new ConsumeIndividual();
+            consumeIndividual.setEatpart(getFoodInstruction());
+            consumeIndividual.setDaypart(Iterables.get(getDaytimes(), day.getId()));
+            consumeIndividuals.add(consumeIndividual);
+        }
+        return consumeIndividuals;
     }
 
     private void showDuration() {
@@ -768,54 +780,49 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void showFoodInstruction() {
-        foodid = 0;
-        rdg_foodInstruction = (RadioGroup) root.findViewById(R.id.rdg_foodInstruction);
         final ViewGroup ln_foodInstruction = (ViewGroup) root.findViewById(R.id.ln_foodInstruction);
-        LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT);
-        eatString = new StringBuilder();
+
         txt_foodInstruction = new TextView(getActivity());
         txt_foodInstruction.setVisibility(View.GONE);
-        showInfoTextField(txt_foodInstruction, ln_foodInstruction);
-        allFoodInstructions = Eat.getAllEatValues(dbAdapter);
-        for (Eat eat : allFoodInstructions) {
-            rd_foodInstruction = new RadioButton(getActivity().getApplicationContext());
-            rd_foodInstruction.setId(foodid);
-            rd_foodInstruction.setText(eat.getDescription());
-            rd_foodInstruction.setTextColor(Color.BLACK);
-            //rd_foodInstruction.setSupportButtonTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
-            rdg_foodInstruction.addView(rd_foodInstruction, layoutParams);
-            foodid ++;
-        }
 
+        allFoodInstructions = Eat.getAllEatValues(dbAdapter);
+        rd_foodinstruction = new RadioButton[allFoodInstructions.size()];
+        RadioGroup rdg_foodInstruction = new RadioGroup(getActivity().getApplicationContext());
+
+       for (Eat eat : allFoodInstructions) {
+           rd_foodinstruction[eat.getId()] = new RadioButton(getActivity().getApplicationContext());
+           rdg_foodInstruction.addView(rd_foodinstruction[eat.getId()]);
+           rd_foodinstruction[eat.getId()].setText(eat.getDescription());
+           rd_foodinstruction[eat.getId()].setTextColor(Color.BLACK);
+           //rd_foodinstruction[eat.getId()].setSupportButtonTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
+        }
+        ln_foodInstruction.addView(rdg_foodInstruction);
+        showInfoTextField(txt_foodInstruction, ln_foodInstruction);
         rdg_foodInstruction.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 txt_foodInstruction.setVisibility(View.VISIBLE);
+                eatString = new StringBuilder();
                 selectedFoodInstruction = checkedId;
-                if (checkedId == foodid) {
+                if (checkedId == rd_foodinstruction[0].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatBefore));
-                    txt_foodInstruction.setText(eatString);
-                } else if (checkedId == foodid) {
-                    eatString.append(getResources().getString(R.string.txt_eatDuring));
-                    txt_foodInstruction.setText(eatString);
-                } else if (checkedId == foodid) {
+                } else if (checkedId == rd_foodinstruction[1].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatAfter));
-                    txt_foodInstruction.setText(eatString);
+                } else if (checkedId == rd_foodinstruction[2].getId()) {
+                    eatString.append(getResources().getString(R.string.txt_eatDuring));
                 }
                 txt_foodInstruction.setText(eatString);
             }
         });
     }
 
-
     private Eat getFoodInstruction(){
         return Iterables.get(allFoodInstructions, selectedFoodInstruction);
     }
 
     private void setFoodInstruction(){
-        //rd_foodInstruction.setChecked(true);
+        rd_foodinstruction[selectedFoodInstruction].isChecked();
     }
-
 
     private String getNotes(){
         edit_notes = (EditText)root.findViewById(R.id.edit_notes);
@@ -830,7 +837,13 @@ public class FragmentRegistration extends Fragment {
         Button btn_save = (Button)root.findViewById(R.id.btn_save);
         final RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
         final RadioGroup rdg_duration = (RadioGroup)root.findViewById(R.id.rdg_duration);
-        final RadioGroup rdg_foodInstruction = (RadioGroup)root.findViewById(R.id.rdg_foodInstruction);
+        final CardView cv_reminder = (CardView)root.findViewById(R.id.cv_reminder);
+        final CardView cv_name = (CardView)root.findViewById(R.id.cv_name);
+        final CardView cv_photo = (CardView)root.findViewById(R.id.cv_photo);
+        final CardView cv_duration = (CardView)root.findViewById(R.id.cv_duration);
+        final CardView cv_dosage = (CardView)root.findViewById(R.id.cv_dosage);
+        final CardView cv_foodInstruction = (CardView)root.findViewById(R.id.cv_foodInstruction);
+        final CardView cv_notes = (CardView)root.findViewById(R.id.cv_notes);
         rd_reminderdaytime = (RadioButton)root.findViewById(R.id.rd_daytime);
         final EditText edit_name = (EditText)root.findViewById(R.id.edit_name);
         final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
@@ -838,51 +851,72 @@ public class FragmentRegistration extends Fragment {
             @Override
             public void onClick(View v) {
                 if (edit_name.getText().toString().trim().length() == 0) {
-                    alertBuilder.setMessage("Bitte gib einen Namen ein!");
+                    alertBuilder.setMessage(getResources().getString(R.string.dialog_nameMessage));
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            cv_name.setFocusable(true);
+                            cv_name.setFocusableInTouchMode(true);
+                            cv_name.requestFocus();
                         }
                     });
                     alertBuilder.show();
-                } else if (rdg_reminder.getCheckedRadioButtonId() == -1) {
-                    alertBuilder.setMessage("Bitte wähle eine Einnahmezeit aus!");
+                } else if (getPicturePath() ==null){
+                    alertBuilder.setMessage(getResources().getString(R.string.dialog_photoMessage));
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            cv_photo.requestFocus();
+                            cv_photo.setFocusableInTouchMode(true);
+                        }
+                    });
+                    alertBuilder.show();
+                }
+                else if (rdg_reminder.getCheckedRadioButtonId() == -1) {
+                    alertBuilder.setMessage(getResources().getString(R.string.dialog_reminderMessage));
+                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            cv_reminder.setFocusable(true);
+                            cv_reminder.requestFocus();
+
                         }
                     });
                     alertBuilder.show();
                 } else if (rdg_duration.getCheckedRadioButtonId() == -1) {
-                    alertBuilder.setMessage("Bitte wähle eine Dauer der Einnahme aus!");
+                    alertBuilder.setMessage(getResources().getString(R.string.dialog_durationMessage));
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-
+                            cv_duration.setFocusable(true);
+                            cv_duration.setFocusableInTouchMode(true);
+                            cv_duration.requestFocus();
                         }
                     });
                     alertBuilder.show();
                 } else if (rd_reminderdaytime.isChecked() && numberofCheckedItems == 0) {
-                    alertBuilder.setMessage("Bitte wähle mindestens 1 Einnahmezeit aus!");
+                    alertBuilder.setMessage(getResources().getString(R.string.dialog_reminderDaytimeMessage));
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-
+                            cv_reminder.setFocusable(true);
+                            cv_reminder.requestFocus();
                         }
                     });
                     alertBuilder.show();
                 } else if (rd_reminderdaytime.isChecked() && rdg_foodInstruction.getCheckedRadioButtonId() == -1) {
-                    alertBuilder.setMessage("Bitte wähle eine Ernährungsanweisung der Einnahme aus!");
+                    alertBuilder.setMessage(getResources().getString(R.string.dialog_foodInstructionMessage));
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            //cv_reminder.requestFocus();
+                            cv_foodInstruction.requestFocus();
+                            cv_foodInstruction.setFocusableInTouchMode(true);
                         }
                     });
                     alertBuilder.show();
                 } else {
-                    //saveDatatoDB();
-                    Toast.makeText(getActivity(), " Ihr Medikament wurde gespeichert", Toast.LENGTH_LONG).show();
+                    saveDatatoDB();
+                    Toast.makeText(getActivity(), getResources().getString(R.string.dialog_Medisave), Toast.LENGTH_LONG).show();
                 }
             }
         });

@@ -137,8 +137,22 @@
     <string name="title_reminderDaytime">Tageszeit der Medikamenteneinnahme</string>
     <string name="btn_delete">Löschen</string>
     <string name="monday">Montag</string>
+    <string name="tuesday">Dienstag</string>
+    <string name="wednesday">Freitag</string>
+    <string name="thursday">Donnerstag</string>
+    <string name="friday">Freitag</string>
+    <string name="saturday">Samstag</string>
+    <string name="sunday">Sonntag</string>
+    <string name="title_dialogWeekday">Wochentag der Einnahme</string>
     <string name="on">am</string>
     <string name="from">von</string>
+    <string name="dialog_nameMessage">Bitte gib einen Namen ein!</string>
+    <string name="dialog_photoMessage">Bitte nimm ein Foto auf!</string>
+    <string name="dialog_reminderMessage">Bitte wähle eine Einnahmezeit aus!</string>
+    <string name="dialog_durationMessage">Bitte wähle eine Dauer der Einnahme aus!</string>
+    <string name="dialog_reminderDaytimeMessage">Bitte wähle mindestens eine Einnahmezeit aus!</string>
+    <string name="dialog_foodInstructionMessage">Bitte wähle eine Ernährungsanweisung der Einnahme aus!</string>
+    <string name="dialog_Medisave">Ihr Medikament wurde gespeichert</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>
@@ -151,6 +165,16 @@
         <item id= "noon">@string/noon</item>
         <item id= "evening">@string/evening</item>
         <item id= "night">@string/night</item>
+    </string-array>
+
+    <string-array name="array_weekday">
+        <item id= "monday">@string/monday</item>
+        <item id= "tuesday">@string/tuesday</item>
+        <item id= "wednesday">@string/wednesday</item>
+        <item id= "thursday">@string/thursday</item>
+        <item id= "friday">@string/friday</item>
+        <item id= "saturday">@string/saturday</item>
+        <item id= "sunday">@string/sunday</item>
     </string-array>
 
 

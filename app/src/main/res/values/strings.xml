@@ -146,6 +146,13 @@
     <string name="title_dialogWeekday">Wochentag der Einnahme</string>
     <string name="on">am</string>
     <string name="from">von</string>
+    <string name="dialog_nameMessage">Bitte gib einen Namen ein!</string>
+    <string name="dialog_photoMessage">Bitte nimm ein Foto auf!</string>
+    <string name="dialog_reminderMessage">Bitte wähle eine Einnahmezeit aus!</string>
+    <string name="dialog_durationMessage">Bitte wähle eine Dauer der Einnahme aus!</string>
+    <string name="dialog_reminderDaytimeMessage">Bitte wähle mindestens eine Einnahmezeit aus!</string>
+    <string name="dialog_foodInstructionMessage">Bitte wähle eine Ernährungsanweisung der Einnahme aus!</string>
+    <string name="dialog_Medisave">Ihr Medikament wurde gespeichert</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>
