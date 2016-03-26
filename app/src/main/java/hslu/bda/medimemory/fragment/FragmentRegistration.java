@@ -1,5 +1,6 @@
 package hslu.bda.medimemory.fragment;
 
+import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -12,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 
@@ -787,29 +789,41 @@ public class FragmentRegistration extends Fragment {
 
         allFoodInstructions = Eat.getAllEatValues(dbAdapter);
         rd_foodinstruction = new RadioButton[allFoodInstructions.size()];
-        RadioGroup rdg_foodInstruction = new RadioGroup(getActivity().getApplicationContext());
+        final RadioGroup rdg_foodInstruction = new RadioGroup(getActivity().getApplicationContext());
 
        for (Eat eat : allFoodInstructions) {
            rd_foodinstruction[eat.getId()] = new RadioButton(getActivity().getApplicationContext());
            rdg_foodInstruction.addView(rd_foodinstruction[eat.getId()]);
            rd_foodinstruction[eat.getId()].setText(eat.getDescription());
            rd_foodinstruction[eat.getId()].setTextColor(Color.BLACK);
-           //rd_foodinstruction[eat.getId()].setSupportButtonTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
+           rd_foodinstruction[eat.getId()].setTextSize(14);
         }
         ln_foodInstruction.addView(rdg_foodInstruction);
         showInfoTextField(txt_foodInstruction, ln_foodInstruction);
         rdg_foodInstruction.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @TargetApi(Build.VERSION_CODES.M)
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 txt_foodInstruction.setVisibility(View.VISIBLE);
                 eatString = new StringBuilder();
                 selectedFoodInstruction = checkedId;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    rd_foodinstruction[0].setButtonTintList(ColorStateList.valueOf(Color.GRAY));
+                    rd_foodinstruction[1].setButtonTintList(ColorStateList.valueOf(Color.GRAY));
+                    rd_foodinstruction[2].setButtonTintList(ColorStateList.valueOf(Color.GRAY));
+                }
                 if (checkedId == rd_foodinstruction[0].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatBefore));
+
                 } else if (checkedId == rd_foodinstruction[1].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatAfter));
+
                 } else if (checkedId == rd_foodinstruction[2].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatDuring));
+
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    rd_foodinstruction[selectedFoodInstruction-1].setButtonTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
                 }
                 txt_foodInstruction.setText(eatString);
             }
@@ -866,8 +880,10 @@ public class FragmentRegistration extends Fragment {
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            cv_photo.requestFocus();
+                            cv_photo.setFocusable(true);
                             cv_photo.setFocusableInTouchMode(true);
+                            cv_photo.requestFocus();
+
                         }
                     });
                     alertBuilder.show();
@@ -878,6 +894,7 @@ public class FragmentRegistration extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             cv_reminder.setFocusable(true);
+                            cv_reminder.setFocusableInTouchMode(true);
                             cv_reminder.requestFocus();
 
                         }
@@ -900,6 +917,7 @@ public class FragmentRegistration extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             cv_reminder.setFocusable(true);
+                            cv_reminder.setFocusableInTouchMode(true);
                             cv_reminder.requestFocus();
                         }
                     });
@@ -909,8 +927,9 @@ public class FragmentRegistration extends Fragment {
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            cv_foodInstruction.requestFocus();
                             cv_foodInstruction.setFocusableInTouchMode(true);
+                            cv_foodInstruction.setFocusable(true);
+                            cv_foodInstruction.requestFocus();
                         }
                     });
                     alertBuilder.show();

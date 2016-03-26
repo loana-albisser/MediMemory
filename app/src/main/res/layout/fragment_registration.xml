@@ -131,7 +131,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/rd_daytime"
                     android:text="@string/rd_daytime"
-                    android:onClick="onReminderDayTimeRadioButtonClick"/>
+                    android:onClick="onReminderDayTimeRadioButtonClick" />
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
