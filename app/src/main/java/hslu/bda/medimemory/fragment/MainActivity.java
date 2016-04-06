@@ -2,6 +2,7 @@ package hslu.bda.medimemory.fragment;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity{
     private Fragment fragment = null;
     private Class fragmentClass;
     private FragmentRegistration fragmentRegistration;
+    private FragmentEdit fragmentEdit;
     private FloatingActionButton fab;
     private NavigationView nvDrawer;
     private int currentMenuItem;
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
+        fragmentRegistration = new FragmentRegistration();
         fab =(FloatingActionButton)findViewById(R.id.fab);
         fab.hide();
         setSupportActionBar(toolbar);
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity{
             e.printStackTrace();
         }
         getFragmentManager().beginTransaction().replace(R.id.main, fragment, "Fragment_Overview").commit();
+        fab.show();
 
         drawer = (DrawerLayout) findViewById(R.id.activity_main);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -57,6 +60,11 @@ public class MainActivity extends AppCompatActivity{
         setupDrawerContent(nvDrawer);
     }
 
+    public void onResume(){
+        super.onResume();
+        fragmentRegistration = new FragmentRegistration();
+    }
+
 
     private void onFloatingButtonPressed(){
         fab.setOnClickListener(new View.OnClickListener() {
@@ -70,6 +78,7 @@ public class MainActivity extends AppCompatActivity{
                 }
                 changeRegistrationFragment(fragment);
                 nvDrawer.setCheckedItem(R.id.nav_registration);
+                currentMenuItem = R.id.nav_registration;
                 nvDrawer.getMenu().getItem(1).setChecked(true);
                 setTitle(getResources().getString(R.string.nav_registration));
                 fab.hide();
@@ -99,17 +108,23 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void onReminderDayTimeRadioButtonClick(View v){
+        //fragmentRegistration = new FragmentRegistration();
         fragmentRegistration.showReminderDaytimeDialog();
     }
+
 
     public void onReminderIntervalRadioButtonClick(View v){
         fragmentRegistration.showReminderIntervalDialog();
     }
 
     public void onDurationNumOfBlistersRadioButtonClick(View v) {
-        fragmentRegistration.changeNumberOfBlisterTextField();
-        fragmentRegistration.showNumberOfBlistersNumberPickerDialog();
+        fragmentRegistration.changeNumberOfBlisterTextField(MainActivity.this);
+        fragmentRegistration.showNumberOfBlistersNumberPickerDialog(MainActivity.this);
         fragmentRegistration.setCurrentNumberOfBlistersValue();
+    }
+
+    public MainActivity getMainContext(){
+        return MainActivity.this;
     }
 
     public void onDurationDateRadioButtonClick(View v) {

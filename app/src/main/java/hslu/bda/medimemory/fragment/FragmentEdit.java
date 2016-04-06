@@ -1,12 +1,15 @@
 package hslu.bda.medimemory.fragment;
 
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,21 +32,26 @@ public class FragmentEdit extends Fragment {
     private DbAdapter dbAdapter;
     private ListView listView;
     private ViewGroup root;
-    private ViewGroup mainView;
-    private Button btn_delete;
     private FragmentRegistration fragmentRegistration;
+    private Context context;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_edit, container, false);
-        mainView = (ViewGroup) inflater.inflate(R.layout.activity_main, container,false);
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
         showItems();
         showRegistrationFragment();
         return root;
     }
+
+    public void onAttach(Context context){
+        super.onAttach(getActivity().getApplicationContext());
+        Log.i("Activity Attached Edit", String.valueOf(getActivity()));
+    }
+
+
 
     private void showItems() {
         listView = (ListView) root.findViewById(R.id.lv_edit);
@@ -68,7 +76,9 @@ public class FragmentEdit extends Fragment {
                 ((MainActivity) getActivity()).getFab().hide();
                 fragmentRegistration = new FragmentRegistration();
                 FragmentManager fragmentManager = getFragmentManager();
-                //fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration).commit();
+                //fragmentManager.executePendingTransactions();
+                //fragmentManager.beginTransaction().remove(R.id.main, f, "Fragment_Registration").commit();
+                //fragmentManager.beginTransaction().add(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
                 fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
             }
         });

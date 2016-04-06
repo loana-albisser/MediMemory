@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -18,8 +19,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Gravity;
@@ -73,6 +74,10 @@ import hslu.bda.medimemory.services.CreateMediService;
  */
 public class FragmentRegistration extends Fragment {
     private ViewGroup root;
+    private Context context;
+    private FragmentRegistration fragmentRegistration;
+    private FragmentActivity mActivity;
+
     private EditText edit_name;
     private final int REQUEST_CAMERA = 0;
     private final int SELECT_FILE = 1;
@@ -147,10 +152,19 @@ public class FragmentRegistration extends Fragment {
         selectedDay = dateCalendar.get(Calendar.DAY_OF_MONTH);
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mActivity = (FragmentActivity) context;
+        Log.i("Activity Attached Reg", String.valueOf(getActivity()));
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_registration, container, false);
+        super.onCreateView(inflater,container,savedInstanceState);
+        Log.i("Activity CreateView", String.valueOf(getActivity()));
+
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
         setupShowImage();
@@ -160,7 +174,7 @@ public class FragmentRegistration extends Fragment {
         setDosage();
         showFoodInstruction();
         save();
-        showDeleteButtonVisibility();
+        setDeleteButtonVisibility();
         return root;
     }
 
@@ -170,10 +184,7 @@ public class FragmentRegistration extends Fragment {
         super.onStop();
     }
 
-
-
-
-    public void showDeleteButtonVisibility(){
+    public void setDeleteButtonVisibility(){
         Button btn_delete = (Button)root.findViewById(R.id.btn_delete);
         if (((MainActivity)getActivity()).getCurrentMenuItem() == R.id.nav_registration){
             btn_delete.setVisibility(View.GONE);
@@ -184,7 +195,6 @@ public class FragmentRegistration extends Fragment {
 
     private String getName(){
         edit_name = (EditText) root.findViewById(R.id.edit_name);
-        Log.i("Name", String.valueOf(edit_name.getText()));
         return String.valueOf(edit_name.getText());
     }
 
@@ -459,6 +469,7 @@ public class FragmentRegistration extends Fragment {
     private void showWeekdayDialog(){
         weekdayString = getResources().getString(R.string.monday);
         weekdays = Arrays.asList(getResources().getStringArray(R.array.array_weekday));
+        //AlertDialog.Builder dialogWeekday = new AlertDialog.Builder(getActivity());
         AlertDialog.Builder dialogWeekday = new AlertDialog.Builder(getActivity());
         dialogWeekday.setCancelable(false);
         dialogWeekday.setTitle(getResources().getString(R.string.title_dialogWeekday));
@@ -690,7 +701,8 @@ public class FragmentRegistration extends Fragment {
     }
 
     public void showDateDialog(){
-        DatePickerDialog dpd = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+
+        DatePickerDialog dpd = new DatePickerDialog(super.getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 StringBuilder numDaysString = new StringBuilder();
@@ -712,8 +724,12 @@ public class FragmentRegistration extends Fragment {
         dpd.show();
     }
 
-    public void changeNumberOfBlisterTextField() {
-        np_numberofBlisters = new NumberPicker(getActivity());
+    public void changeNumberOfBlisterTextField(Context context) {
+        Log.i("Activity NumberBlister",String.valueOf(getActivity()));
+        Log.i("Activity get",String.valueOf(getActivity()));
+        Log.i("Activity NumberBlister",String.valueOf(context));
+        Log.i("Activity isAdded Num",String.valueOf(isAdded()));
+        np_numberofBlisters = new NumberPicker(context);
         np_numberofBlisters.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
@@ -722,23 +738,23 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
-    public void showNumberOfBlistersNumberPickerDialog(){
-        AlertDialog.Builder npb_numberofBlisters = new AlertDialog.Builder(getActivity());
+    public void showNumberOfBlistersNumberPickerDialog(final Context context){
+        AlertDialog.Builder npb_numberofBlisters = new AlertDialog.Builder(context);
         numberOfBlisterString = new StringBuilder();
         npb_numberofBlisters.setCancelable(false);
         np_numberofBlisters.setMaxValue(20);
         np_numberofBlisters.setMinValue(1);
-        final FrameLayout parent = new FrameLayout(getActivity());
+        final FrameLayout parent = new FrameLayout(context);
         parent.addView(np_numberofBlisters, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
         npb_numberofBlisters.setView(parent);
-        npb_numberofBlisters.setTitle(getResources().getString(R.string.d_packagEnd));
-        npb_numberofBlisters.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+        npb_numberofBlisters.setTitle(context.getResources().getString(R.string.d_packagEnd));
+        npb_numberofBlisters.setPositiveButton(context.getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                numberOfBlisterString.append(getResources().getString(R.string.taking)).append(" ");
+                numberOfBlisterString.append(context.getResources().getString(R.string.taking)).append(" ");
                 numberOfBlisterString.append(numberOfBlisters);
-                txt_duration.setText(numberOfBlisterString);
+                //txt_duration.setText(numberOfBlisterString);
             }
         });
         Dialog dialog = npb_numberofBlisters.create();
@@ -782,6 +798,8 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void showFoodInstruction() {
+        Log.i("Activity Food", String.valueOf(getActivity()));
+        Log.i("Activity Food isAdded", String.valueOf(isAdded()));
         final ViewGroup ln_foodInstruction = (ViewGroup) root.findViewById(R.id.ln_foodInstruction);
 
         txt_foodInstruction = new TextView(getActivity());
@@ -806,7 +824,6 @@ public class FragmentRegistration extends Fragment {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 txt_foodInstruction.setVisibility(View.VISIBLE);
                 eatString = new StringBuilder();
-                selectedFoodInstruction = checkedId;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     rd_foodinstruction[0].setButtonTintList(ColorStateList.valueOf(Color.GRAY));
                     rd_foodinstruction[1].setButtonTintList(ColorStateList.valueOf(Color.GRAY));
@@ -814,17 +831,21 @@ public class FragmentRegistration extends Fragment {
                 }
                 if (checkedId == rd_foodinstruction[0].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatBefore));
+                    selectedFoodInstruction = 0;
 
                 } else if (checkedId == rd_foodinstruction[1].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatAfter));
+                    selectedFoodInstruction = 1;
 
                 } else if (checkedId == rd_foodinstruction[2].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatDuring));
+                    selectedFoodInstruction = 2;
 
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    rd_foodinstruction[selectedFoodInstruction-1].setButtonTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
+                    rd_foodinstruction[selectedFoodInstruction].setButtonTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
                 }
+                selectedFoodInstruction = checkedId;
                 txt_foodInstruction.setText(eatString);
             }
         });
