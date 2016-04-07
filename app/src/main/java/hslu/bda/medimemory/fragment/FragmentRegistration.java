@@ -76,7 +76,7 @@ public class FragmentRegistration extends Fragment {
     private ViewGroup root;
     private Context context;
     private FragmentRegistration fragmentRegistration;
-    private FragmentActivity mActivity;
+    private Activity mActivity;
 
     private EditText edit_name;
     private final int REQUEST_CAMERA = 0;
@@ -152,12 +152,21 @@ public class FragmentRegistration extends Fragment {
         selectedDay = dateCalendar.get(Calendar.DAY_OF_MONTH);
     }
 
+    @TargetApi(23)
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mActivity = (FragmentActivity) context;
-        Log.i("Activity Attached Reg", String.valueOf(getActivity()));
+        mActivity = (Activity)context;
     }
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            mActivity = activity;
+        }
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -175,13 +184,81 @@ public class FragmentRegistration extends Fragment {
         showFoodInstruction();
         save();
         setDeleteButtonVisibility();
+        setOnReminderDayTimeRadioButtonClickEvent();
+        setOnReminderIntervalRadioButtonClickEvent();
+        setOnDurationDateRadioButtonClickEvent();
         return root;
     }
 
     @Override
+    public void onResume(){
+
+        if(dbAdapter==null){
+            dbAdapter= new DbAdapter(getActivity().getApplicationContext());
+            dbAdapter.open();
+        }
+        super.onResume();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+    }
+
+    @Override
     public void onStop(){
-        dbAdapter.close();
+        if(dbAdapter!=null) {
+            dbAdapter.close();
+            dbAdapter = null;
+        }
         super.onStop();
+    }
+
+    private void setOnReminderDayTimeRadioButtonClickEvent(){
+        RadioButton rdnReminderDayTime = (RadioButton)root.findViewById((R.id.rd_daytime));
+        rdnReminderDayTime.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showReminderDaytimeDialog();
+            }
+        });
+    }
+
+    private void setOnDurationDateRadioButtonClickEvent(){
+        RadioButton rdnReminderDayTime = (RadioButton)root.findViewById((R.id.rd_numberOfDays));
+        rdnReminderDayTime.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateDialog();
+            }
+        });
+    }
+
+    private void setOnDurationNumOfBlistersRadioButtonClick(){
+        RadioButton rdnReminderDayTime = (RadioButton)root.findViewById((R.id.rd_numberOfDays));
+        rdnReminderDayTime.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeNumberOfBlisterTextField(mActivity);
+                showNumberOfBlistersNumberPickerDialog(mActivity);
+                setCurrentNumberOfBlistersValue();
+            }
+        });
+    }
+
+    private void setOnReminderIntervalRadioButtonClickEvent(){
+        RadioButton rdnReminderDayTime = (RadioButton)root.findViewById((R.id.rd_interval));
+        rdnReminderDayTime.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showReminderIntervalDialog();
+            }
+        });
     }
 
     public void setDeleteButtonVisibility(){
@@ -244,7 +321,6 @@ public class FragmentRegistration extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == SELECT_FILE) {
@@ -254,6 +330,9 @@ public class FragmentRegistration extends Fragment {
             }
             getPicturePath();
         }
+
+        super.onActivityResult(requestCode, resultCode, data);
+
     }
 
     private void onCaptureImageResult(Intent data) {
@@ -339,7 +418,7 @@ public class FragmentRegistration extends Fragment {
         }
         daytimes = strDayTimes.toArray(new CharSequence[allDayTimes.size()]);
         daytimebuilder = new StringBuilder();
-        AlertDialog.Builder reminderDaytimeDialog = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder reminderDaytimeDialog = new AlertDialog.Builder(mActivity);
         daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
         reminderDaytimeDialog.setCancelable(false);
         reminderDaytimeDialog.setTitle(getResources().getString(R.string.title_reminderDaytime));

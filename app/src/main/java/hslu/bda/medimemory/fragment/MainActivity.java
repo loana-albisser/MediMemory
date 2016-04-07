@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        fragmentRegistration = new FragmentRegistration();
         fab =(FloatingActionButton)findViewById(R.id.fab);
         fab.hide();
         setSupportActionBar(toolbar);
@@ -62,7 +61,6 @@ public class MainActivity extends AppCompatActivity{
 
     public void onResume(){
         super.onResume();
-        fragmentRegistration = new FragmentRegistration();
     }
 
 
@@ -107,28 +105,8 @@ public class MainActivity extends AppCompatActivity{
                 .commit();
     }
 
-    public void onReminderDayTimeRadioButtonClick(View v){
-        //fragmentRegistration = new FragmentRegistration();
-        fragmentRegistration.showReminderDaytimeDialog();
-    }
-
-
-    public void onReminderIntervalRadioButtonClick(View v){
-        fragmentRegistration.showReminderIntervalDialog();
-    }
-
-    public void onDurationNumOfBlistersRadioButtonClick(View v) {
-        fragmentRegistration.changeNumberOfBlisterTextField(MainActivity.this);
-        fragmentRegistration.showNumberOfBlistersNumberPickerDialog(MainActivity.this);
-        fragmentRegistration.setCurrentNumberOfBlistersValue();
-    }
-
     public MainActivity getMainContext(){
         return MainActivity.this;
-    }
-
-    public void onDurationDateRadioButtonClick(View v) {
-        fragmentRegistration.showDateDialog();
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

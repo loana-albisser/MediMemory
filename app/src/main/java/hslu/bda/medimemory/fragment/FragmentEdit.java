@@ -1,12 +1,14 @@
 package hslu.bda.medimemory.fragment;
 
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -34,7 +36,7 @@ public class FragmentEdit extends Fragment {
     private ViewGroup root;
     private FragmentRegistration fragmentRegistration;
     private Context context;
-
+    private Activity mActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -46,11 +48,20 @@ public class FragmentEdit extends Fragment {
         return root;
     }
 
-    public void onAttach(Context context){
-        super.onAttach(getActivity().getApplicationContext());
-        Log.i("Activity Attached Edit", String.valueOf(getActivity()));
+    @TargetApi(23)
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mActivity = (Activity)context;
     }
-
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            mActivity = activity;
+        }
+    }
 
 
     private void showItems() {

@@ -109,7 +109,7 @@ public class Day implements DbObject{
                 allDayValues.add(day);
             }
         }catch (Exception e){
-            System.console().printf(e.getMessage());
+            System.out.printf(e.getMessage());
         }
 
         return allDayValues;
