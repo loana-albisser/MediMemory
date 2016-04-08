@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Date;
 
@@ -80,6 +81,8 @@ public class FragmentEdit extends Fragment {
         });
     }
 
+
+
     private void showRegistrationFragment(){
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -87,9 +90,6 @@ public class FragmentEdit extends Fragment {
                 ((MainActivity) getActivity()).getFab().hide();
                 fragmentRegistration = new FragmentRegistration();
                 FragmentManager fragmentManager = getFragmentManager();
-                //fragmentManager.executePendingTransactions();
-                //fragmentManager.beginTransaction().remove(R.id.main, f, "Fragment_Registration").commit();
-                //fragmentManager.beginTransaction().add(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
                 fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
             }
         });
@@ -98,6 +98,5 @@ public class FragmentEdit extends Fragment {
     private void setData(){
         Data data = new Data();
         fragmentRegistration.setName(data.getDescription());
-
     }
 }

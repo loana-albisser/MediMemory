@@ -20,5 +20,8 @@
     <string name="title_intervalDialog">Wie oft möchten Sie das Medikament einnehmen?</string>
     <string name="d_per">mal pro</string>
     <string name="btn_delete">Löschen</string>
+    <string name="um" />
+    <string name="at">um</string>
+    <string name="title_chooseTime">Uhrzeit wählen</string>
 
 </resources>
