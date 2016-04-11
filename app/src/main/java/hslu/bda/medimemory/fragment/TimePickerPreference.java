@@ -60,9 +60,7 @@ public class TimePickerPreference extends DialogPreference {
 
     @Override
     protected void onDialogClosed(boolean positiveResult) {
-        super.onDialogClosed(positiveResult);
-
-        if (positiveResult) {
+        super.onDialogClosed(positiveResult);        if (positiveResult) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
                 calendar.set(Calendar.MINUTE, timePicker.getMinute());
@@ -70,7 +68,6 @@ public class TimePickerPreference extends DialogPreference {
                 calendar.set(Calendar.HOUR_OF_DAY, timePicker.getCurrentHour());
                 calendar.set(Calendar.MINUTE, timePicker.getCurrentMinute());
             }
-
             setSummary(getSummary());
             if (callChangeListener(calendar.getTimeInMillis())) {
                 persistInt((int) calendar.getTimeInMillis());

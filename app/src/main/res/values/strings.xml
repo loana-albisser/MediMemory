@@ -7,7 +7,7 @@
     <string name="nav_header_title">MediMemory</string>
     <string name="title_name">Name des Medikamentes</string>
     <string name="edit_name">Name des Medikamentes eingeben</string>
-    <string name="title_photo">Foto wählen/ erstellen</string>
+    <string name="dialog_title_photo">Foto wählen/ erstellen</string>
     <string name="title_reminder">Einnahmezeit</string>
     <string name="title_duration">Dauer der Einnahme</string>
     <string name="title_dosage">Dosierung</string>
@@ -90,7 +90,7 @@
     <string name="txt_eatBefore">Einnahme: Vor dem Essen</string>
     <string name="txt_eatDuring">Einnahme: Während dem Essen</string>
     <string name="txt_eatAfter">Einnahme: Nach dem Essen</string>
-    <string name="txt_duration_numberOfPills">In der Verpackung hat es</string>
+    <string name="txt_duration_numberOfPills">In der Packung hat es</string>
     <string name="chooseDate">Wähle ein Datum aus</string>
     <string name="blister">Blister</string>
     <string name="desc_pillPhoto">Pill Photo</string>
@@ -153,9 +153,12 @@
     <string name="dialog_reminderDaytimeMessage">Bitte wähle mindestens eine Einnahmezeit aus!</string>
     <string name="dialog_foodInstructionMessage">Bitte wähle eine Ernährungsanweisung der Einnahme aus!</string>
     <string name="dialog_Medisave">Ihr Medikament wurde gespeichert</string>
-    <string name="um" />
+    <string name="um" >um</string>
     <string name="at">um</string>
     <string name="title_chooseTime">Uhrzeit wählen</string>
+    <string name="title_dialogDelete">Willst du das Medikament wirklich löschen?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

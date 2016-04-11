@@ -12,6 +12,7 @@ import hslu.bda.medimemory.R;
 public class FragmentSettings extends PreferenceFragment {
 
 
+
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);

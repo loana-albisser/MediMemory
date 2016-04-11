@@ -3,12 +3,12 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/fragment_help">
-
-    <TextView
-        android:id="@+id/help_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/help_text"
-        android:layout_margin="10dp" />
+    <ExpandableListView
+        android:id="@+id/expList_help"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+        android:dividerHeight="0.5dp"
+        android:layout_margin="16dp" />
 
 </LinearLayout>

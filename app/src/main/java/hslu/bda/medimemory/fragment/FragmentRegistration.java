@@ -8,7 +8,6 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,7 +18,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -81,7 +79,7 @@ public class FragmentRegistration extends Fragment {
     private EditText edit_name;
     private final int REQUEST_CAMERA = 0;
     private final int SELECT_FILE = 1;
-    private ImageView iv_image;
+    private ImageView iv_selectedImage;
     private String imagePath;
 
     private TextView txt_reminder;
@@ -116,10 +114,10 @@ public class FragmentRegistration extends Fragment {
     private RadioGroup rdg_duration;
     private TextView txt_duration = null;
     private StringBuilder numberOfBlisterString;
-    private final Calendar dateCalendar;
-    private int selectedYear;
-    private int selectedMonth;
-    private int selectedDay;
+    private final Calendar dateCalendarDuration;
+    private int selectedYearDuration;
+    private int selectedMonthDuration;
+    private int selectedDayDuration;
     private NumberPicker np_numberofBlisters;
     private int numberOfBlisters = 1;
 
@@ -152,10 +150,10 @@ public class FragmentRegistration extends Fragment {
 
 
     public FragmentRegistration() {
-        dateCalendar = Calendar.getInstance();
-        selectedYear = dateCalendar.get(Calendar.YEAR);
-        selectedMonth = dateCalendar.get(Calendar.MONTH);
-        selectedDay = dateCalendar.get(Calendar.DAY_OF_MONTH);
+        dateCalendarDuration = Calendar.getInstance();
+        selectedYearDuration = dateCalendarDuration.get(Calendar.YEAR);
+        selectedMonthDuration = dateCalendarDuration.get(Calendar.MONTH);
+        selectedDayDuration = dateCalendarDuration.get(Calendar.DAY_OF_MONTH);
     }
 
     @TargetApi(23)
@@ -177,24 +175,23 @@ public class FragmentRegistration extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_registration, container, false);
-        super.onCreateView(inflater,container,savedInstanceState);
-        Log.i("Activity CreateView", String.valueOf(getActivity()));
+        super.onCreateView(inflater, container, savedInstanceState);
 
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
         setupShowImage();
         showReminderDetails();
+        setOnReminderDayTimeRadioButtonClickEvent();
+        setOnReminderIntervalRadioButtonClickEvent();
         showDuration();
+        setOnDurationDateRadioButtonClickEvent();
+        setOnDurationNumOfBlistersRadioButtonClick();
         setupDosageNumberPicker();
         setDosage();
         showFoodInstruction();
-        save();
-        setDeleteButtonVisibility();
-        setOnReminderDayTimeRadioButtonClickEvent();
-        setOnReminderIntervalRadioButtonClickEvent();
-        setOnDurationDateRadioButtonClickEvent();
-        setOnDurationNumOfBlistersRadioButtonClick();
+        saveItem();
         deleteItem();
+        setDeleteButtonVisibility();
         return root;
     }
 
@@ -238,8 +235,8 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void setOnDurationDateRadioButtonClickEvent(){
-        RadioButton rdnReminderDayTime = (RadioButton)root.findViewById((R.id.rd_numberOfDays));
-        rdnReminderDayTime.setOnClickListener(new OnClickListener() {
+        RadioButton rd_durationDate = (RadioButton)root.findViewById((R.id.rd_numberOfDays));
+        rd_durationDate.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDateDialog();
@@ -248,8 +245,8 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void setOnDurationNumOfBlistersRadioButtonClick(){
-        RadioButton rdnReminderDayTime = (RadioButton)root.findViewById((R.id.rd_packageEnd));
-        rdnReminderDayTime.setOnClickListener(new OnClickListener() {
+        RadioButton rd_durationPackageEnd = (RadioButton)root.findViewById((R.id.rd_durationPackageEnd));
+        rd_durationPackageEnd.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 changeNumberOfBlisterTextField();
@@ -260,8 +257,8 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void setOnReminderIntervalRadioButtonClickEvent(){
-        RadioButton rdnReminderDayTime = (RadioButton)root.findViewById((R.id.rd_interval));
-        rdnReminderDayTime.setOnClickListener(new OnClickListener() {
+        RadioButton rd_ReminderInterval = (RadioButton)root.findViewById((R.id.rd_interval));
+        rd_ReminderInterval.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showReminderIntervalDialog();
@@ -288,14 +285,14 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void setupShowImage() {
-        Button btn_select = (Button) root.findViewById(R.id.btn_SelectPhoto);
-        btn_select.setOnClickListener(new OnClickListener() {
+        Button btn_selectPhoto = (Button) root.findViewById(R.id.btn_selectPhoto);
+        btn_selectPhoto.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectImage();
             }
         });
-        iv_image = (ImageView) root.findViewById(R.id.iv_Image);
+        iv_selectedImage = (ImageView) root.findViewById(R.id.iv_selectedImage);
 
     }
 
@@ -303,9 +300,9 @@ public class FragmentRegistration extends Fragment {
         final CharSequence[] items = { getResources().getString(R.string.d_selectPhoto), getResources().getString(R.string.d_chooseLibrary),
                 getResources().getString(R.string.cancel) };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
-        builder.setTitle(getResources().getString(R.string.title_photo));
-        builder.setItems(items, new DialogInterface.OnClickListener() {
+        android.support.v7.app.AlertDialog.Builder builder_selectImage = new android.support.v7.app.AlertDialog.Builder(getActivity());
+        builder_selectImage.setTitle(getResources().getString(R.string.dialog_title_photo));
+        builder_selectImage.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals(getResources().getString(R.string.d_selectPhoto))) {
@@ -324,7 +321,7 @@ public class FragmentRegistration extends Fragment {
                 }
             }
         });
-        builder.show();
+        builder_selectImage.show();
     }
 
     @Override
@@ -359,7 +356,7 @@ public class FragmentRegistration extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        iv_image.setImageBitmap(thumbnail);
+        iv_selectedImage.setImageBitmap(thumbnail);
     }
 
     private void onSelectFromGalleryResult(Intent data) {
@@ -384,7 +381,7 @@ public class FragmentRegistration extends Fragment {
         options.inJustDecodeBounds = false;
         bm = BitmapFactory.decodeFile(imagePath, options);
 
-        iv_image.setImageBitmap(bm);
+        iv_selectedImage.setImageBitmap(bm);
     }
 
     private String getPicturePath(){
@@ -556,7 +553,7 @@ public class FragmentRegistration extends Fragment {
 
     private void showIntervalTimePickerDialog() {
         intervalCalendar = Calendar.getInstance();
-        TimePickerDialog tpd_interval = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+        TimePickerDialog tpd_interval = new TimePickerDialog(getActivity(),R.style.DateTimeDialogTheme, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 intervalCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -646,7 +643,7 @@ public class FragmentRegistration extends Fragment {
             @Override
             public void onClick(View v) {
                 final StringBuilder startString = new StringBuilder();
-                tp_startEndTimeInterval = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                tp_startEndTimeInterval = new TimePickerDialog(getActivity(),R.style.DateTimeDialogTheme, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         startTimeCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -666,7 +663,7 @@ public class FragmentRegistration extends Fragment {
             @Override
             public void onClick(View v) {
                 final StringBuilder endString = new StringBuilder();
-                tp_startEndTimeInterval = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                tp_startEndTimeInterval = new TimePickerDialog(getActivity(),R.style.DateTimeDialogTheme, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         endTimeCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -759,8 +756,8 @@ public class FragmentRegistration extends Fragment {
     }
 
     private long getSelectedDate(){
-        Log.i("Selected Date", String.valueOf(dateCalendar.getTimeInMillis()));
-        return dateCalendar.getTimeInMillis();
+        Log.i("Selected Date", String.valueOf(dateCalendarDuration.getTimeInMillis()));
+        return dateCalendarDuration.getTimeInMillis();
 
     }
 
@@ -781,7 +778,7 @@ public class FragmentRegistration extends Fragment {
         int numberOfIntakes = -1;
         RadioButton rd_numberOfDays = (RadioButton)root.findViewById(R.id.rd_numberOfDays);
         RadioButton rd_always = (RadioButton)root.findViewById(R.id.rd_always);
-        RadioButton rd_packageEnd = (RadioButton)root.findViewById(R.id.rd_packageEnd);
+        RadioButton rd_packageEnd = (RadioButton)root.findViewById(R.id.rd_durationPackageEnd);
         if (rd_numberOfDays.isChecked()){
             if (rd_reminderInterval.isChecked()){
                 if (getInterval() ==0){
@@ -809,24 +806,24 @@ public class FragmentRegistration extends Fragment {
     }
 
     public void showDateDialog(){
-        DatePickerDialog dpd = new DatePickerDialog(super.getActivity(), new DatePickerDialog.OnDateSetListener() {
+        DatePickerDialog dpd = new DatePickerDialog(getActivity(),R.style.DateTimeDialogTheme, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 StringBuilder numDaysString = new StringBuilder();
-                dateCalendar.set(Calendar.YEAR, year);
-                dateCalendar.set(Calendar.MONTH, monthOfYear);
-                dateCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                dateCalendarDuration.set(Calendar.YEAR, year);
+                dateCalendarDuration.set(Calendar.MONTH, monthOfYear);
+                dateCalendarDuration.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 endDate = new SimpleDateFormat("dd.MM.yyyy");
-                String dateString = endDate.format(dateCalendar.getTime());
+                String dateString = endDate.format(dateCalendarDuration.getTime());
                 monthOfYear = monthOfYear+1;
                 numDaysString.append(getResources().getString(R.string.taking)).append(" ")
                         .append(getResources().getString(R.string.till)).append(" ").append(dateString);
                 txt_duration.setText(numDaysString);
-                selectedYear = year;
-                selectedMonth = monthOfYear-1;
-                selectedDay = dayOfMonth;
+                selectedYearDuration = year;
+                selectedMonthDuration = monthOfYear-1;
+                selectedDayDuration = dayOfMonth;
             }
-        }, selectedYear, selectedMonth, selectedDay);
+        }, selectedYearDuration, selectedMonthDuration, selectedDayDuration);
         dpd.setButton(DialogInterface.BUTTON_NEGATIVE, null, dpd);
         dpd.show();
     }
@@ -911,7 +908,7 @@ public class FragmentRegistration extends Fragment {
         final RadioGroup rdg_foodInstruction = new RadioGroup(getActivity().getApplicationContext());
 
        for (Eat eat : allFoodInstructions) {
-           rd_foodinstruction[eat.getId()] = new RadioButton(getActivity().getApplicationContext());
+           rd_foodinstruction[eat.getId()] = (RadioButton)getActivity().getLayoutInflater().inflate(R.layout.template_radiobutton, null);
            rdg_foodInstruction.addView(rd_foodinstruction[eat.getId()]);
            rd_foodinstruction[eat.getId()].setText(eat.getDescription());
            rd_foodinstruction[eat.getId()].setTextColor(Color.BLACK);
@@ -925,11 +922,6 @@ public class FragmentRegistration extends Fragment {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 txt_foodInstruction.setVisibility(View.VISIBLE);
                 eatString = new StringBuilder();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    rd_foodinstruction[0].setButtonTintList(ColorStateList.valueOf(Color.GRAY));
-                    rd_foodinstruction[1].setButtonTintList(ColorStateList.valueOf(Color.GRAY));
-                    rd_foodinstruction[2].setButtonTintList(ColorStateList.valueOf(Color.GRAY));
-                }
                 if (checkedId == rd_foodinstruction[0].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatBefore));
                     selectedFoodInstruction = 0;
@@ -942,9 +934,6 @@ public class FragmentRegistration extends Fragment {
                     eatString.append(getResources().getString(R.string.txt_eatDuring));
                     selectedFoodInstruction = 2;
 
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    rd_foodinstruction[selectedFoodInstruction].setButtonTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
                 }
                 selectedFoodInstruction = checkedId;
                 txt_foodInstruction.setText(eatString);
@@ -969,7 +958,7 @@ public class FragmentRegistration extends Fragment {
         edit_notes.setText(text);
     }
 
-    private void save(){
+    private void saveItem(){
         Button btn_save = (Button)root.findViewById(R.id.btn_save);
         final RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
         final RadioGroup rdg_duration = (RadioGroup)root.findViewById(R.id.rdg_duration);
@@ -1068,7 +1057,21 @@ public class FragmentRegistration extends Fragment {
         btn_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(),"Medikament wurde gelöscht", Toast.LENGTH_SHORT).show();
+                final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+                alertBuilder.setTitle(getResources().getString(R.string.title_dialogDelete));
+                alertBuilder.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getActivity(), "Medikament wurde gelöscht", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                alertBuilder.setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alertBuilder.show();
             }
         });
     }

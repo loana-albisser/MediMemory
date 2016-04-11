@@ -16,5 +16,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/iv_example"
         android:layout_gravity="center"
-        android:longClickable="false"/>
+        android:longClickable="false"
+        />
 </FrameLayout>
