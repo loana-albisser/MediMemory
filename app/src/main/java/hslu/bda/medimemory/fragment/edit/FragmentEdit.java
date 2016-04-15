@@ -1,32 +1,28 @@
-package hslu.bda.medimemory.fragment;
+package hslu.bda.medimemory.fragment.edit;
 
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.Date;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.entity.Data;
+import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
+import hslu.bda.medimemory.fragment.MainActivity;
 
 /**
  * Created by Loana on 01.03.2016.

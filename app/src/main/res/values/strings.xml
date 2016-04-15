@@ -124,7 +124,7 @@
     <string name="beforeFood">Vor dem Essen</string>
     <string name="duringFood">Während dem Essen</string>
     <string name="afterFood">Nach dem Essen</string>
-    <string name="title_intervalDialog">Intervall der Medikamenteneinnahme</string>
+    <string name="title_intervalDialog">Intervall der Einnahme</string>
     <string name="d_per">mal pro</string>
     <string name="btn_endtime">Endzeit</string>
     <string name="Startzeit">Startzeit</string>
@@ -134,7 +134,7 @@
     <string name="txt_dosage">Dosierung:</string>
     <string name="reminder">Erinnerung:</string>
     <string name="minutes">Minuten</string>
-    <string name="title_reminderDaytime">Tageszeit der Medikamenteneinnahme</string>
+    <string name="title_reminderDaytime">Tageszeit der Einnahme</string>
     <string name="btn_delete">Löschen</string>
     <string name="monday">Montag</string>
     <string name="tuesday">Dienstag</string>
@@ -143,7 +143,7 @@
     <string name="friday">Freitag</string>
     <string name="saturday">Samstag</string>
     <string name="sunday">Sonntag</string>
-    <string name="title_dialogWeekday">Wochentag der Einnahme</string>
+    <string name="title_dialogWeekday">Wochentag wählen</string>
     <string name="on">am</string>
     <string name="from">von</string>
     <string name="dialog_nameMessage">Bitte gib einen Namen ein!</string>
@@ -159,6 +159,39 @@
     <string name="title_dialogDelete">Willst du das Medikament wirklich löschen?</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="iBtn_helpName">help</string>
+    <string name="pref_help">Hilfe</string>
+    <string name="title_showHelp">Hilfetext Anzeigen</string>
+
+    <string name="question_1">Was ist MediMemory?</string>
+    <string name="question_2">Wie kann ich ein Medikament hinzufügen?</string>
+    <string name="question_3">Wie kann ich ein Medikament löschen?</string>
+    <string name="question_4">Wozu muss ein Foto aufgenommen werden?</string>
+    <string name="question_5">Wozu ist der „+“ Knopt unten rechts?</string>
+    <string name="question_6">Wo kann ich Erinnerungszeiten ändern?</string>
+    <string name="question_7">Wie kann ich Erinnerungen vor/nach Mahlzeiten anpassen?</string>
+    <string name="question_8">Wie kann ich den Erinnerungston anpassen?</string>
+    <string name="question_9">Wozu sind die „?“ in der Erfassung? ?</string>
+
+    <string name="answer_1">MediMemory soll dazu dienen Medikamente regelmässig einzunehmen. Es erinnert dazu zuverlässig an die Einnahme und stellt alle einzunehmenden Medikamente übersichtlich dar.</string>
+    <string name="answer_2">Im Erfassungsbildschirm können Medikamente einfach hinzugefügt werden. Dazu sollen allen nötigen Daten angegeben werden und mit „Speichern“ bestätigt werden.</string>
+    <string name="answer_3">Im Bearbeitungsbildschirm sind alle Medikamente in einer übersichtlichen Liste dargestellt. Wenn das entsprechende Medikament angewählt wird, kann man danach mit dem „Löschen“ Knopf das Medikament einfach löschen.m</string>
+    <string name="answer_4">Das Foto dient zum einen zur automatischen Erkennung der Anzahl der Tabletten. Zusätzlich kann so im Übersichtsbildschirm dargestellt werden wie der Blister aussehen soll.</string>
+    <string name="answer_5">Mit diesem Knopf kann man schnell ein neues Medikament hinzufügen.</string>
+    <string name="answer_6">Alle jeweiligen Zeiten können individuell in den Einstellungen angepasst werden.</string>
+    <string name="answer_7">Dies kann in den Einstellungen angepasst werden.</string>
+    <string name="answer_8">Die Klingeltöne können in den Einstellungen festgelegt werden.</string>
+    <string name="answer_9">So können Hilfestellungen angezeigt werden. Falls diese nicht mehr benötigt werden, können sie in den Einstellungen deaktiviert werden.</string>
+
+    <string name="iBtn_helpPhoto">iBtn_helpPhoto</string>
+    <string name="iBtn_helpReminder">helpReminder</string>
+    <string name="iBtn_helpDuration">helpDuration</string>
+    <string name="iBtn_helpfoodInstruction">helpFoodinstruction</string>
+    <string name="hepltext_name">Der Name dient zur Identifikation des Medikamentes!</string>
+    <string name="helptext_photo">Das Foto dient zum einen zur automatischen Erkennung der Anzahl der Tabletten. Zusätzlich kann so im Übersichtsbildschirm dargestellt werden wie der Blister aussehen soll.</string>
+    <string name="helptext_reminder">Hier können die Einnahmezeiten nach Tageszeiten (Morgen/ Mittag/ Abend/ Nacht) oder Intervall (Stunde/ Tag/ Woche) eingestellt werden.</string>
+    <string name="helptext_duration">Die Einnahmezeit kann entweder bis zu einem bestimmten Datum, unbeschränkt oder bis zum Ende der Packung eingestellt werden.</string>
+    <string name="helptext_FoodInstruction">Geben Sie an ob sie das Medikament vor, während oder nach dem Essen einnehmen wollen.</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

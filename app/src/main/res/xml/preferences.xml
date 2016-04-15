@@ -6,22 +6,22 @@
            android:title="@string/title_reminder_time"
            android:key="pref_key_reminder_time"
            android:persistent="true">
-           <hslu.bda.medimemory.fragment.TimePickerPreference
+           <hslu.bda.medimemory.fragment.settings.TimePickerPreference
                android:key="pref_key_morning_reminder"
                android:title="@string/title_morning_reminder"
                android:defaultValue="25200000"
                android:persistent="true"/>
-           <hslu.bda.medimemory.fragment.TimePickerPreference
+           <hslu.bda.medimemory.fragment.settings.TimePickerPreference
                android:key="pref_key_noon_reminder"
                android:title="@string/title_noon_reminder"
                android:defaultValue="39600000"
                android:persistent="true"/>
-           <hslu.bda.medimemory.fragment.TimePickerPreference
+           <hslu.bda.medimemory.fragment.settings.TimePickerPreference
                android:key="pref_key_evening_reminder"
                android:title="@string/title_evening_reminder"
                android:defaultValue="61200000"
                android:persistent="true"/>
-           <hslu.bda.medimemory.fragment.TimePickerPreference
+           <hslu.bda.medimemory.fragment.settings.TimePickerPreference
                android:key="pref_key_night_reminder"
                android:title="@string/title_night_reminder"
                android:defaultValue="82800000"
@@ -31,12 +31,12 @@
            android:title="@string/pref_foodinstruction"
            android:key="pref_key_foodinstruction"
            android:persistent="true">
-       <hslu.bda.medimemory.fragment.NumberPickerPreference
+       <hslu.bda.medimemory.fragment.settings.NumberPickerPreference
            android:key="pref_key_before_food"
            android:title="@string/title_before_food"
            android:defaultValue="15"
            android:persistent="true"/>
-       <hslu.bda.medimemory.fragment.NumberPickerPreference
+       <hslu.bda.medimemory.fragment.settings.NumberPickerPreference
            android:key="pref_key_after_food"
            android:title="@string/title_after_food"
            android:defaultValue="15"
@@ -51,11 +51,23 @@
         <RingtonePreference
             android:key="pref_key_ringtone"
             android:title="@string/title_ringtone"
-            android:ringtoneType="notification"
+            android:ringtoneType="all"
+            android:showSilent="true"
             android:persistent="true"/>
         <CheckBoxPreference
             android:key="pref_key_vibration"
             android:title="@string/title_vibration"
+            android:defaultValue="true"
+            android:persistent="true"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_help"
+        android:key="pref_key_help"
+        android:persistent="true">
+        <CheckBoxPreference
+            android:key="pref_key_showHelp"
+            android:title="@string/title_showHelp"
             android:defaultValue="true"
             android:persistent="true"/>
     </PreferenceCategory>

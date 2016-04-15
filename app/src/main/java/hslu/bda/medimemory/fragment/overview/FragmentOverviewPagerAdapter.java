@@ -1,4 +1,4 @@
-package hslu.bda.medimemory.fragment;
+package hslu.bda.medimemory.fragment.overview;
 
 import android.content.Context;
 import android.app.Fragment;

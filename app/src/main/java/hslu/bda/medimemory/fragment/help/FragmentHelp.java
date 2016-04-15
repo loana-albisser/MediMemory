@@ -1,4 +1,4 @@
-package hslu.bda.medimemory.fragment;
+package hslu.bda.medimemory.fragment.help;
 
 
 

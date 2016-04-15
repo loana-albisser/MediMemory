@@ -1,4 +1,4 @@
-package hslu.bda.medimemory.fragment;
+package hslu.bda.medimemory.fragment.settings;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -15,8 +15,8 @@ import hslu.bda.medimemory.R;
 public class NumberPickerPreference extends DialogPreference {
     private NumberPicker numberPicker;
     private StringBuilder numberString;
-    private int value = 15;
-    private final int DEFAULT_VALUE = 15;
+    private int value = 30;
+    private final int DEFAULT_VALUE = 30;
 
     public NumberPickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);

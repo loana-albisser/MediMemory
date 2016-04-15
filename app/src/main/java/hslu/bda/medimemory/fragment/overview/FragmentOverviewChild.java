@@ -1,4 +1,4 @@
-package hslu.bda.medimemory.fragment;
+package hslu.bda.medimemory.fragment.overview;
 
 import android.app.Fragment;
 import android.graphics.Bitmap;
@@ -24,7 +24,6 @@ public class FragmentOverviewChild extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //View view = inflater.inflate(R.layout.fragment_overview_child, container, false);
         View view = inflater.inflate(R.layout.fragment_overview_child, container, false);
         Bundle bundle = getArguments();
         childname = bundle.getString("data");

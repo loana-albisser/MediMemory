@@ -2,7 +2,6 @@ package hslu.bda.medimemory.fragment;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 
@@ -16,6 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import hslu.bda.medimemory.R;
+import hslu.bda.medimemory.fragment.edit.FragmentEdit;
+import hslu.bda.medimemory.fragment.help.FragmentHelp;
+import hslu.bda.medimemory.fragment.overview.FragmentOverview;
+import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
+import hslu.bda.medimemory.fragment.settings.FragmentSettings;
 
 public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawer;

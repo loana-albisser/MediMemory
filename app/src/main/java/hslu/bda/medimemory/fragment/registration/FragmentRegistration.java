@@ -1,4 +1,4 @@
-package hslu.bda.medimemory.fragment;
+package hslu.bda.medimemory.fragment.registration;
 
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
@@ -8,16 +8,25 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 
 import android.os.Bundle;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -25,10 +34,12 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 
@@ -49,6 +60,7 @@ import android.provider.MediaStore.MediaColumns;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -65,6 +77,8 @@ import hslu.bda.medimemory.entity.ConsumeInterval;
 import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.entity.Day;
 import hslu.bda.medimemory.entity.Eat;
+import hslu.bda.medimemory.fragment.MainActivity;
+import hslu.bda.medimemory.fragment.settings.FragmentSettings;
 import hslu.bda.medimemory.services.CreateMediService;
 
 /**
@@ -144,9 +158,12 @@ public class FragmentRegistration extends Fragment {
     private Collection<ConsumeInterval> consumeIntervals = new ArrayList<>();
     private Collection<ConsumeIndividual> consumeIndividuals = new ArrayList<>();
     private StringBuilder eatString;
-    //private RadioButton rd_foodInstruction;
     private int selectedFoodInstruction;
-    private int foodid;
+    private ImageButton iBtn_helpPhoto;
+    private ImageButton iBtn_helpReminder;
+    private ImageButton iBtn_helpDuration;
+    private ImageButton iBtn_helpFoodInstruction;
+    private TextView txt_helpText;
 
 
     public FragmentRegistration() {
@@ -189,6 +206,19 @@ public class FragmentRegistration extends Fragment {
         setupDosageNumberPicker();
         setDosage();
         showFoodInstruction();
+        if (checkHelpTextVisibility()){
+            showHelpText();
+            iBtn_helpPhoto.setVisibility(View.VISIBLE);
+            iBtn_helpReminder.setVisibility(View.VISIBLE);
+            iBtn_helpDuration.setVisibility(View.VISIBLE);
+            iBtn_helpFoodInstruction.setVisibility(View.VISIBLE);
+        } else {
+            iBtn_helpPhoto.setVisibility(View.GONE);
+            iBtn_helpReminder.setVisibility(View.GONE);
+            iBtn_helpDuration.setVisibility(View.GONE);
+            iBtn_helpFoodInstruction.setVisibility(View.GONE);
+        }
+
         saveItem();
         deleteItem();
         setDeleteButtonVisibility();
@@ -197,7 +227,6 @@ public class FragmentRegistration extends Fragment {
 
     @Override
     public void onResume(){
-
         if(dbAdapter==null){
             dbAdapter= new DbAdapter(getActivity().getApplicationContext());
             dbAdapter.open();
@@ -536,7 +565,7 @@ public class FragmentRegistration extends Fragment {
                     np_reminderInterval.setMaxValue(23);
                     np_reminderInterval.setValue(selectedValue);
                 } else if (selectedInterval.equals(getResources().getString(R.string.day))) {
-                    np_reminderInterval.setMaxValue(20);
+                    np_reminderInterval.setMaxValue(31);
                     np_reminderInterval.setValue(selectedValue);
                 } else if (selectedInterval.equals(getResources().getString(R.string.week))) {
                     np_reminderInterval.setMaxValue(60);
@@ -956,6 +985,61 @@ public class FragmentRegistration extends Fragment {
 
     private void setNotes(String text){
         edit_notes.setText(text);
+    }
+
+    private void showHelpText(){
+        iBtn_helpPhoto.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayPopupWindow(v, getActivity().getString(R.string.helptext_photo));
+            }
+        });
+        iBtn_helpReminder.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayPopupWindow(v, getActivity().getString(R.string.helptext_reminder));
+            }
+        });
+        iBtn_helpDuration.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayPopupWindow(v, getActivity().getString(R.string.helptext_duration));
+            }
+        });
+        iBtn_helpFoodInstruction.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayPopupWindow(v, getActivity().getString(R.string.helptext_FoodInstruction));
+            }
+        });
+    }
+
+    private boolean checkHelpTextVisibility(){
+        iBtn_helpPhoto = (ImageButton) root.findViewById(R.id.iBtn_helpPhoto);
+        iBtn_helpReminder = (ImageButton) root.findViewById(R.id.iBtn_helpReminder);
+        iBtn_helpDuration = (ImageButton)root.findViewById(R.id.iBtn_helpDuration);
+        iBtn_helpFoodInstruction = (ImageButton) root.findViewById(R.id.iBtn_helpfoodInstruction);
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
+        boolean showHelp = pref.getBoolean("pref_key_showHelp",false);
+        return showHelp;
+    }
+
+    private void displayPopupWindow(View anchorView, String helptext) {
+
+        PopupWindow popup = new PopupWindow(getActivity());
+        View layout = getActivity().getLayoutInflater().inflate(R.layout.popup_help_content, null);
+        txt_helpText = (TextView)layout.findViewById(R.id.txt_helpText);
+        txt_helpText.setText(helptext);
+        popup.setContentView(layout);
+        popup.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        popup.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+        popup.setOutsideTouchable(true);
+        popup.setFocusable(true);
+        popup.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.popup_layout, null));
+        popup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        popup.showAsDropDown(anchorView);
     }
 
     private void saveItem(){

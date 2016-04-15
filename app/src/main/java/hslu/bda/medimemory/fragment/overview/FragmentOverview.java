@@ -1,4 +1,4 @@
-package hslu.bda.medimemory.fragment;
+package hslu.bda.medimemory.fragment.overview;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -26,13 +26,13 @@ public class FragmentOverview extends Fragment {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_overview, container, false);
         getIDs(root);
         setEvents();
-        addPage("Kardionin");
-        addPage("Aspirin");
-        addPage("Mucokehl D5");
-        addPage("Dafalgan");
-        addPage("Buscopan");
-        addPage("Collunosol");
-        addPage("Algifor Forte");
+        addPage("Medikament1");
+        addPage("Medikament2");
+        addPage("Medikament3");
+        addPage("Medikament4");
+        addPage("Medikament5");
+        addPage("Medikament6");
+        addPage("Medikament7");
         addPage("Medikament8");
         return root;
     }

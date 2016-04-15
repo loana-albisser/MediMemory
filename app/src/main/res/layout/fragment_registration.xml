@@ -35,16 +35,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <TextView
-                android:id="@+id/title_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="3"
-                android:padding="8dp"
-                android:text="@string/title_name"
-                android:textColor="#222"
-                android:textStyle="bold"
-                android:textSize="22sp" />
+
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/title_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:padding="8dp"
+                    android:text="@string/title_name"
+                    android:textColor="#222"
+                    android:textStyle="bold"
+                    android:textSize="22sp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="0dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="0dp"
+                    android:layout_alignParentStart="true" />
+
+            </RelativeLayout>
+
             <EditText
                 android:id="@+id/edit_name"
                 android:layout_width="match_parent"
@@ -67,16 +81,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <TextView
-                android:id="@+id/title_photo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="3"
-                android:padding="8dp"
-                android:text="@string/dialog_title_photo"
-                android:textColor="#222"
-                android:textStyle="bold"
-                android:textSize="22sp" />
+
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/title_photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:padding="8dp"
+                    android:text="@string/dialog_title_photo"
+                    android:textColor="#222"
+                    android:textStyle="bold"
+                    android:textSize="22sp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="0dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="0dp" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/iBtn_helpPhoto"
+                    android:src="@drawable/ic_help"
+                    android:contentDescription="@string/iBtn_helpPhoto"
+                    android:background="#00ffffff"
+                    android:layout_alignParentLeft="false"
+                    android:layout_alignParentTop="false"
+                    android:layout_marginTop="0dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignBottom="@+id/title_photo"
+                    android:layout_alignTop="@+id/title_photo"
+                    android:visibility="visible"
+                    android:layout_margin="10dp" />
+            </RelativeLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -113,16 +155,40 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/ln_reminder">
-            <TextView
-                android:id="@+id/title_reminder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="3"
-                android:padding="8dp"
-                android:text="@string/title_reminder"
-                android:textColor="#222"
-                android:textStyle="bold"
-                android:textSize="22sp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/title_reminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:padding="8dp"
+                    android:text="@string/title_reminder"
+                    android:textColor="#222"
+                    android:textStyle="bold"
+                    android:textSize="22sp"
+                    android:layout_alignParentEnd="false" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/iBtn_helpReminder"
+                    android:src="@drawable/ic_help"
+                    android:contentDescription="@string/iBtn_helpReminder"
+                    android:background="#00ffffff"
+                    android:layout_alignParentLeft="false"
+                    android:layout_alignParentTop="false"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignBottom="@+id/title_reminder"
+                    android:layout_alignTop="@+id/title_reminder"
+                    android:visibility="visible"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="false"
+                    android:layout_margin="10dp" />
+            </RelativeLayout>
 
             <RadioGroup
                 android:layout_width="match_parent"
@@ -156,16 +222,37 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/ln_duration">
-            <TextView
-                android:id="@+id/title_duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="3"
-                android:padding="8dp"
-                android:text="@string/title_duration"
-                android:textColor="#222"
-                android:textStyle="bold"
-                android:textSize="22sp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/title_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:padding="8dp"
+                    android:text="@string/title_duration"
+                    android:textColor="#222"
+                    android:textStyle="bold"
+                    android:textSize="22sp" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/iBtn_helpDuration"
+                    android:src="@drawable/ic_help"
+                    android:contentDescription="@string/iBtn_helpDuration"
+                    android:background="#00ffffff"
+                    android:layout_alignParentLeft="false"
+                    android:layout_alignParentTop="false"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignBottom="@+id/title_duration"
+                    android:layout_alignTop="@+id/title_duration"
+                    android:visibility="visible"
+                    android:layout_margin="10dp" />
+            </RelativeLayout>
 
             <RadioGroup
                 android:layout_width="match_parent"
@@ -233,16 +320,37 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/ln_foodInstruction">
-            <TextView
-                android:id="@+id/title_foodInstruction"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="3"
-                android:padding="8dp"
-                android:text="@string/title_foodinstruction"
-                android:textColor="#222"
-                android:textStyle="bold"
-                android:textSize="22sp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/title_foodInstruction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:padding="8dp"
+                    android:text="@string/title_foodinstruction"
+                    android:textColor="#222"
+                    android:textStyle="bold"
+                    android:textSize="22sp" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/iBtn_helpfoodInstruction"
+                    android:src="@drawable/ic_help"
+                    android:contentDescription="@string/iBtn_helpfoodInstruction"
+                    android:background="#00ffffff"
+                    android:layout_alignParentLeft="false"
+                    android:layout_alignParentTop="false"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignBottom="@+id/title_foodInstruction"
+                    android:layout_alignTop="@+id/title_foodInstruction"
+                    android:visibility="visible"
+                    android:layout_margin="10dp" />
+            </RelativeLayout>
 
 
         </LinearLayout>
