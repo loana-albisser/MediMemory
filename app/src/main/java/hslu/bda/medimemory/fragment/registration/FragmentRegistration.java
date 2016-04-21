@@ -36,6 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -103,6 +104,7 @@ public class FragmentRegistration extends Fragment {
     private ArrayList<Integer> selList = new ArrayList<Integer>();
     private Spinner sp_reminderInterval;
     private int numberofCheckedItems;
+    private AlertDialog.Builder reminderDaytimeDialog;
     private RadioButton rd_reminderInterval;
     private TimePickerDialog tp_startEndTimeInterval;
     private StringBuilder daytimebuilder;
@@ -118,9 +120,11 @@ public class FragmentRegistration extends Fragment {
     private SimpleDateFormat intervalTime;
     private String intervalTimeString;
     private List<String> weekdays;
+    private AlertDialog.Builder dialogWeekday;
     private int weekday;
     private String weekdayString;
     private NumberPicker np_reminderInterval;
+    private TimePickerDialog tpd_interval;
     private StringBuilder intervalbuilder;
     private int selectedValue = 1;
     private String selectedInterval;
@@ -374,7 +378,9 @@ public class FragmentRegistration extends Fragment {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         assert thumbnail != null;
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-        File destination = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
+        //File destination = new File(Environment.getExternalStorageDirectory()+File.separator+"MediMemory"+File.separator, System.currentTimeMillis() + ".jpg");
+        //File destination = new File ("/storage/emulated/MediMemory",System.currentTimeMillis() + ".jpg");
+        File destination = new File(Environment.getRootDirectory()+"/Medimemory", System.currentTimeMillis()+".jpg");
         imagePath = destination.toString();
         FileOutputStream fo;
         try {
@@ -417,6 +423,11 @@ public class FragmentRegistration extends Fragment {
         return imagePath;
     }
 
+    public void setPicture(Bitmap picture){
+        ImageView iv_selectedImage = (ImageView)root.findViewById(R.id.iv_selectedImage);
+        iv_selectedImage.setImageBitmap(picture);
+    }
+
     private void showInfoTextField(TextView textView, ViewGroup viewGroup) {
         textView.setPadding(10, 10, 10, 10);
         textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -452,23 +463,11 @@ public class FragmentRegistration extends Fragment {
         }
         daytimes = strDayTimes.toArray(new CharSequence[allDayTimes.size()]);
         daytimebuilder = new StringBuilder();
-        AlertDialog.Builder reminderDaytimeDialog = new AlertDialog.Builder(mActivity);
+        reminderDaytimeDialog = new AlertDialog.Builder(mActivity);
         daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
         reminderDaytimeDialog.setCancelable(false);
         reminderDaytimeDialog.setTitle(getResources().getString(R.string.title_reminderDaytime));
-        reminderDaytimeDialog.setMultiChoiceItems(daytimes, checkItems, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        if (isChecked) {
-                            selList.add(which);
-                            checkItems[which] = true;
-                        } else if (selList.contains(which)) {
-                            selList.remove(which);
-                            checkItems[which] = false;
-                        }
-                    }
-                }
-        );
+        reminderDaytimeDialog.setMultiChoiceItems(daytimes, checkItems, dayTimeListener);
         reminderDaytimeDialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -484,6 +483,21 @@ public class FragmentRegistration extends Fragment {
         Dialog dialog = reminderDaytimeDialog.create();
         dialog.show();
     }
+
+    DialogInterface.OnMultiChoiceClickListener dayTimeListener = new DialogInterface.OnMultiChoiceClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+            if (isChecked) {
+                selList.add(which);
+                checkItems[which] = true;
+            } else if (selList.contains(which)) {
+                selList.remove(which);
+                checkItems[which] = false;
+            }
+        }
+    };
+
+
 
     private Collection<Day> getDaytimes(){
         return selectedDayTimes;
@@ -542,6 +556,8 @@ public class FragmentRegistration extends Fragment {
         b.show();
     }
 
+
+
     private void setupReminderIntervalNumberPicker(){
         np_reminderInterval = (NumberPicker)dialogView.findViewById(R.id.np_reminderInterval);
         np_reminderInterval.setMinValue(1);
@@ -582,7 +598,7 @@ public class FragmentRegistration extends Fragment {
 
     private void showIntervalTimePickerDialog() {
         intervalCalendar = Calendar.getInstance();
-        TimePickerDialog tpd_interval = new TimePickerDialog(getActivity(),R.style.DateTimeDialogTheme, new TimePickerDialog.OnTimeSetListener() {
+        tpd_interval = new TimePickerDialog(getActivity(),R.style.DateTimeDialogTheme, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 intervalCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -604,55 +620,94 @@ public class FragmentRegistration extends Fragment {
     private void showWeekdayDialog(){
         weekdayString = getResources().getString(R.string.monday);
         weekdays = Arrays.asList(getResources().getStringArray(R.array.array_weekday));
-        AlertDialog.Builder dialogWeekday = new AlertDialog.Builder(getActivity());
+        dialogWeekday = new AlertDialog.Builder(getActivity());
         dialogWeekday.setCancelable(false);
-        dialogWeekday.setTitle(getResources().getString(R.string.title_dialogWeekday));
-        dialogWeekday.setSingleChoiceItems(R.array.array_weekday, 0, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (which == weekdays.indexOf(getString(R.string.monday))) {
-                    weekday = Calendar.MONDAY;
-                    weekdayString = getResources().getString(R.string.monday);
-                } else if (which == weekdays.indexOf(getString(R.string.tuesday))) {
-                    weekday = Calendar.TUESDAY;
-                    weekdayString = getResources().getString(R.string.tuesday);
-                } else if (which == weekdays.indexOf(getString(R.string.wednesday))) {
-                    weekday = Calendar.WEDNESDAY;
-                    weekdayString = getResources().getString(R.string.wednesday);
-                } else if (which == weekdays.indexOf(getString(R.string.thursday))) {
-                    weekday = Calendar.THURSDAY;
-                    weekdayString = getResources().getString(R.string.thursday);
-                } else if (which == weekdays.indexOf(getString(R.string.friday))) {
-                    weekday = Calendar.FRIDAY;
-                    weekdayString = getResources().getString(R.string.friday);
-                } else if (which == weekdays.indexOf(getString(R.string.saturday))) {
-                    weekday = Calendar.SATURDAY;
-                    weekdayString = getResources().getString(R.string.saturday);
-                } else if (which == weekdays.indexOf(getString(R.string.sunday))) {
-                    weekday = Calendar.SUNDAY;
-                    weekdayString = getResources().getString(R.string.sunday);
-                }
-            }
 
-        });
+        dialogWeekday.setTitle(getResources().getString(R.string.title_dialogWeekday));
+        dialogWeekday.setSingleChoiceItems(R.array.array_weekday, 0, dialogWeekListener);
         dialogWeekday.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 intervalbuilder.append(" ").append(getResources().getString(R.string.on)).append(" ").append(weekdayString);
                 showIntervalTimePickerDialog();
-                //intervalbuilder.append(" ").append(getResources().getString(R.string.on)).append(" ").append(weekdayString).append(" ").append(getResources().getString(R.string.at)).append(" ").append(intervalTimeString);
-                //txt_reminder.setText(intervalbuilder);
             }
         });
         Dialog d = dialogWeekday.create();
         d.show();
     }
 
+    DialogInterface.OnClickListener dialogWeekListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == weekdays.indexOf(getString(R.string.monday))) {
+                weekday = Calendar.MONDAY;
+                weekdayString = getResources().getString(R.string.monday);
+            } else if (which == weekdays.indexOf(getString(R.string.tuesday))) {
+                weekday = Calendar.TUESDAY;
+                weekdayString = getResources().getString(R.string.tuesday);
+            } else if (which == weekdays.indexOf(getString(R.string.wednesday))) {
+                weekday = Calendar.WEDNESDAY;
+                weekdayString = getResources().getString(R.string.wednesday);
+            } else if (which == weekdays.indexOf(getString(R.string.thursday))) {
+                weekday = Calendar.THURSDAY;
+                weekdayString = getResources().getString(R.string.thursday);
+            } else if (which == weekdays.indexOf(getString(R.string.friday))) {
+                weekday = Calendar.FRIDAY;
+                weekdayString = getResources().getString(R.string.friday);
+            } else if (which == weekdays.indexOf(getString(R.string.saturday))) {
+                weekday = Calendar.SATURDAY;
+                weekdayString = getResources().getString(R.string.saturday);
+            } else if (which == weekdays.indexOf(getString(R.string.sunday))) {
+                weekday = Calendar.SUNDAY;
+                weekdayString = getResources().getString(R.string.sunday);
+            }
+        }
+
+    };
+
+
     private int getWeekday(){
         return weekday;
     }
 
-    private void setWeekday(){
+    public void setReminderRadioButton(int checkedRadioButton){
+        RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
+        rdg_reminder.check(checkedRadioButton);
+    }
+
+    public void setReminderDayTime(boolean [] checkedItems){
+        reminderDaytimeDialog.setMultiChoiceItems(daytimes, checkedItems, dayTimeListener);
+    }
+
+    public void setReminderInterval(int value, int position){
+        NumberPicker np_reminderInterval = (NumberPicker)root.findViewById(R.id.np_reminderInterval);
+        np_reminderInterval.setValue(value);
+        Spinner sp_reminderInterval = (Spinner)root.findViewById(R.id.sp_reminderInterval);
+        sp_reminderInterval.setSelection(position);
+    }
+
+    public void setReminderStartTime(int hour, int minute){
+        if (sp_reminderInterval.getSelectedItemPosition() ==0){
+            startTimeCalendar.set(Calendar.HOUR_OF_DAY,hour);
+            startTimeCalendar.set(Calendar.MINUTE,minute);
+        } else if (sp_reminderInterval.getSelectedItemPosition() ==1 || sp_reminderInterval.getSelectedItemPosition() ==2){
+            intervalCalendar.set(Calendar.HOUR_OF_DAY,hour);
+            intervalCalendar.set(Calendar.MINUTE,minute);
+        }
+    }
+
+    public void setReminderEndTime(int hour, int minute){
+        if (sp_reminderInterval.getSelectedItemPosition() ==0){
+            endTimeCalendar.set(Calendar.HOUR_OF_DAY,hour);
+            endTimeCalendar.set(Calendar.MINUTE,minute);
+        } else if (sp_reminderInterval.getSelectedItemPosition() ==1 || sp_reminderInterval.getSelectedItemPosition() ==2){
+            intervalCalendar.set(Calendar.HOUR_OF_DAY,hour);
+            intervalCalendar.set(Calendar.MINUTE,minute);
+        }
+    }
+
+    public void setWeekday(int checkedItems){
+        dialogWeekday.setSingleChoiceItems(R.array.array_weekday, checkedItems, dialogWeekListener);
 
     }
 
@@ -830,18 +885,36 @@ public class FragmentRegistration extends Fragment {
         return numberOfIntakes;
     }
 
+    public void setDuration(int checkedItem,int value,int year,int month, int day){
+        rdg_duration.check(checkedItem);
+        if (checkedItem==0){
+            dateCalendarDuration.set(Calendar.YEAR, year);
+            dateCalendarDuration.set(Calendar.MONTH,month);
+            dateCalendarDuration.set(Calendar.DAY_OF_MONTH,day);
+        } else if (checkedItem==2){
+            np_numberofBlisters.setValue(value);
+        }
+    }
+
     public void setCurrentNumberOfBlistersValue(){
         np_numberofBlisters.setValue(numberOfBlisters);
     }
 
     public void showDateDialog(){
-        DatePickerDialog dpd = new DatePickerDialog(getActivity(),R.style.DateTimeDialogTheme, new DatePickerDialog.OnDateSetListener() {
+        int style;
+        if (isBrokenSamsungDevice()){
+            style = android.R.style.Theme_Holo_Light_Dialog;
+        } else {
+            style = R.style.DateTimeDialogTheme;
+        }
+        DatePickerDialog dpd = new DatePickerDialog(getActivity(),  style,new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 StringBuilder numDaysString = new StringBuilder();
                 dateCalendarDuration.set(Calendar.YEAR, year);
                 dateCalendarDuration.set(Calendar.MONTH, monthOfYear);
                 dateCalendarDuration.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
                 endDate = new SimpleDateFormat("dd.MM.yyyy");
                 String dateString = endDate.format(dateCalendarDuration.getTime());
                 monthOfYear = monthOfYear+1;
@@ -855,6 +928,17 @@ public class FragmentRegistration extends Fragment {
         }, selectedYearDuration, selectedMonthDuration, selectedDayDuration);
         dpd.setButton(DialogInterface.BUTTON_NEGATIVE, null, dpd);
         dpd.show();
+    }
+
+    private static boolean isBrokenSamsungDevice() {
+        return (Build.MANUFACTURER.equalsIgnoreCase("samsung")
+                && isBetweenAndroidVersions(
+                Build.VERSION_CODES.LOLLIPOP,
+                Build.VERSION_CODES.LOLLIPOP_MR1));
+    }
+
+    private static boolean isBetweenAndroidVersions(int min, int max) {
+        return Build.VERSION.SDK_INT >= min && Build.VERSION.SDK_INT <= max;
     }
 
     public void changeNumberOfBlisterTextField() {
@@ -974,8 +1058,8 @@ public class FragmentRegistration extends Fragment {
         return Iterables.get(allFoodInstructions, selectedFoodInstruction);
     }
 
-    private void setFoodInstruction(){
-        rd_foodinstruction[selectedFoodInstruction].isChecked();
+    private void setFoodInstruction(int selectedFoodInstruction){
+        rd_foodinstruction[selectedFoodInstruction].setChecked(true);
     }
 
     private String getNotes(){
@@ -983,8 +1067,8 @@ public class FragmentRegistration extends Fragment {
         return String.valueOf(edit_notes.getText());
     }
 
-    private void setNotes(String text){
-        edit_notes.setText(text);
+    private void setNotes(String notes){
+        edit_notes.setText(notes);
     }
 
     private void showHelpText(){
@@ -1036,7 +1120,6 @@ public class FragmentRegistration extends Fragment {
         popup.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
         popup.setOutsideTouchable(true);
         popup.setFocusable(true);
-        popup.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.popup_layout, null));
         popup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         popup.showAsDropDown(anchorView);

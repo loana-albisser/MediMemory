@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import hslu.bda.medimemory.R;
 
@@ -20,20 +22,24 @@ public class FragmentOverview extends Fragment {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private FragmentOverviewPagerAdapter adapter;
+    private int count = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_overview, container, false);
         getIDs(root);
         setEvents();
-        addPage("Medikament1");
+        /*addPage("Medikament1");
         addPage("Medikament2");
         addPage("Medikament3");
         addPage("Medikament4");
         addPage("Medikament5");
         addPage("Medikament6");
         addPage("Medikament7");
-        addPage("Medikament8");
+        addPage("Medikament8");*/
+        if (count ==0){
+           addPage("Noch kein Medikament erfasst");
+        }
         return root;
     }
 
@@ -80,15 +86,13 @@ public class FragmentOverview extends Fragment {
 
         viewPager.setCurrentItem(adapter.getCount() - 1);
         setupTabLayout();
+        count ++;
     }
 
     public void setupTabLayout() {
         selectedTabPosition = viewPager.getCurrentItem();
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             tabLayout.getTabAt(i).setCustomView(adapter.getTabView(i));
-
         }
-
-
     }
 }

@@ -169,7 +169,7 @@
     <string name="question_4">Wozu muss ein Foto aufgenommen werden?</string>
     <string name="question_5">Wozu ist der „+“ Knopt unten rechts?</string>
     <string name="question_6">Wo kann ich Erinnerungszeiten ändern?</string>
-    <string name="question_7">Wie kann ich Erinnerungen vor/nach Mahlzeiten anpassen?</string>
+    <string name="question_7">Wie kann ich Erinnerungen vor/ nach Mahlzeiten anpassen?</string>
     <string name="question_8">Wie kann ich den Erinnerungston anpassen?</string>
     <string name="question_9">Wozu sind die „?“ in der Erfassung? ?</string>
 
@@ -192,6 +192,9 @@
     <string name="helptext_reminder">Hier können die Einnahmezeiten nach Tageszeiten (Morgen/ Mittag/ Abend/ Nacht) oder Intervall (Stunde/ Tag/ Woche) eingestellt werden.</string>
     <string name="helptext_duration">Die Einnahmezeit kann entweder bis zu einem bestimmten Datum, unbeschränkt oder bis zum Ende der Packung eingestellt werden.</string>
     <string name="helptext_FoodInstruction">Geben Sie an ob sie das Medikament vor, während oder nach dem Essen einnehmen wollen.</string>
+    <string name="txt_titleAlarm">Medikamenten Alarm</string>
+    <string name="txt_reminderAlarm">Hast du deine Medikamente genommen?</string>
+    <string name="txt_noMediRegistered">Es wurde noch kein Medikament erfasst!</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>
