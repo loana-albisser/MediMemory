@@ -72,7 +72,6 @@ public class FragmentEdit extends Fragment {
             listView.setVisibility(View.GONE);
             txt_edit.setVisibility(View.VISIBLE);
             LinearLayout ln_edit = (LinearLayout)root.findViewById(R.id.ln_edit);
-            //ln_edit.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.example_pill, null));
         } else {
             listView.setVisibility(View.VISIBLE);
             txt_edit.setVisibility(View.GONE);

@@ -195,6 +195,14 @@
     <string name="txt_titleAlarm">Medikamenten Alarm</string>
     <string name="txt_reminderAlarm">Hast du deine Medikamente genommen?</string>
     <string name="txt_noMediRegistered">Es wurde noch kein Medikament erfasst!</string>
+    <string name="chk_pillTake">Eingenommen</string>
+    <string name="chk_pillForgot">Vergessen</string>
+    <string name="chk_pillLost">Verloren</string>
+    <string name="txt_taken">Eingenommen</string>
+    <string name="txt_next">Nächste Pille</string>
+    <string name="txt_lost">Verloren</string>
+    <string name="txt_forgot">Vergessen</string>
+    <string name="iBtn_helpOverview">helOverview</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

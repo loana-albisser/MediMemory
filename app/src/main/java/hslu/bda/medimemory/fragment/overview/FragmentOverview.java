@@ -1,17 +1,28 @@
 package hslu.bda.medimemory.fragment.overview;
 
 import android.app.Fragment;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 import hslu.bda.medimemory.R;
+import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
 
 /**
  * Created by Loana on 04.03.2016.
@@ -19,27 +30,31 @@ import hslu.bda.medimemory.R;
 public class FragmentOverview extends Fragment {
 
     private ViewGroup root;
+    private ViewGroup overviewView;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private FragmentOverviewPagerAdapter adapter;
     private int count = 0;
+    private ImageButton iBtn_helpOverview;
+    private FragmentRegistration fragmentRegistration;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_overview, container, false);
         getIDs(root);
         setEvents();
-        /*addPage("Medikament1");
+        addPage("Medikament1");
         addPage("Medikament2");
         addPage("Medikament3");
         addPage("Medikament4");
         addPage("Medikament5");
         addPage("Medikament6");
         addPage("Medikament7");
-        addPage("Medikament8");*/
+        addPage("Medikament8");
         if (count ==0){
            addPage("Noch kein Medikament erfasst");
         }
+
         return root;
     }
 
@@ -95,4 +110,6 @@ public class FragmentOverview extends Fragment {
             tabLayout.getTabAt(i).setCustomView(adapter.getTabView(i));
         }
     }
+
+
 }

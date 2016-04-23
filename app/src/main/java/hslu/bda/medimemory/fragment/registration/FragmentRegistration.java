@@ -79,7 +79,6 @@ import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.entity.Day;
 import hslu.bda.medimemory.entity.Eat;
 import hslu.bda.medimemory.fragment.MainActivity;
-import hslu.bda.medimemory.fragment.settings.FragmentSettings;
 import hslu.bda.medimemory.services.CreateMediService;
 
 /**
@@ -167,6 +166,7 @@ public class FragmentRegistration extends Fragment {
     private ImageButton iBtn_helpReminder;
     private ImageButton iBtn_helpDuration;
     private ImageButton iBtn_helpFoodInstruction;
+    private ImageButton iBtn_helpOverview;
     private TextView txt_helpText;
 
 
@@ -1098,11 +1098,12 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
-    private boolean checkHelpTextVisibility(){
+    public boolean checkHelpTextVisibility(){
         iBtn_helpPhoto = (ImageButton) root.findViewById(R.id.iBtn_helpPhoto);
         iBtn_helpReminder = (ImageButton) root.findViewById(R.id.iBtn_helpReminder);
         iBtn_helpDuration = (ImageButton)root.findViewById(R.id.iBtn_helpDuration);
         iBtn_helpFoodInstruction = (ImageButton) root.findViewById(R.id.iBtn_helpfoodInstruction);
+        iBtn_helpOverview = (ImageButton)root.findViewById(R.id.iBtn_helpOverview);
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         boolean showHelp = pref.getBoolean("pref_key_showHelp",false);
@@ -1110,7 +1111,6 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void displayPopupWindow(View anchorView, String helptext) {
-
         PopupWindow popup = new PopupWindow(getActivity());
         View layout = getActivity().getLayoutInflater().inflate(R.layout.popup_help_content, null);
         txt_helpText = (TextView)layout.findViewById(R.id.txt_helpText);
