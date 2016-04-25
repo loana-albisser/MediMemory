@@ -13,20 +13,14 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.preference.CheckBoxPreference;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 
 import android.os.Bundle;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -36,7 +30,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -463,7 +456,7 @@ public class FragmentRegistration extends Fragment {
         }
         daytimes = strDayTimes.toArray(new CharSequence[allDayTimes.size()]);
         daytimebuilder = new StringBuilder();
-        reminderDaytimeDialog = new AlertDialog.Builder(mActivity);
+        reminderDaytimeDialog = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
         reminderDaytimeDialog.setCancelable(false);
         reminderDaytimeDialog.setTitle(getResources().getString(R.string.title_reminderDaytime));
@@ -508,7 +501,7 @@ public class FragmentRegistration extends Fragment {
     }
 
     public void showReminderIntervalDialog(){
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         dialogView = inflater.inflate(R.layout.dialog_reminderinterval, null);
         dialogBuilder.setView(dialogView);
@@ -558,6 +551,7 @@ public class FragmentRegistration extends Fragment {
 
 
 
+
     private void setupReminderIntervalNumberPicker(){
         np_reminderInterval = (NumberPicker)dialogView.findViewById(R.id.np_reminderInterval);
         np_reminderInterval.setMinValue(1);
@@ -598,7 +592,7 @@ public class FragmentRegistration extends Fragment {
 
     private void showIntervalTimePickerDialog() {
         intervalCalendar = Calendar.getInstance();
-        tpd_interval = new TimePickerDialog(getActivity(),R.style.DateTimeDialogTheme, new TimePickerDialog.OnTimeSetListener() {
+        tpd_interval = new TimePickerDialog(getActivity(),R.style.DialogTheme, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 intervalCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -620,7 +614,7 @@ public class FragmentRegistration extends Fragment {
     private void showWeekdayDialog(){
         weekdayString = getResources().getString(R.string.monday);
         weekdays = Arrays.asList(getResources().getStringArray(R.array.array_weekday));
-        dialogWeekday = new AlertDialog.Builder(getActivity());
+        dialogWeekday = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         dialogWeekday.setCancelable(false);
 
         dialogWeekday.setTitle(getResources().getString(R.string.title_dialogWeekday));
@@ -716,7 +710,7 @@ public class FragmentRegistration extends Fragment {
         endTimeCalendar = Calendar.getInstance();
         startTimeString = "00:00";
         endTimeString = "23:59";
-        final AlertDialog.Builder dialogStartEndTime = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder dialogStartEndTime = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         LayoutInflater inflaterStartEnd = getActivity().getLayoutInflater();
         View dialogViewStartEnd = inflaterStartEnd.inflate(R.layout.dialog_reminderstartendtime, null);
         final Button btn_starttime = (Button)dialogViewStartEnd.findViewById(R.id.btn_starttime);
@@ -727,7 +721,7 @@ public class FragmentRegistration extends Fragment {
             @Override
             public void onClick(View v) {
                 final StringBuilder startString = new StringBuilder();
-                tp_startEndTimeInterval = new TimePickerDialog(getActivity(),R.style.DateTimeDialogTheme, new TimePickerDialog.OnTimeSetListener() {
+                tp_startEndTimeInterval = new TimePickerDialog(getActivity(),R.style.DialogTheme, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         startTimeCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -747,7 +741,7 @@ public class FragmentRegistration extends Fragment {
             @Override
             public void onClick(View v) {
                 final StringBuilder endString = new StringBuilder();
-                tp_startEndTimeInterval = new TimePickerDialog(getActivity(),R.style.DateTimeDialogTheme, new TimePickerDialog.OnTimeSetListener() {
+                tp_startEndTimeInterval = new TimePickerDialog(getActivity(),R.style.DialogTheme, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         endTimeCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -905,7 +899,7 @@ public class FragmentRegistration extends Fragment {
         if (isBrokenSamsungDevice()){
             style = android.R.style.Theme_Holo_Light_Dialog;
         } else {
-            style = R.style.DateTimeDialogTheme;
+            style = R.style.DialogTheme;
         }
         DatePickerDialog dpd = new DatePickerDialog(getActivity(),  style,new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -952,7 +946,7 @@ public class FragmentRegistration extends Fragment {
     }
 
     public void showNumberOfBlistersNumberPickerDialog(){
-        AlertDialog.Builder npb_numberofBlisters = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder npb_numberofBlisters = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         numberOfBlisterString = new StringBuilder();
         npb_numberofBlisters.setCancelable(false);
         np_numberofBlisters.setMaxValue(20);
@@ -1138,7 +1132,7 @@ public class FragmentRegistration extends Fragment {
         final CardView cv_notes = (CardView)root.findViewById(R.id.cv_notes);
         rd_reminderdaytime = (RadioButton)root.findViewById(R.id.rd_daytime);
         final EditText edit_name = (EditText)root.findViewById(R.id.edit_name);
-        final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         btn_save.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1224,7 +1218,7 @@ public class FragmentRegistration extends Fragment {
         btn_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+                final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
                 alertBuilder.setTitle(getResources().getString(R.string.title_dialogDelete));
                 alertBuilder.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override

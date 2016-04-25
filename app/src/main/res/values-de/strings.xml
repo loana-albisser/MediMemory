@@ -194,6 +194,7 @@
     <string name="helptext_FoodInstruction">Geben Sie an ob sie das Medikament vor, während oder nach dem Essen einnehmen wollen.</string>
     <string name="txt_titleAlarm">Medikamenten Alarm</string>
     <string name="txt_reminderAlarm">Hast du deine Medikamente genommen?</string>
+    <string name="title_dialogStatus">Status</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

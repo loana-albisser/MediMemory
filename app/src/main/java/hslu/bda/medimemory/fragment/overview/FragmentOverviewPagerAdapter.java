@@ -46,14 +46,8 @@ public class FragmentOverviewPagerAdapter extends FragmentPagerAdapter{
     public View getTabView(int position) {
         View view = LayoutInflater.from(context).inflate(R.layout.custom_tab_item, null);
         TextView tabItemName = (TextView) view.findViewById(R.id.textViewTabItemName);
-
-
-
         tabItemName.setText(mFragmentTitleList.get(position));
         tabItemName.setTextColor(context.getResources().getColor(android.R.color.background_light));
-
-
-
         return view;
     }
 

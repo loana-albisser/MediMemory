@@ -203,6 +203,7 @@
     <string name="txt_lost">Verloren</string>
     <string name="txt_forgot">Vergessen</string>
     <string name="iBtn_helpOverview">helOverview</string>
+    <string name="title_dialogStatus">Status</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>
@@ -225,6 +226,12 @@
         <item id= "friday">@string/friday</item>
         <item id= "saturday">@string/saturday</item>
         <item id= "sunday">@string/sunday</item>
+    </string-array>
+
+    <string-array name="array_status">
+        <item id= "taken">@string/txt_taken</item>
+        <item id= "forgot">@string/txt_forgot</item>
+        <item id= "lost">@string/txt_lost</item>
     </string-array>
 
 

@@ -54,8 +54,14 @@ public class FragmentOverview extends Fragment {
         if (count ==0){
            addPage("Noch kein Medikament erfasst");
         }
+        viewPager.setCurrentItem(0);
 
         return root;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
     }
 
     private void getIDs(View view) {
@@ -63,12 +69,12 @@ public class FragmentOverview extends Fragment {
         adapter = new FragmentOverviewPagerAdapter(getFragmentManager(), getActivity());
         viewPager.setAdapter(adapter);
         tabLayout = (TabLayout) view.findViewById(R.id.my_tab_layout);
+
     }
 
     int selectedTabPosition;
 
     private void setEvents() {
-
         tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -83,8 +89,6 @@ public class FragmentOverview extends Fragment {
             public void onTabUnselected(TabLayout.Tab tab) {
                 super.onTabUnselected(tab);
                 Log.d("Unselected", "Unselected " + tab.getPosition());
-
-
             }
         });
     }
