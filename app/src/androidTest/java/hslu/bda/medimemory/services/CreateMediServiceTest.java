@@ -1,6 +1,7 @@
 package hslu.bda.medimemory.services;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.entity.ConsumeIndividual;
 import hslu.bda.medimemory.entity.ConsumeInterval;
@@ -42,7 +44,7 @@ public class CreateMediServiceTest extends AndroidTestCase {
         data.setAmount(1);
         data.setWidth(2);
         data.setLength(4);
-        data.setPicture("Test.jpg");
+        data.setPicture(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.example_pill));
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         data.setCreateDate(cal);

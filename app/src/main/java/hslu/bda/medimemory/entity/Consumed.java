@@ -2,6 +2,8 @@ package hslu.bda.medimemory.entity;
 
 import android.content.ContentValues;
 
+import org.opencv.core.Point;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -18,6 +20,7 @@ import hslu.bda.medimemory.database.DbHelper;
  */
 public class Consumed implements DbObject {
     private int id;
+    private PillCoords pillCoord;
     private int mediid;
     private Calendar pointInTime;
     private Status status;
@@ -25,11 +28,12 @@ public class Consumed implements DbObject {
 
     public Consumed(){}
 
-    public Consumed(int id, int mediid, Calendar pointInTime, Status status){
+    public Consumed(int id, int mediid, Calendar pointInTime, Status status, PillCoords pillCoords){
         this.setId(id);
         this.setMediid(mediid);
         this.setPointInTime(pointInTime);
         this.setStatus(status);
+        this.setPillCoord(pillCoords);
     }
 
     public int getId() {
@@ -72,6 +76,14 @@ public class Consumed implements DbObject {
         this.status = status;
     }
 
+    public PillCoords getPillCoord() {
+        return pillCoord;
+    }
+
+    public void setPillCoord(PillCoords pillCoord) {
+        this.pillCoord = pillCoord;
+    }
+
     @Override
     public ContentValues getContentValues() {
         final ContentValues values = new ContentValues();
@@ -79,7 +91,7 @@ public class Consumed implements DbObject {
         values.put(DbHelper.COLUMN_MEDIID, getMediid());
         values.put(DbHelper.COLUMN_POINTINTIME, simpleDateFormat.format(getPointInTime().getTime()));
         values.put(DbHelper.COLUMN_STATUS, getStatus().getId());
-
+        values.put(DbHelper.COLUMN_POINT, getPillCoord().getId());
         return values;
     }
 
@@ -122,6 +134,9 @@ public class Consumed implements DbObject {
             consumed.setPointInTime(calendar);
         }catch(Exception e) {consumed.setPointInTime(null);}
         consumed.setStatus(Status.getStatusById(contentValues.getAsString(DbHelper.COLUMN_STATUS),dbAdapter));
+        consumed.setPillCoord(PillCoords.getPillCoordById(contentValues.getAsString(DbHelper.COLUMN_POINT),dbAdapter));
         return  consumed;
     }
+
+
 }

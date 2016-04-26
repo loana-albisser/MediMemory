@@ -1,7 +1,10 @@
 package hslu.bda.medimemory.entity;
 
 import android.content.ContentValues;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,7 +27,7 @@ public class Data implements DbObject {
     private int amount;
     private int width;
     private int length;
-    private String picture;
+    private Bitmap picture;
     private Calendar createDate;
     private String note;
     private int active;
@@ -33,6 +36,7 @@ public class Data implements DbObject {
     private Collection<Consumed> allConsumed = new ArrayList<Consumed>();
     private Collection<ConsumeIndividual> allConsumeIndividual = new ArrayList<ConsumeIndividual>();
     private Collection<ConsumeInterval> allConsumeInterval = new ArrayList<ConsumeInterval>();
+    private Collection<PillCoords> allPillCoords = new ArrayList<PillCoords>();
 
     public int getId() {
         return id;
@@ -82,11 +86,11 @@ public class Data implements DbObject {
         this.length = length;
     }
 
-    public String getPicture() {
+    public Bitmap getPicture() {
         return picture;
     }
 
-    public void setPicture(String picture) {
+    public void setPicture(Bitmap picture) {
         this.picture = picture;
     }
 
@@ -138,6 +142,11 @@ public class Data implements DbObject {
         this.allConsumeInterval = allConsumeInterval;
     }
 
+    public Collection<PillCoords> getAllPillCoords(){return  allPillCoords;}
+
+    public void setAllPillCoords(Collection<PillCoords> allPillCoords){
+        this.allPillCoords = allPillCoords;
+    }
 
     @Override
     public ContentValues getContentValues() {
@@ -148,7 +157,9 @@ public class Data implements DbObject {
         values.put(DbHelper.COLUMN_AMOUNT, getAmount());
         values.put(DbHelper.COLUMN_WIDTH, getWidth());
         values.put(DbHelper.COLUMN_LENGTH, getLength());
-        values.put(DbHelper.COLUMN_PICTURE, getPicture());
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        getPicture().compress(Bitmap.CompressFormat.PNG, 0, stream);
+        values.put(DbHelper.COLUMN_PICTURE, stream.toByteArray());
         values.put(DbHelper.COLUMN_CREATEDATE, simpleDateFormat.format(getCreateDate().getTime()));
         values.put(DbHelper.COLUMN_NOTE, getNote());
         values.put(DbHelper.COLUMN_ACTIVE, getActive());
@@ -179,7 +190,7 @@ public class Data implements DbObject {
         data.setAmount(contentValues.getAsInteger(DbHelper.COLUMN_AMOUNT));
         data.setWidth(contentValues.getAsInteger(DbHelper.COLUMN_WIDTH));
         data.setLength(contentValues.getAsInteger(DbHelper.COLUMN_LENGTH));
-        data.setPicture(contentValues.getAsString(DbHelper.COLUMN_PICTURE));
+        data.setPicture(BitmapFactory.decodeByteArray(contentValues.getAsByteArray(DbHelper.COLUMN_PICTURE),0,contentValues.getAsByteArray(DbHelper.COLUMN_PICTURE).length));
         try{
             Calendar calendar = new GregorianCalendar();
             calendar.setTime(simpleDateFormat.parse(contentValues.getAsString(DbHelper.COLUMN_CREATEDATE)));
@@ -201,6 +212,7 @@ public class Data implements DbObject {
         data.setAllConsumed(Consumed.getAllConsumedByMedid(data.getId(), dbAdapter));
         data.setAllConsumeIndividual(ConsumeIndividual.getAllConsumeIndividualByMedid(data.getId(), dbAdapter));
         data.setAllConsumeInterval(ConsumeInterval.getAllConsumeIntervalByMedid(data.getId(), dbAdapter));
+        data.setAllPillCoords(PillCoords.getAllPillCoordsByMedid(data.getId(),dbAdapter));
         return data;
     }
 

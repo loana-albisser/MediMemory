@@ -17,15 +17,15 @@ import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
 
 /**
- * Created by Andy on 18.03.2016.
+ * Created by Andy on 22.04.2016.
  */
-public class ConsumedTest extends AndroidTestCase{
+public class PillCoordsTest extends AndroidTestCase{
     private Data data;
     private DbAdapter dbAdapter;
     private Context context;
-    private Consumed consumed;
-    private int newID = 0;
     private PillCoords pillCoords;
+    private int newID = 0;
+
 
 
 
@@ -41,7 +41,7 @@ public class ConsumedTest extends AndroidTestCase{
         data.setAmount(1);
         data.setWidth(2);
         data.setLength(4);
-        data.setPicture(BitmapFactory.decodeResource(getContext().getResources(),R.drawable.example_pill));
+        data.setPicture(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.example_pill));
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         data.setCreateDate(cal);
@@ -49,36 +49,34 @@ public class ConsumedTest extends AndroidTestCase{
         data.setActive(1);
         data.setId(dbAdapter.createDbObject(data));
         assertTrue(data.getId() > 0);
-        pillCoords = new PillCoords(0, data.getId(),new Point(200,200));
-        pillCoords.setId(dbAdapter.createDbObject(pillCoords));
-        assertTrue(pillCoords.getId() > 0);
-        consumed = new Consumed(0,data.getId(),cal,Status.getStatusById("0",dbAdapter), pillCoords);
-        assertTrue(consumed!=null);
+        Point point = new Point();
+        point.x = 200;
+        point.y = 200;
+        pillCoords = new PillCoords(0,data.getId(),point);
+        assertTrue(pillCoords != null);
     }
 
     public void testCRUD(){
 
         //CRUD - TEST CREATED
-        newID = (int) dbAdapter.createDbObject(consumed);
+        newID = (int) dbAdapter.createDbObject(pillCoords);
         assertTrue(newID > 0);
 
         //CRUD - TEST READ
-        consumed = null;
-        Collection<Consumed> allConsumedByMedid= Consumed.getAllConsumedByMedid(data.getId(),dbAdapter);
-        consumed = Iterables.get(allConsumedByMedid,0);
-        assertEquals(consumed.getMediid(), data.getId());
+        pillCoords = null;
+        pillCoords = PillCoords.getPillCoordById(String.valueOf(newID), dbAdapter);
+        assertEquals(pillCoords.getMediid(), data.getId());
 
         //CRUD - TEST UPDATED
-        consumed.setStatus(Status.getStatusById("1",dbAdapter));
-        assertTrue(dbAdapter.updateDbObject(consumed));
+        pillCoords.setCoords(new Point(200,300));
+        assertTrue(dbAdapter.updateDbObject(pillCoords));
 
         //CRUD - TEST DELETED
-        assertTrue(dbAdapter.deleteDbObject(consumed));
+        assertTrue(dbAdapter.deleteDbObject(pillCoords));
     }
 
     @Override
     protected void tearDown(){
-        dbAdapter.deleteDbObject(pillCoords);
         dbAdapter.deleteDbObject(data);
         dbAdapter.close();
     }

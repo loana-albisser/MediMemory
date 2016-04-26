@@ -18,6 +18,7 @@ public class DbHelper extends SQLiteOpenHelper{
     public static String TABLE_MEDI_DAY = "Medi_day";
     public static String TABLE_MEDI_CONSINDIV = "Medi_consumeIndividual";
     public static String TABLE_MEDI_CONSINTER = "Medi_consumeInterval";
+    public static String TABLE_MEDI_PILL_LOC = "Medi_pill_loc";
 
     public static String COLUMN_ID = "ID";
     public static String COLUMN_DESC = "description";
@@ -40,6 +41,9 @@ public class DbHelper extends SQLiteOpenHelper{
     public static String COLUMN_WEEKDAY = "weekday";
     public static String COLUMN_CREATEDATE="createDate";
     public static String COLUMN_NOTE = "note";
+    public static String COLUMN_XCOORD = "xaxes";
+    public static String COLUMN_YCOORD = "yaxes";
+    public static String COLUMN_POINT = "point";
 
     public DbHelper(final Context context) {
         super(context, DB_NAME, null, DB_Version);
@@ -53,9 +57,12 @@ public class DbHelper extends SQLiteOpenHelper{
         createDataTable(db);
         createConsumeIndividualTable(db);
         createConsumeIntervalTable(db);
+        createPillCoordinateTable(db);
         createStatusTable(db);
         createConsumeTable(db);
     }
+
+
 
     private void createDayTable(SQLiteDatabase db){
         String CREATE_DAY_TABLE = "CREATE TABLE "+this.TABLE_MEDI_DAY + " (" +
@@ -92,7 +99,7 @@ public class DbHelper extends SQLiteOpenHelper{
                 this.COLUMN_AMOUNT + " INTEGER, "+
                 this.COLUMN_WIDTH + " INTEGER, "+
                 this.COLUMN_LENGTH + " INTEGER, "+
-                this.COLUMN_PICTURE + " TEXT, " +
+                this.COLUMN_PICTURE + " BLOB, " +
                 this.COLUMN_CREATEDATE+ " TEXT, " +
                 this.COLUMN_NOTE+ " TEXT, " +
                 this.COLUMN_ACTIVE + " INTEGER " +
@@ -131,6 +138,18 @@ public class DbHelper extends SQLiteOpenHelper{
         db.execSQL(CREATE_ConsInt_TABLE);
     }
 
+    private void createPillCoordinateTable(SQLiteDatabase db) {
+        String CREATE_Pill_LOC_TABLE = "CREATE TABLE " + this.TABLE_MEDI_PILL_LOC + " ("+
+                this.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                this.COLUMN_MEDIID + " INTEGER, "+
+                this.COLUMN_XCOORD + " REAL, "+
+                this.COLUMN_YCOORD + " REAL, "+
+                "FOREIGN KEY("+ this.COLUMN_MEDIID +") REFERENCES "+
+                this.TABLE_MEDI_DATA+"("+this.COLUMN_ID+")  ON DELETE CASCADE"+
+                ");";
+        db.execSQL(CREATE_Pill_LOC_TABLE);
+    }
+
     private void createStatusTable(SQLiteDatabase db) {
         String CREATE_STATUS_TABLE = "CREATE TABLE "+this.TABLE_MEDI_STATUS + " (" +
                 this.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -148,12 +167,15 @@ public class DbHelper extends SQLiteOpenHelper{
         String CREATE_CONSUME_TABLE = "CREATE TABLE "+this.TABLE_MEDI_CONSUMED +"("+
                 this.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 this.COLUMN_MEDIID + " INTEGER, "+
+                this.COLUMN_POINT + " INTEGER, "+
                 this.COLUMN_POINTINTIME + " TEXT, "+
                 this.COLUMN_STATUS + " INTEGER,"+
                 "FOREIGN KEY("+ this.COLUMN_MEDIID +") REFERENCES "+
                 this.TABLE_MEDI_DATA+"("+this.COLUMN_ID+") ON DELETE CASCADE, " +
                 "FOREIGN KEY("+ this.COLUMN_STATUS +") REFERENCES "+
-                this.TABLE_MEDI_STATUS+"("+this.COLUMN_ID+")  ON DELETE SET NULL" +
+                this.TABLE_MEDI_STATUS+"("+this.COLUMN_ID+")  ON DELETE SET NULL," +
+                "FOREIGN KEY("+ this.COLUMN_POINT +") REFERENCES "+
+                this.TABLE_MEDI_PILL_LOC+"("+this.COLUMN_ID+")  ON DELETE SET NULL" +
                 ");";
         db.execSQL(CREATE_CONSUME_TABLE);
     }
