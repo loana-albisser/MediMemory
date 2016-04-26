@@ -35,7 +35,6 @@ public class FragmentEdit extends Fragment {
     private ViewGroup root;
     private FragmentRegistration fragmentRegistration;
     private Context context;
-    private Activity mActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -47,27 +46,14 @@ public class FragmentEdit extends Fragment {
         return root;
     }
 
-    @TargetApi(23)
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mActivity = (Activity)context;
-    }
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mActivity = activity;
-        }
-    }
-
-
+    /**
+     * shows all registered pills in a listview
+     */
     private void showItems() {
         listView = (ListView) root.findViewById(R.id.lv_edit);
         TextView txt_edit = (TextView)root.findViewById(R.id.txt_edit);
-        //String[] testlist = new String[]{"Item1","Item2","Item3","Item4","Item5"};
-        String[] testlist = new String[]{};
+        String[] testlist = new String[]{"Item1","Item2","Item3","Item4","Item5"};
+        //String[] testlist = new String[]{};
         if (testlist.length == 0){
             listView.setVisibility(View.GONE);
             txt_edit.setVisibility(View.VISIBLE);
@@ -86,12 +72,12 @@ public class FragmentEdit extends Fragment {
                 }
             });
         }
-        // // TODO: 23.03.2016 no Items! 
 
     }
 
-
-
+    /**
+     * shows the RegistraionFragment from selected pill
+     */
     private void showRegistrationFragment(){
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

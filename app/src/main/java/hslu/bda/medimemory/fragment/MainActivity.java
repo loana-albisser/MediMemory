@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity{
     private Fragment fragment = null;
     private Class fragmentClass;
     private FragmentRegistration fragmentRegistration;
-    private FragmentEdit fragmentEdit;
     private FloatingActionButton fab;
     private NavigationView nvDrawer;
     private int currentMenuItem;
@@ -109,9 +108,6 @@ public class MainActivity extends AppCompatActivity{
                 .commit();
     }
 
-    public MainActivity getMainContext(){
-        return MainActivity.this;
-    }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -176,8 +172,6 @@ public class MainActivity extends AppCompatActivity{
                 currentMenuItem = R.id.nav_help;
                 break;
         }
-
-        //
 
         // Highlight the selected item, update the title, and close the drawer
         menuItem.setChecked(true);

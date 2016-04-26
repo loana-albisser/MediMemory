@@ -29,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -170,21 +171,6 @@ public class FragmentRegistration extends Fragment {
         selectedDayDuration = dateCalendarDuration.get(Calendar.DAY_OF_MONTH);
     }
 
-    @TargetApi(23)
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mActivity = (Activity)context;
-    }
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mActivity = activity;
-        }
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -193,6 +179,7 @@ public class FragmentRegistration extends Fragment {
 
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
+
         setupShowImage();
         showReminderDetails();
         setOnReminderDayTimeRadioButtonClickEvent();
@@ -203,6 +190,7 @@ public class FragmentRegistration extends Fragment {
         setupDosageNumberPicker();
         setDosage();
         showFoodInstruction();
+
         if (checkHelpTextVisibility()){
             showHelpText();
             iBtn_helpPhoto.setVisibility(View.VISIBLE);
@@ -292,6 +280,9 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
+    /**
+     * checks whether the delete button needs to be displayed
+     */
     public void setDeleteButtonVisibility(){
         Button btn_delete = (Button)root.findViewById(R.id.btn_delete);
         if (((MainActivity)getActivity()).getCurrentMenuItem() == R.id.nav_registration){
@@ -322,6 +313,9 @@ public class FragmentRegistration extends Fragment {
 
     }
 
+    /**
+     * setup dialog to choose between take photo and choose photo from gallery
+     */
     private void selectImage() {
         final CharSequence[] items = { getResources().getString(R.string.d_selectPhoto), getResources().getString(R.string.d_chooseLibrary),
                 getResources().getString(R.string.cancel) };
@@ -365,6 +359,7 @@ public class FragmentRegistration extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
     }
+
 
     private void onCaptureImageResult(Intent data) {
         Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
@@ -421,6 +416,11 @@ public class FragmentRegistration extends Fragment {
         iv_selectedImage.setImageBitmap(picture);
     }
 
+    /**
+     * shows textView with selected information
+     * @param textView selected textView
+     * @param viewGroup current view
+     */
     private void showInfoTextField(TextView textView, ViewGroup viewGroup) {
         textView.setPadding(10, 10, 10, 10);
         textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -491,7 +491,6 @@ public class FragmentRegistration extends Fragment {
     };
 
 
-
     private Collection<Day> getDaytimes(){
         return selectedDayTimes;
     }
@@ -548,8 +547,6 @@ public class FragmentRegistration extends Fragment {
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
-
-
 
 
     private void setupReminderIntervalNumberPicker(){
@@ -924,6 +921,10 @@ public class FragmentRegistration extends Fragment {
         dpd.show();
     }
 
+    /**
+     * Samsung Bug: samsung device with lollipop can't display date dialog correctly
+     * @return whether it's a samsung device with lollipop
+     */
     private static boolean isBrokenSamsungDevice() {
         return (Build.MANUFACTURER.equalsIgnoreCase("samsung")
                 && isBetweenAndroidVersions(
@@ -1065,6 +1066,7 @@ public class FragmentRegistration extends Fragment {
         edit_notes.setText(notes);
     }
 
+
     private void showHelpText(){
         iBtn_helpPhoto.setOnClickListener(new OnClickListener() {
             @Override
@@ -1092,6 +1094,10 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
+    /**
+     * checks whether help needs to be displayed
+     * @return the preference
+     */
     public boolean checkHelpTextVisibility(){
         iBtn_helpPhoto = (ImageButton) root.findViewById(R.id.iBtn_helpPhoto);
         iBtn_helpReminder = (ImageButton) root.findViewById(R.id.iBtn_helpReminder);
@@ -1104,6 +1110,11 @@ public class FragmentRegistration extends Fragment {
         return showHelp;
     }
 
+    /**
+     * shows help dialog
+     * @param anchorView
+     * @param helptext text to be shown
+     */
     private void displayPopupWindow(View anchorView, String helptext) {
         PopupWindow popup = new PopupWindow(getActivity());
         View layout = getActivity().getLayoutInflater().inflate(R.layout.popup_help_content, null);
@@ -1119,6 +1130,9 @@ public class FragmentRegistration extends Fragment {
         popup.showAsDropDown(anchorView);
     }
 
+    /**
+     * checks weather required items are selected
+     */
     private void saveItem(){
         Button btn_save = (Button)root.findViewById(R.id.btn_save);
         final RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
@@ -1206,7 +1220,7 @@ public class FragmentRegistration extends Fragment {
                     });
                     alertBuilder.show();
                 } else {
-                    saveDatatoDB();
+                    saveDataToDB();
                     Toast.makeText(getActivity(), getResources().getString(R.string.dialog_Medisave), Toast.LENGTH_LONG).show();
                 }
             }
@@ -1237,7 +1251,7 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
-    private void saveDatatoDB(){
+    private void saveDataToDB(){
         RadioButton rd_reminderDayTime = (RadioButton)root.findViewById(R.id.rd_daytime);
         Data data = new Data();
         data.setDescription(getName());

@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,13 +22,10 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
 
 import hslu.bda.medimemory.R;
+import hslu.bda.medimemory.database.DbAdapter;
+import hslu.bda.medimemory.entity.Status;
 
 /**
  * Created by Loana on 08.04.2016.
@@ -37,21 +33,21 @@ import hslu.bda.medimemory.R;
 public class FragmentOverviewChild extends Fragment  {
     private View root;
     private String childname;
-    private TextView textViewChildName;
-    private ImageView iv_example;
     private ImageView iv_status;
     private RelativeLayout rl_pillImage;
     private RelativeLayout.LayoutParams params;
     private ImageButton iBtn_helpOverview;
-    private AlertDialog.Builder statusDialog;
-    private int selectedItem;
     private int xTouchPosition;
     private int yTouchPosition;
+    private DbAdapter dbAdapter;
+    private String status;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_overview_child, container, false);
+        dbAdapter= new DbAdapter(getActivity().getApplicationContext());
+        dbAdapter.open();
         Bundle bundle = getArguments();
         childname = bundle.getString("data");
         if (checkHelpTextVisibility()){
@@ -66,24 +62,52 @@ public class FragmentOverviewChild extends Fragment  {
         return root;
     }
 
+    @Override
+    public void onResume(){
+        if(dbAdapter==null){
+            dbAdapter= new DbAdapter(getActivity().getApplicationContext());
+            dbAdapter.open();
+        }
+        super.onResume();
+    }
+
+    @Override
+    public void onStop(){
+        if(dbAdapter!=null) {
+            dbAdapter.close();
+            dbAdapter = null;
+        }
+        super.onStop();
+    }
+
 
     private void getIDs(View view, Drawable pillPicture) {
-        textViewChildName = (TextView) view.findViewById(R.id.textViewChild);
-        iv_example = (ImageView)view.findViewById(R.id.iv_example);
+        TextView textViewChildName = (TextView) view.findViewById(R.id.textViewChild);
+        ImageView iv_example = (ImageView) view.findViewById(R.id.iv_example);
         textViewChildName.setText(childname);
         iv_example.setImageDrawable(pillPicture);
         setTouchListener(50, 60);
     }
 
+    /**
+     *
+     * @param x x-Position of Drawable
+     * @param y y-Position of Drawable
+     */
     private void setupStatus(int x, int y){
         rl_pillImage = (RelativeLayout) root.findViewById(R.id.rl_pillImage);
-        params = new RelativeLayout.LayoutParams(30, 40);
+        //size of Drawable
+        params = new RelativeLayout.LayoutParams(40, 40);
         params.leftMargin = x;
         params.topMargin = y;
         iv_status = new ImageView(getActivity());
     }
 
-    public void setStatus(Drawable status){
+    /**
+     * sets the Status for the pill
+     * @param status status-Drawable
+     */
+    private void setStatus(Drawable status){
         iv_status.setImageDrawable(status);
         rl_pillImage.addView(iv_status, params);
     }
@@ -104,7 +128,7 @@ public class FragmentOverviewChild extends Fragment  {
         return yTouchPosition;
     }
 
-    public void setTouchListener(final int xPillPosition, final int yPillPosition){
+    private void setTouchListener(final int xPillPosition, final int yPillPosition){
         final int range = 40;
         rl_pillImage = (RelativeLayout)root.findViewById(R.id.rl_pillImage);
         rl_pillImage.setOnTouchListener(new View.OnTouchListener() {
@@ -129,27 +153,31 @@ public class FragmentOverviewChild extends Fragment  {
         });
     }
 
+    /**
+     * shows status-dialog (taken, forgot, lost)
+     */
     private void setupStatusDialog(){
-        statusDialog = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
+        AlertDialog.Builder statusDialog = new AlertDialog.Builder(getActivity(), R.style.DialogTheme);
         statusDialog.setCancelable(false);
         statusDialog.setTitle(getResources().getString(R.string.title_dialogStatus));
         statusDialog.setSingleChoiceItems(R.array.array_status, 0, null);
         statusDialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                ListView lw = ((AlertDialog)dialog).getListView();
+                ListView lw = ((AlertDialog) dialog).getListView();
                 int selectedItem = (int) lw.getAdapter().getItemId(lw.getCheckedItemPosition());
-                //Toast.makeText(getActivity(),selectedItem,Toast.LENGTH_LONG).show();
                 rl_pillImage.removeView(iv_status);
                 Log.i("which", String.valueOf(which));
                 Log.i("checkedItem", String.valueOf(selectedItem));
-
                 if (selectedItem == 0) {
                     setStatus(getResources().getDrawable(R.drawable.check_mark));
+                    status = getResources().getString(R.string.txt_taken);
                 } else if (selectedItem == 1) {
                     setStatus(getResources().getDrawable(R.drawable.question_mark));
+                    status = getResources().getString(R.string.txt_forgot);
                 } else if (selectedItem == 2) {
                     setStatus(getResources().getDrawable(R.drawable.x_mark));
+                    status = getResources().getString(R.string.txt_lost);
                 }
             }
         });
@@ -176,13 +204,20 @@ public class FragmentOverviewChild extends Fragment  {
         });
     }
 
+    /**
+     * checks whether help needs to be displayed
+     * @return the preference
+     */
     private boolean checkHelpTextVisibility(){
         iBtn_helpOverview = (ImageButton) root.findViewById(R.id.iBtn_helpOverview);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
-        boolean showHelp = pref.getBoolean("pref_key_showHelp",false);
-        return showHelp;
+        return pref.getBoolean("pref_key_showHelp",false);
     }
 
+    /**
+     * shows help dialog
+     * @param anchorView
+     */
     private void displayPopupWindow(View anchorView) {
         PopupWindow popup = new PopupWindow(getActivity());
         View layout = getActivity().getLayoutInflater().inflate(R.layout.popup_help_overview, null);
@@ -193,5 +228,14 @@ public class FragmentOverviewChild extends Fragment  {
         popup.setFocusable(true);
         popup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         popup.showAsDropDown(anchorView);
+    }
+
+    private void saveDataToDB(){
+        Status status = new Status();
+        status.setDescription(getStatus());
+    }
+
+    private String getStatus() {
+        return status;
     }
 }

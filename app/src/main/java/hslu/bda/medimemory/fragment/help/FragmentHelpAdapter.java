@@ -28,27 +28,18 @@ public class FragmentHelpAdapter extends BaseExpandableListAdapter {
     }
 
 
-    /*private String[] header = {
-            context.getString(R.string.question_1), 
-            context.getString(R.string.question_2), 
-            context.getString(R.string.question_3),
-            context.getString(R.string.question_4),
-            context.getString(R.string.question_5),
-            context.getString(R.string.question_6),
-            context.getString(R.string.question_7),
-            context.getString(R.string.question_8)
-    };*/
-
-    /*private String[][] children = {
-            { context.getString(R.string.answer_1) },
-            { context.getString(R.string.answer_2) },
-            { context.getString(R.string.answer_3) },
-            { context.getString(R.string.answer_4) },
-            { context.getString(R.string.answer_5) },
-            { context.getString(R.string.answer_6) },
-            { context.getString(R.string.answer_7) },
-            { context.getString(R.string.answer_8) }
-    };*/
+    public void setQuestion(){
+        header = new String[]{
+                context.getString(R.string.question_1),
+                context.getString(R.string.question_2),
+                context.getString(R.string.question_3),
+                context.getString(R.string.question_4),
+                context.getString(R.string.question_5),
+                context.getString(R.string.question_6),
+                context.getString(R.string.question_7),
+                context.getString(R.string.question_8)
+        };
+    }
 
     public void setAnswer(){
         children = new String[][]{
@@ -60,19 +51,6 @@ public class FragmentHelpAdapter extends BaseExpandableListAdapter {
                 {context.getString(R.string.answer_6)},
                 {context.getString(R.string.answer_7)},
                 {context.getString(R.string.answer_8)}
-        };
-    }
-
-    public void setQuestion(){
-        header = new String[]{
-                context.getString(R.string.question_1),
-                context.getString(R.string.question_2),
-                context.getString(R.string.question_3),
-                context.getString(R.string.question_4),
-                context.getString(R.string.question_5),
-                context.getString(R.string.question_6),
-                context.getString(R.string.question_7),
-                context.getString(R.string.question_8)
         };
     }
 

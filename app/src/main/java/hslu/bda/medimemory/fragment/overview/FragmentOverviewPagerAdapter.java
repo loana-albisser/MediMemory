@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ import hslu.bda.medimemory.R;
 public class FragmentOverviewPagerAdapter extends FragmentPagerAdapter{
     private final ArrayList<Fragment> mFragmentList = new ArrayList<>();
     private final ArrayList<String> mFragmentTitleList = new ArrayList<>();
-    Context context;
+    private final Context context;
 
     public FragmentOverviewPagerAdapter(FragmentManager manager, Context context) {
         super(manager);
