@@ -120,5 +120,24 @@ public class PillCoords implements DbObject{
         return pillCoords;
     }
 
+    public static PillCoords getNextPillByMedid(int mediid, DbAdapter dbAdapter){
+        PillCoords pillCoords = null;
+        Collection<PillCoords> allPillCoords = getAllPillCoordsByMedid(mediid,dbAdapter);
+        Collection<Consumed> allConsumedPills = Consumed.getAllConsumedByMedid(mediid, dbAdapter);
 
+        for(PillCoords element:allPillCoords){
+            boolean isConsumed = false;
+            for(Consumed consumed :allConsumedPills){
+                if(consumed.getPillCoord().getId()==element.getId()){
+                    isConsumed = true;
+                    break;
+                }
+            }
+            if(!isConsumed){
+                pillCoords=element;
+                break;
+            }
+        }
+        return pillCoords;
+    }
 }
