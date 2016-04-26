@@ -136,14 +136,14 @@ public class ConsumeInterval implements DbObject{
                         new String[]{DbHelper.COLUMN_MEDIID},new String[]{String.valueOf(medid)});
         if(allContentValues!=null) {
             for(ContentValues contentValues:allContentValues){
-                allConsumeInterval.add(copyContentValuesToObject(contentValues, dbAdapter));
+                allConsumeInterval.add(copyContentValuesToObject(contentValues));
             }
         }
 
         return allConsumeInterval;
     }
 
-    private static ConsumeInterval copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
+    private static ConsumeInterval copyContentValuesToObject(ContentValues contentValues) {
         ConsumeInterval consumeInterval = new ConsumeInterval();
         consumeInterval.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
         consumeInterval.setMediid(contentValues.getAsInteger(DbHelper.COLUMN_MEDIID));

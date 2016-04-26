@@ -1,6 +1,7 @@
 package hslu.bda.medimemory.entity;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.support.test.espresso.core.deps.guava.collect.Iterables;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
 
 /**
@@ -37,7 +39,7 @@ public class ConsumeIndividualTest extends AndroidTestCase{
         data.setAmount(1);
         data.setWidth(2);
         data.setLength(4);
-        data.setPicture("Test.jpg");
+        data.setPicture(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.example_pill));
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         data.setCreateDate(cal);

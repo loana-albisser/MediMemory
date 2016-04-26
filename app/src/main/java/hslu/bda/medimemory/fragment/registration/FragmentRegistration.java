@@ -1255,7 +1255,7 @@ public class FragmentRegistration extends Fragment {
         RadioButton rd_reminderDayTime = (RadioButton)root.findViewById(R.id.rd_daytime);
         Data data = new Data();
         data.setDescription(getName());
-        data.setPicture(getPicturePath());
+        //data.setPicture(getPicturePath());
         if (rd_reminderInterval.isChecked()){
             data.setAllConsumeInterval(getReminderInterval());
         } else if (rd_reminderDayTime.isChecked()) {
