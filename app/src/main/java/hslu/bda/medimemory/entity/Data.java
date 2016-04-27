@@ -221,7 +221,12 @@ public class Data implements DbObject {
         try{
             Collection<ContentValues> allContentValues = dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_DATA);
             for(ContentValues contentValues : allContentValues){
-                allData.add(copyContentValuesToObject(contentValues,dbAdapter));
+                Data data = copyContentValuesToObject(contentValues, dbAdapter);
+                data.setAllConsumed(Consumed.getAllConsumedByMedid(data.getId(), dbAdapter));
+                data.setAllConsumeIndividual(ConsumeIndividual.getAllConsumeIndividualByMedid(data.getId(), dbAdapter));
+                data.setAllConsumeInterval(ConsumeInterval.getAllConsumeIntervalByMedid(data.getId(), dbAdapter));
+                data.setAllPillCoords(PillCoords.getAllPillCoordsByMedid(data.getId(),dbAdapter));
+                allData.add(data);
             }
         }catch (Exception e) {
             System.out.printf(e.getMessage());

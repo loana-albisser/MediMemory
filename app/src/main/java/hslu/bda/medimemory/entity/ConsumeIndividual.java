@@ -82,7 +82,12 @@ public class ConsumeIndividual implements DbObject {
         final ContentValues values = new ContentValues();
         values.put(DbHelper.COLUMN_ID,getId());
         values.put(DbHelper.COLUMN_MEDIID, getMediid());
-        values.put(DbHelper.COLUMN_CONSTIME, simpleDateFormat.format(getConsumeTime().getTime()));
+        if(getConsumeTime()!=null) {
+            values.put(DbHelper.COLUMN_CONSTIME, simpleDateFormat.format(getConsumeTime().getTime()));
+        }
+        else{
+            values.put(DbHelper.COLUMN_CONSTIME, (String)null);
+        }
         values.put(DbHelper.COLUMN_DAYPART, getDaypart().getId());
         values.put(DbHelper.COLUMN_EATPART, getEatpart().getId());
 

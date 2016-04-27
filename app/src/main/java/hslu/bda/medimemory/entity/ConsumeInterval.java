@@ -106,8 +106,19 @@ public class ConsumeInterval implements DbObject{
         final ContentValues values = new ContentValues();
         values.put(DbHelper.COLUMN_ID,getId());
         values.put(DbHelper.COLUMN_MEDIID, getMediid());
-        values.put(DbHelper.COLUMN_STARTTIME, simpleDateFormat.format(getStartTime().getTime()));
-        values.put(DbHelper.COLUMN_ENDTIME, simpleDateFormat.format(getEndTime().getTime()));
+        if(getStartTime()!=null) {
+            values.put(DbHelper.COLUMN_STARTTIME, simpleDateFormat.format(getStartTime().getTime()));
+        }
+        else{
+            values.put(DbHelper.COLUMN_STARTTIME, (String)null);
+        }
+        if(getEndTime()!=null) {
+            values.put(DbHelper.COLUMN_ENDTIME, simpleDateFormat.format(getEndTime().getTime()));
+        }
+        else{
+            values.put(DbHelper.COLUMN_ENDTIME, (String)null);
+        }
+
         values.put(DbHelper.COLUMN_INTERVAL, getInterval());
         values.put(DbHelper.COLUMN_WEEKDAY, getWeekday());
 
