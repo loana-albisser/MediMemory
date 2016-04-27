@@ -89,6 +89,7 @@ public class FragmentRegistration extends Fragment {
     private final int SELECT_FILE = 1;
     private ImageView iv_selectedImage;
     private String imagePath;
+    private Bitmap thumbnail;
 
     private TextView txt_reminder;
     private View dialogView;
@@ -353,7 +354,7 @@ public class FragmentRegistration extends Fragment {
             } else if (requestCode == REQUEST_CAMERA){
                 onCaptureImageResult(data);
             }
-            getPicturePath();
+            //getPicturePath();
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -362,7 +363,7 @@ public class FragmentRegistration extends Fragment {
 
 
     private void onCaptureImageResult(Intent data) {
-        Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+        thumbnail = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         assert thumbnail != null;
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
@@ -405,10 +406,11 @@ public class FragmentRegistration extends Fragment {
         bm = BitmapFactory.decodeFile(imagePath, options);
 
         iv_selectedImage.setImageBitmap(bm);
+        thumbnail = bm;
     }
 
-    private String getPicturePath(){
-        return imagePath;
+    private Bitmap getPicture(){
+        return thumbnail;
     }
 
     public void setPicture(Bitmap picture){
@@ -1043,7 +1045,6 @@ public class FragmentRegistration extends Fragment {
                     selectedFoodInstruction = 2;
 
                 }
-                selectedFoodInstruction = checkedId;
                 txt_foodInstruction.setText(eatString);
             }
         });
@@ -1161,7 +1162,7 @@ public class FragmentRegistration extends Fragment {
                         }
                     });
                     alertBuilder.show();
-                } else if (getPicturePath() ==null){
+                } else if (getPicture() ==null){
                     alertBuilder.setMessage(getResources().getString(R.string.dialog_photoMessage));
                     alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
@@ -1255,7 +1256,7 @@ public class FragmentRegistration extends Fragment {
         RadioButton rd_reminderDayTime = (RadioButton)root.findViewById(R.id.rd_daytime);
         Data data = new Data();
         data.setDescription(getName());
-        //data.setPicture(getPicturePath());
+        data.setPicture(getPicture());
         if (rd_reminderInterval.isChecked()){
             data.setAllConsumeInterval(getReminderInterval());
         } else if (rd_reminderDayTime.isChecked()) {

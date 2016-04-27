@@ -4,11 +4,13 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,8 +25,12 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.Collection;
+
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
+import hslu.bda.medimemory.entity.Data;
+import hslu.bda.medimemory.entity.PillCoords;
 import hslu.bda.medimemory.entity.Status;
 
 /**
@@ -33,6 +39,9 @@ import hslu.bda.medimemory.entity.Status;
 public class FragmentOverviewChild extends Fragment  {
     private View root;
     private String childname;
+    private Bitmap pillPhoto;
+    private int id;
+    private FragmentOverview fragmentOverview;
     private ImageView iv_status;
     private RelativeLayout rl_pillImage;
     private RelativeLayout.LayoutParams params;
@@ -41,6 +50,7 @@ public class FragmentOverviewChild extends Fragment  {
     private int yTouchPosition;
     private DbAdapter dbAdapter;
     private String status;
+    private Collection<PillCoords> allPillCoordsById;
 
 
     @Override
@@ -48,17 +58,24 @@ public class FragmentOverviewChild extends Fragment  {
         root = inflater.inflate(R.layout.fragment_overview_child, container, false);
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
+        fragmentOverview = new FragmentOverview();
         Bundle bundle = getArguments();
-        childname = bundle.getString("data");
+        childname = bundle.getString("pagename");
+        pillPhoto = bundle.getParcelable("pillPicture");
+        id = bundle.getInt("id");
         if (checkHelpTextVisibility()){
             showHelpText();
             iBtn_helpOverview.setVisibility(View.VISIBLE);
         } else {
             iBtn_helpOverview.setVisibility(View.GONE);
         }
+        /*allPillCoordsById = PillCoords.getAllPillCoordsByMedid(id,dbAdapter);
+        for (PillCoords pillCoords : allPillCoordsById){
+            setupStatus((int)pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
+        }*/
         setupStatus(50, 60);
-        setStatus(getResources().getDrawable(R.drawable.circle));
-        getIDs(root, getResources().getDrawable(R.drawable.example_pill));
+        setStatus(ResourcesCompat.getDrawable(getResources(), R.drawable.circle, null));
+        getIDs(root);
         return root;
     }
 
@@ -81,11 +98,11 @@ public class FragmentOverviewChild extends Fragment  {
     }
 
 
-    private void getIDs(View view, Drawable pillPicture) {
+    private void getIDs(View view) {
         TextView textViewChildName = (TextView) view.findViewById(R.id.textViewChild);
         ImageView iv_example = (ImageView) view.findViewById(R.id.iv_example);
         textViewChildName.setText(childname);
-        iv_example.setImageDrawable(pillPicture);
+        iv_example.setImageBitmap(pillPhoto);
         setTouchListener(50, 60);
     }
 
@@ -102,6 +119,7 @@ public class FragmentOverviewChild extends Fragment  {
         params.topMargin = y;
         iv_status = new ImageView(getActivity());
     }
+
 
     /**
      * sets the Status for the pill
