@@ -48,6 +48,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.Activity;
@@ -1265,6 +1266,9 @@ public class FragmentRegistration extends Fragment {
         data.setDuration(getDuration());
         data.setAmount(getDosage());
         data.setNote(getNotes());
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(new Date());
+        data.setCreateDate(cal);
         try {
             CreateMediService.addNewMedi(data, dbAdapter);
         } catch (Throwable throwable) {
