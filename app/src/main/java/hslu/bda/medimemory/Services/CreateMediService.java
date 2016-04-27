@@ -10,6 +10,8 @@ import hslu.bda.medimemory.entity.Data;
  */
 public class CreateMediService {
 
+    private CreateMediService(){}
+
     public static int addNewMedi(Data data, DbAdapter dbAdapter) throws Throwable{
         int result = -1;
 

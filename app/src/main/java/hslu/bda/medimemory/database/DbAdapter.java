@@ -101,7 +101,23 @@ public class DbAdapter {
                 do {
                     ContentValues contentValues = new ContentValues();
                     for (int i = 0; i < result.getColumnCount(); i++) {
-                        contentValues.put(result.getColumnName(i), result.getString(i));
+                        switch (result.getType(i)) {
+                            case Cursor.FIELD_TYPE_BLOB:
+                                contentValues.put(result.getColumnName(i), result.getBlob(i));
+                                break;
+                            case Cursor.FIELD_TYPE_FLOAT:
+                                contentValues.put(result.getColumnName(i), result.getFloat(i));
+                                break;
+                            case Cursor.FIELD_TYPE_INTEGER:
+                                contentValues.put(result.getColumnName(i), result.getInt(i));
+                                break;
+                            case Cursor.FIELD_TYPE_STRING:
+                                contentValues.put(result.getColumnName(i), result.getString(i));
+                                break;
+                            default:
+                                contentValues.put(result.getColumnName(i), result.getString(i));
+                                break;
+                        }
                     }
                     allContentValues.add(contentValues);
                 } while (result.moveToNext());
@@ -146,7 +162,23 @@ public class DbAdapter {
                 do {
                     ContentValues contentValues = new ContentValues();
                     for (int i = 0; i < result.getColumnCount(); i++) {
-                        contentValues.put(result.getColumnName(i), result.getString(i));
+                        switch (result.getType(i)) {
+                            case Cursor.FIELD_TYPE_BLOB:
+                                contentValues.put(result.getColumnName(i), result.getBlob(i));
+                                break;
+                            case Cursor.FIELD_TYPE_FLOAT:
+                                contentValues.put(result.getColumnName(i), result.getFloat(i));
+                                break;
+                            case Cursor.FIELD_TYPE_INTEGER:
+                                contentValues.put(result.getColumnName(i), result.getInt(i));
+                                break;
+                            case Cursor.FIELD_TYPE_STRING:
+                                contentValues.put(result.getColumnName(i), result.getString(i));
+                                break;
+                            default:
+                                contentValues.put(result.getColumnName(i), result.getString(i));
+                                break;
+                        }
                     }
                     allContentValues.add(contentValues);
                 } while (result.moveToNext());
