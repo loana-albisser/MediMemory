@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: C:\\Users\\Loana\\Documents\\Fachhochschule\\Semester 8\\TA.BA_BAA+INF.F1601\\MediMemory\\openCVLibrary310\\src\\main\\aidl\\org\\opencv\\engine\\OpenCVEngineInterface.aidl
+ * Original file: D:\\Dropbox\\Fachhochschule\\BDA_Entwicklungsordner\\MediMemory\\openCVLibrary310\\src\\main\\aidl\\org\\opencv\\engine\\OpenCVEngineInterface.aidl
  */
 package org.opencv.engine;
 /**

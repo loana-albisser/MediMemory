@@ -9,6 +9,7 @@ import android.view.Display;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -31,31 +32,34 @@ import hslu.bda.medimemory.entity.PillCoords;
 public class PillDetection {
 
     private String selectedImagePath = "";
-    private Mat sampledImage = new Mat();
-    private Mat originalImage = new Mat();
+    private Mat sampledImage;
+    private Mat originalImage;
 
-    public PillDetection(String picturePath, Activity activity){
-        originalImage = Imgcodecs.imread(picturePath);
-        loadImage(activity);
+    public PillDetection(String picturePath, int width, int height){
+        try {
+            originalImage = Imgcodecs.imread(picturePath);
+            loadImage(width, height);
+        }catch (Throwable e){
+            System.out.printf(e.getMessage());
+        }
     }
 
-    public PillDetection(Bitmap bitmap, Activity activity){
-        Utils.bitmapToMat(bitmap, originalImage);
-        loadImage(activity);
+    public PillDetection(Bitmap bitmap, int width, int height){
+        try {
+            originalImage = new Mat();
+            Utils.bitmapToMat(bitmap, originalImage);
+            loadImage(width, height);
+        }
+        catch (Throwable e){
+            System.out.printf(e.getMessage());
+        }
     }
 
-    private void loadImage(Activity activity){
+    private void loadImage(int width, int height){
         Mat rgbImage=new Mat();
 
         Imgproc.cvtColor(originalImage, rgbImage, Imgproc.COLOR_BGR2RGB);
 
-        Display display = activity.getWindowManager().getDefaultDisplay();
-        //This is "android graphics Point" class
-        android.graphics.Point size = new android.graphics.Point();
-        display.getSize(size);
-
-        int width = (int) size.x;
-        int height = (int) size.y;
         sampledImage=new Mat();
 
         double downSampleRatio= calculateSubSampleSize(rgbImage, width, height);
