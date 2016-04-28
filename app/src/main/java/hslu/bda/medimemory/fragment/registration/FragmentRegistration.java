@@ -84,6 +84,7 @@ import hslu.bda.medimemory.entity.ConsumeInterval;
 import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.entity.Day;
 import hslu.bda.medimemory.entity.Eat;
+import hslu.bda.medimemory.entity.PillCoords;
 import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.overview.FragmentOverview;
 import hslu.bda.medimemory.services.CreateMediService;
@@ -1406,7 +1407,8 @@ public class FragmentRegistration extends Fragment {
         //TODO Take relative layout
         PillDetection pillDetection = new PillDetection(getPicture(),(int)size.x,(int)size.y);
         try {
-            //pillDetection.getAllPillPoints();
+            Collection<PillCoords> allPillCoords = pillDetection.getAllPillPoints(data.getId());
+
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
