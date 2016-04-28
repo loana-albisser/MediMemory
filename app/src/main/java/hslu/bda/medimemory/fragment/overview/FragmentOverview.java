@@ -48,12 +48,13 @@ public class FragmentOverview extends Fragment {
 
         allPills = Data.getAllDataFromTable(dbAdapter);
 
-        for(Data pill: allPills){
-            addPage(pill.getDescription(),pill.getPicture(), pill.getId());
-        }
-
-        if (count ==0){
-           addPage("Noch kein Medikament erfasst",defaultPillPicture,0);
+        if (allPills.size() ==0){
+           //addPage("Noch kein Medikament erfasst",defaultPillPicture,0);
+            root = (ViewGroup) inflater.inflate(R.layout.fragment_overview_noitem, container, false);
+        } else {
+            for(Data pill: allPills){
+                addPage(pill.getDescription(),pill.getPicture(), pill.getId());
+            }
         }
         viewPager.setCurrentItem(0);
 

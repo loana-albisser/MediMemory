@@ -99,9 +99,7 @@ public class FragmentOverviewChild extends Fragment  {
 
 
     private void getIDs(View view) {
-        TextView textViewChildName = (TextView) view.findViewById(R.id.textViewChild);
         ImageView iv_example = (ImageView) view.findViewById(R.id.iv_example);
-        textViewChildName.setText(childname);
         iv_example.setImageBitmap(pillPhoto);
         setTouchListener(50, 60);
     }

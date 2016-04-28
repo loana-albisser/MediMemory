@@ -72,6 +72,7 @@ import com.google.common.collect.Iterables;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
+import hslu.bda.medimemory.detection.PillDetection;
 import hslu.bda.medimemory.entity.ConsumeIndividual;
 import hslu.bda.medimemory.entity.ConsumeInterval;
 import hslu.bda.medimemory.entity.Data;
@@ -379,9 +380,7 @@ public class FragmentRegistration extends Fragment {
 
     private void onCaptureImageResult(Intent data) {
         LinearLayout ln_photo = (LinearLayout)root.findViewById(R.id.ln_photo);
-        //ImageView iv_selectedImage = (ImageView)root.findViewById(R.id.iv_selectedImage);
-        //ln_photo.getWidth();
-        //ln_photo.getHeight();
+        ImageView iv_selectedImage = (ImageView)root.findViewById(R.id.iv_selectedImage);
         thumbnail = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         assert thumbnail != null;
@@ -398,11 +397,16 @@ public class FragmentRegistration extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        rotate(filename);
-        //iv_selectedImage.setImageBitmap(thumbnail);
-        //iv_selectedImage.setAdjustViewBounds(true);
-        iv_selectedImage.setImageBitmap(getResizedBitmap(thumbnail, iv_selectedImage.getWidth(), 450                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ));
 
+        rotate(filename);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = false;
+        BitmapFactory.decodeFile(imagePath, options);
+
+
+        iv_selectedImage.setImageBitmap(thumbnail);
+        //iv_selectedImage.setAdjustViewBounds(true);
+        //iv_selectedImage.setImageBitmap(getResizedBitmap(thumbnail, iv_selectedImage.getWidth(), 450));
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
@@ -410,12 +414,12 @@ public class FragmentRegistration extends Fragment {
         int height = bm.getHeight();
         float scaleWidth = ((float) newWidth) / width;
         float scaleHeight = ((float) newHeight) / height;
-        // CREATE A MATRIX FOR THE MANIPULATION
+        // Create Matrix for Rotation
         Matrix matrix = new Matrix();
-        // RESIZE THE BIT MAP
+        // Resize Bitmap
         matrix.postScale(scaleWidth, scaleHeight);
         matrix.postRotate(90);
-        // "RECREATE" THE NEW BITMAP
+        // Recreate Bitmap
         Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
         bm.recycle();
         return resizedBitmap;
@@ -459,6 +463,7 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void onSelectFromGalleryResult(Intent data) {
+        ImageView iv_selectedImage = (ImageView)root.findViewById(R.id.iv_selectedImage);
         Uri selectedImageUri = data.getData();
         String[] projection = { MediaColumns.DATA };
         Cursor cursor = getActivity().getContentResolver().query(selectedImageUri, projection, null, null, null);
@@ -471,7 +476,7 @@ public class FragmentRegistration extends Fragment {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(imagePath, options);
-        final int REQUIRED_SIZE = 200;
+        final int REQUIRED_SIZE = 350;
         int scale = 1;
         while (options.outWidth / scale / 2 >= REQUIRED_SIZE
                 && options.outHeight / scale / 2 >= REQUIRED_SIZE)
@@ -1365,6 +1370,12 @@ public class FragmentRegistration extends Fragment {
         data.setCreateDate(cal);
         try {
             CreateMediService.addNewMedi(data, dbAdapter);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+        PillDetection pillDetection = new PillDetection(getPicture(),getActivity());
+        try {
+            pillDetection.getAllPillPoints();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
