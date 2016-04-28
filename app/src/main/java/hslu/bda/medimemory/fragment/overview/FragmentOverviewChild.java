@@ -69,12 +69,12 @@ public class FragmentOverviewChild extends Fragment  {
         } else {
             iBtn_helpOverview.setVisibility(View.GONE);
         }
-        /*allPillCoordsById = PillCoords.getAllPillCoordsByMedid(id,dbAdapter);
+        allPillCoordsById = PillCoords.getAllPillCoordsByMedid(id,dbAdapter);
         for (PillCoords pillCoords : allPillCoordsById){
             setupStatus((int)pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
-        }*/
-        setupStatus(50, 60);
-        setStatus(ResourcesCompat.getDrawable(getResources(), R.drawable.circle, null));
+        }
+        //setupStatus(50, 60);
+        //setStatus(ResourcesCompat.getDrawable(getResources(), R.drawable.circle, null));
         getIDs(root);
         return root;
     }
@@ -99,9 +99,7 @@ public class FragmentOverviewChild extends Fragment  {
 
 
     private void getIDs(View view) {
-        TextView textViewChildName = (TextView) view.findViewById(R.id.textViewChild);
         ImageView iv_example = (ImageView) view.findViewById(R.id.iv_example);
-        textViewChildName.setText(childname);
         iv_example.setImageBitmap(pillPhoto);
         setTouchListener(50, 60);
     }

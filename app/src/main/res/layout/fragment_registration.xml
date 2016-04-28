@@ -126,7 +126,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:padding="5dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:id="@+id/ln_photo">
 
                 <Button
                     android:id="@+id/btn_selectPhoto"
@@ -138,7 +139,7 @@
 
                 <ImageView
                     android:id="@+id/iv_selectedImage"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/desc_pillPhoto" />
 

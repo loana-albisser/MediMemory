@@ -103,7 +103,6 @@ public class FragmentEdit extends Fragment {
     }
 
     private void setData(){
-        //Data data = new Data();
-        //fragmentRegistration.setName(data.getDescription());
+
     }
 }
