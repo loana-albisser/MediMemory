@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,7 +14,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -21,6 +24,7 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -74,6 +78,7 @@ import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.entity.Day;
 import hslu.bda.medimemory.entity.Eat;
 import hslu.bda.medimemory.fragment.MainActivity;
+import hslu.bda.medimemory.fragment.overview.FragmentOverview;
 import hslu.bda.medimemory.services.CreateMediService;
 
 /**
@@ -355,22 +360,34 @@ public class FragmentRegistration extends Fragment {
             } else if (requestCode == REQUEST_CAMERA){
                 onCaptureImageResult(data);
             }
-            //getPicturePath();
         }
 
         super.onActivityResult(requestCode, resultCode, data);
 
     }
 
+    private static int exifToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        }
+        return 0;
+    }
 
     private void onCaptureImageResult(Intent data) {
+        LinearLayout ln_photo = (LinearLayout)root.findViewById(R.id.ln_photo);
+        //ImageView iv_selectedImage = (ImageView)root.findViewById(R.id.iv_selectedImage);
+        //ln_photo.getWidth();
+        //ln_photo.getHeight();
         thumbnail = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         assert thumbnail != null;
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-        //File destination = new File(Environment.getExternalStorageDirectory()+File.separator+"MediMemory"+File.separator, System.currentTimeMillis() + ".jpg");
-        //File destination = new File ("/storage/emulated/MediMemory",System.currentTimeMillis() + ".jpg");
-        File destination = new File(Environment.getRootDirectory()+"/Medimemory", System.currentTimeMillis()+".jpg");
+        String filename = System.currentTimeMillis()+".jpg";
+        File destination = new File(Environment.getRootDirectory(), filename);
         imagePath = destination.toString();
         FileOutputStream fo;
         try {
@@ -381,7 +398,64 @@ public class FragmentRegistration extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        iv_selectedImage.setImageBitmap(thumbnail);
+        rotate(filename);
+        //iv_selectedImage.setImageBitmap(thumbnail);
+        //iv_selectedImage.setAdjustViewBounds(true);
+        iv_selectedImage.setImageBitmap(getResizedBitmap(thumbnail, iv_selectedImage.getWidth(), 450                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ));
+
+    }
+
+    public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+        matrix.postRotate(90);
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+        bm.recycle();
+        return resizedBitmap;
+    }
+
+    private void getOrientation(){
+
+    }
+
+    private void rotate(String filename){
+        Matrix matrix = new Matrix();
+
+        ExifInterface exifReader = null;
+        try {
+            exifReader = new ExifInterface(filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        int orientation = exifReader.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
+
+        if (orientation ==ExifInterface.ORIENTATION_NORMAL) {
+
+        // Do nothing. The original image is fine.
+        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            matrix.postRotate(90);
+
+        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
+
+            matrix.postRotate(180);
+
+        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
+
+            matrix.postRotate(270);
+
+        }
+
+        else if(orientation == 0){
+            matrix.postRotate(90);
+        }
     }
 
     private void onSelectFromGalleryResult(Intent data) {
@@ -409,6 +483,9 @@ public class FragmentRegistration extends Fragment {
         iv_selectedImage.setImageBitmap(bm);
         thumbnail = bm;
     }
+
+
+
 
     private Bitmap getPicture(){
         return thumbnail;
@@ -1223,7 +1300,24 @@ public class FragmentRegistration extends Fragment {
                     alertBuilder.show();
                 } else {
                     saveDataToDB();
-                    Toast.makeText(getActivity(), getResources().getString(R.string.dialog_Medisave), Toast.LENGTH_LONG).show();
+                    alertBuilder.setMessage(getResources().getString(R.string.dialog_Medisave));
+                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            FragmentOverview fragmentOverview = new FragmentOverview();
+                            ((MainActivity) getActivity()).getNavigationView().setCheckedItem(R.id.nav_list);
+                            ((MainActivity) getActivity()).getNavigationView().getMenu().getItem(0).setChecked(true);
+                            ((MainActivity) getActivity()).setTitle("Übersicht");
+                            //NavigationView nvDrawer = (NavigationView) root.findViewById(R.id.nav_view);
+                            //nvDrawer.setCheckedItem(R.id.nav_list);
+                            //nvDrawer.getMenu().getItem(0).setChecked(true);
+                            FragmentManager fragmentManager = getFragmentManager();
+                            fragmentManager.beginTransaction().replace(R.id.main, fragmentOverview, "Fragment_Overview").commit();
+                        }
+                    });
+                    alertBuilder.setCancelable(false);
+                    alertBuilder.show();
+
                 }
             }
         });

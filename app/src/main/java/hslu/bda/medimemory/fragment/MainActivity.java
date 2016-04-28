@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity{
         setupDrawerContent(nvDrawer);
     }
 
+
     public void onResume(){
         super.onResume();
     }
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
+    public NavigationView getNavigationView() { return nvDrawer;}
     public FloatingActionButton getFab(){
         return fab;
     }
