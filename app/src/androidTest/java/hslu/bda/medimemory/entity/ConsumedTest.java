@@ -49,7 +49,7 @@ public class ConsumedTest extends AndroidTestCase{
         data.setActive(1);
         data.setId(dbAdapter.createDbObject(data));
         assertTrue(data.getId() > 0);
-        pillCoords = new PillCoords(0, data.getId(),new Point(200,200));
+        pillCoords = new PillCoords(0, data.getId(),new Point(200,200),100,200);
         pillCoords.setId(dbAdapter.createDbObject(pillCoords));
         assertTrue(pillCoords.getId() > 0);
         consumed = new Consumed(0,data.getId(),cal,Status.getStatusById("0",dbAdapter), pillCoords);

@@ -28,6 +28,7 @@ public class DbHelper extends SQLiteOpenHelper{
     public static String COLUMN_EATPART = "eatpart";
     public static String COLUMN_AMOUNT = "amount";
     public static String COLUMN_WIDTH = "width";
+    public static String COLUMN_HEIGHT = "height";
     public static String COLUMN_LENGTH = "length";
     public static String COLUMN_PICTURE = "picture";
     public static String COLUMN_ACTIVE = "active";
@@ -144,6 +145,8 @@ public class DbHelper extends SQLiteOpenHelper{
                 this.COLUMN_MEDIID + " INTEGER, "+
                 this.COLUMN_XCOORD + " REAL, "+
                 this.COLUMN_YCOORD + " REAL, "+
+                this.COLUMN_WIDTH + " INTEGER, "+
+                this.COLUMN_HEIGHT + " INTEGER, "+
                 "FOREIGN KEY("+ this.COLUMN_MEDIID +") REFERENCES "+
                 this.TABLE_MEDI_DATA+"("+this.COLUMN_ID+")  ON DELETE CASCADE"+
                 ");";

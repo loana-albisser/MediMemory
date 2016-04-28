@@ -4,11 +4,8 @@ import android.content.ContentValues;
 
 import org.opencv.core.Point;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.GregorianCalendar;
 
 import hslu.bda.medimemory.contract.DbObject;
 import hslu.bda.medimemory.database.DbAdapter;
@@ -21,16 +18,21 @@ public class PillCoords implements DbObject{
     private int id;
     private int mediid;
     private Point coords;
+    private int height;
+    private int width;
+
     /**
      * empty Constructor
      */
     public PillCoords(){}
 
 
-    public PillCoords(int id, int mediid, Point coords){
+    public PillCoords(int id, int mediid, Point coords, int width, int height){
         this.setId(id);
         this.setMediid(mediid);
         this.setCoords(coords);
+        this.setWidth(width);
+        this.setHeight(height);
     }
 
     public int getId() {
@@ -57,6 +59,21 @@ public class PillCoords implements DbObject{
         this.coords = coords;
     }
 
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
     @Override
     public ContentValues getContentValues() {
         final ContentValues values = new ContentValues();
@@ -64,6 +81,8 @@ public class PillCoords implements DbObject{
         values.put(DbHelper.COLUMN_MEDIID, getMediid());
         values.put(DbHelper.COLUMN_XCOORD, getCoords().x);
         values.put(DbHelper.COLUMN_YCOORD, getCoords().y);
+        values.put(DbHelper.COLUMN_WIDTH, getWidth());
+        values.put(DbHelper.COLUMN_HEIGHT, getHeight());
 
 
         return values;
@@ -105,6 +124,8 @@ public class PillCoords implements DbObject{
         Point point = new Point();
         point.x = contentValues.getAsDouble(DbHelper.COLUMN_XCOORD);
         point.y = contentValues.getAsDouble(DbHelper.COLUMN_YCOORD);
+        pillCoords.setWidth(contentValues.getAsInteger(DbHelper.COLUMN_WIDTH));
+        pillCoords.setHeight(contentValues.getAsInteger(DbHelper.COLUMN_HEIGHT));
         pillCoords.setCoords(point);
         return  pillCoords;
     }
@@ -140,4 +161,6 @@ public class PillCoords implements DbObject{
         }
         return pillCoords;
     }
+
+
 }

@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import hslu.bda.medimemory.entity.PillCoords;
+
 /**
  * Created by Andy on 24.04.2016.
  */
@@ -105,8 +107,8 @@ public class PillDetection {
         return inSampleSize;
     }
 
-    public Collection<Point> getAllPillPoints() throws Throwable{
-        Collection<Point> allPillPoints = new ArrayList<Point>();
+    public Collection<PillCoords> getAllPillPoints(int mediid) throws Throwable{
+        Collection<PillCoords> allPillPoints = new ArrayList<PillCoords>();
         try {
             Mat orgImage = sampledImage.clone();
             Mat rgb_image = new Mat();
@@ -132,7 +134,8 @@ public class PillDetection {
                         Point point = new Point();
                         point.x = moments.get_m10() / moments.get_m00();
                         point.y = moments.get_m01() / moments.get_m00();
-                        allPillPoints.add(point);
+                        PillCoords pillCoords = new PillCoords(0, mediid, point,rect.width, rect.height);
+                        allPillPoints.add(pillCoords);
                     }
 
                 }
