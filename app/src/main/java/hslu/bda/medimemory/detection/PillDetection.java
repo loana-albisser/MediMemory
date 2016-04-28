@@ -31,8 +31,8 @@ import hslu.bda.medimemory.entity.PillCoords;
 public class PillDetection {
 
     private String selectedImagePath = "";
-    private Mat sampledImage;
-    private Mat originalImage;
+    private Mat sampledImage = new Mat();
+    private Mat originalImage = new Mat();
 
     public PillDetection(String picturePath, Activity activity){
         originalImage = Imgcodecs.imread(picturePath);

@@ -1375,7 +1375,7 @@ public class FragmentRegistration extends Fragment {
         }
         PillDetection pillDetection = new PillDetection(getPicture(),getActivity());
         try {
-            pillDetection.getAllPillPoints();
+            //pillDetection.getAllPillPoints();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
