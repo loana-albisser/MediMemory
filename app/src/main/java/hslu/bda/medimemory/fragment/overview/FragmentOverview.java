@@ -61,6 +61,16 @@ public class FragmentOverview extends Fragment {
         return root;
     }
 
+    public void onResume(){
+        super.onResume();
+        /*allPills = Data.getAllDataFromTable(dbAdapter);
+
+            for(Data pill: allPills){
+                addPage(pill.getDescription(),pill.getPicture(), pill.getId());
+            }*/
+
+    }
+
     private void getIDs(View view) {
         viewPager = (ViewPager) view.findViewById(R.id.my_viewpager);
         adapter = new FragmentOverviewPagerAdapter(getFragmentManager(), getActivity());

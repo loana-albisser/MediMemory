@@ -48,6 +48,8 @@ public class FragmentOverviewChild extends Fragment  {
     private ImageButton iBtn_helpOverview;
     private int xTouchPosition;
     private int yTouchPosition;
+    private int xPillPosition;
+    private int yPillPosition;
     private DbAdapter dbAdapter;
     private String status;
     private Collection<PillCoords> allPillCoordsById;
@@ -71,7 +73,10 @@ public class FragmentOverviewChild extends Fragment  {
         }
         allPillCoordsById = PillCoords.getAllPillCoordsByMedid(id,dbAdapter);
         for (PillCoords pillCoords : allPillCoordsById){
-            setupStatus((int)pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
+            xPillPosition = (int)pillCoords.getCoords().x;
+            yPillPosition = (int)pillCoords.getCoords().y;
+            setupStatus(xPillPosition, yPillPosition);
+            //setTouchListener((int) pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
         }
         //setupStatus(50, 60);
         //setStatus(ResourcesCompat.getDrawable(getResources(), R.drawable.circle, null));
@@ -101,7 +106,13 @@ public class FragmentOverviewChild extends Fragment  {
     private void getIDs(View view) {
         ImageView iv_example = (ImageView) view.findViewById(R.id.iv_example);
         iv_example.setImageBitmap(pillPhoto);
-        setTouchListener(50, 60);
+        for (PillCoords pillCoords : allPillCoordsById){
+            xPillPosition = (int)pillCoords.getCoords().x;
+            yPillPosition = (int)pillCoords.getCoords().y;
+            setTouchListener(xPillPosition,yPillPosition);
+            //setTouchListener((int) pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
+        }
+
     }
 
     /**
