@@ -14,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import org.opencv.android.OpenCVLoader;
+
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.fragment.edit.FragmentEdit;
 import hslu.bda.medimemory.fragment.help.FragmentHelp;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity{
 
 
     public void onResume(){
+
         super.onResume();
     }
 

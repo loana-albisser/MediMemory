@@ -15,6 +15,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -28,6 +29,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,6 +71,10 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.common.collect.Iterables;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
@@ -224,8 +230,29 @@ public class FragmentRegistration extends Fragment {
             dbAdapter= new DbAdapter(getActivity().getApplicationContext());
             dbAdapter.open();
         }
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, getActivity(), mLoaderCallback);
         super.onResume();
     }
+
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(getActivity()) {
+
+        @Override
+        //This is the callback method called once the OpenCV //manager is connected
+        public void onManagerConnected(int status) {
+            switch (status) {
+                //Once the OpenCV manager is successfully connected we can enable the camera interaction with the defined OpenCV camera view
+                case LoaderCallbackInterface.SUCCESS:
+                {
+                    Log.i("Example Loaded", "OpenCV loaded successfully");
+                    //mOpenCvCameraView.enableView();
+                } break;
+                default:
+                {
+                    super.onManagerConnected(status);
+                } break;
+            }
+        }
+    };
 
     @Override
     public void onPause(){
@@ -1369,11 +1396,15 @@ public class FragmentRegistration extends Fragment {
         cal.setTime(new Date());
         data.setCreateDate(cal);
         try {
-            CreateMediService.addNewMedi(data, dbAdapter);
+            data.setId(CreateMediService.addNewMedi(data, dbAdapter));
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-        PillDetection pillDetection = new PillDetection(getPicture(),getActivity());
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        android.graphics.Point size = new Point();
+        display.getSize(size);
+        //TODO Take relative layout
+        PillDetection pillDetection = new PillDetection(getPicture(),(int)size.x,(int)size.y);
         try {
             //pillDetection.getAllPillPoints();
         } catch (Throwable throwable) {
