@@ -65,6 +65,7 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -376,6 +377,7 @@ public class FragmentRegistration extends Fragment {
                 }
             }
         });
+        builder_selectImage.setCancelable(false);
         builder_selectImage.show();
     }
 
@@ -585,6 +587,7 @@ public class FragmentRegistration extends Fragment {
                 }
             }
         });
+        reminderDaytimeDialog.setCancelable(false);
         Dialog dialog = reminderDaytimeDialog.create();
         dialog.show();
     }
@@ -656,6 +659,7 @@ public class FragmentRegistration extends Fragment {
             }
         });
         sp_reminderInterval.setSelection(selectedIntervalPosition);
+        dialogBuilder.setCancelable(false);
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
@@ -735,6 +739,7 @@ public class FragmentRegistration extends Fragment {
                 showIntervalTimePickerDialog();
             }
         });
+        dialogWeekday.setCancelable(false);
         Dialog d = dialogWeekday.create();
         d.show();
     }
@@ -873,7 +878,7 @@ public class FragmentRegistration extends Fragment {
                 txt_reminder.setText(intervalbuilder);
             }
         });
-
+        dialogStartEndTime.setCancelable(false);
         Dialog d = dialogStartEndTime.create();
         d.show();
     }
@@ -1029,6 +1034,7 @@ public class FragmentRegistration extends Fragment {
                 selectedDayDuration = dayOfMonth;
             }
         }, selectedYearDuration, selectedMonthDuration, selectedDayDuration);
+        dpd.setCancelable(false);
         dpd.setButton(DialogInterface.BUTTON_NEGATIVE, null, dpd);
         dpd.show();
     }
@@ -1077,6 +1083,7 @@ public class FragmentRegistration extends Fragment {
                 txt_duration.setText(numberOfBlisterString);
             }
         });
+        npb_numberofBlisters.setCancelable(false);
         Dialog dialog = npb_numberofBlisters.create();
         dialog.show();
     }
@@ -1374,6 +1381,7 @@ public class FragmentRegistration extends Fragment {
                         dialog.dismiss();
                     }
                 });
+                alertBuilder.setCancelable(false);
                 alertBuilder.show();
             }
         });
@@ -1403,10 +1411,12 @@ public class FragmentRegistration extends Fragment {
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         android.graphics.Point size = new Point();
         display.getSize(size);
+        RelativeLayout rl_pillImage = (RelativeLayout)root.findViewById(R.id.rl_pillImage);
         //TODO Take relative layout
         PillDetection pillDetection = new PillDetection(getPicture(),(int)size.x,(int)size.y);
+        //PillDetection pillDetection = new PillDetection(getPicture(),rl_pillImage.getWidth(),rl_pillImage.getHeight());
         try {
-            //pillDetection.getAllPillPoints();
+            pillDetection.getAllPillPoints(data.getId());
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
