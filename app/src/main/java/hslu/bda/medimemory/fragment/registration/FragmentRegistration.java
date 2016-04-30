@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ResolveInfo;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +23,7 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 
@@ -46,6 +49,7 @@ import android.widget.NumberPicker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -342,193 +346,187 @@ public class FragmentRegistration extends Fragment {
         btn_selectPhoto.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectImage();
+                Intent chooseImageIntent = getPickImageIntent(getActivity());
+                startActivityForResult(chooseImageIntent, 234);
             }
         });
         iv_selectedImage = (ImageView) root.findViewById(R.id.iv_selectedImage);
 
     }
 
-    /**
-     * setup dialog to choose between take photo and choose photo from gallery
-     */
-    private void selectImage() {
-        final CharSequence[] items = { getResources().getString(R.string.d_selectPhoto), getResources().getString(R.string.d_chooseLibrary),
-                getResources().getString(R.string.cancel) };
 
-        android.support.v7.app.AlertDialog.Builder builder_selectImage = new android.support.v7.app.AlertDialog.Builder(getActivity());
-        builder_selectImage.setTitle(getResources().getString(R.string.dialog_title_photo));
-        builder_selectImage.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals(getResources().getString(R.string.d_selectPhoto))) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_CAMERA);
-                } else if (items[item].equals(getResources().getString(R.string.d_chooseLibrary))) {
-                    Intent intent = new Intent(
-                            Intent.ACTION_PICK,
-                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(
-                            Intent.createChooser(intent, getResources().getString(R.string.d_selectFile)),
-                            SELECT_FILE);
-                } else if (items[item].equals(getResources().getString(R.string.cancel))) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder_selectImage.setCancelable(false);
-        builder_selectImage.show();
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch(requestCode) {
+            case 234:
+                thumbnail = getImageFromResult(getActivity(), resultCode, data);
+                iv_selectedImage.setImageBitmap(thumbnail);
+                break;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+                break;
+        }
 
+    }
+
+    public static Bitmap getImageFromResult(Context context, int resultCode,
+                                            Intent imageReturnedIntent) {
+        Log.d("ImageResult", "getImageFromResult, resultCode: " + resultCode);
+        Bitmap bm = null;
+        File imageFile = getTempFile(context);
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == SELECT_FILE) {
-                onSelectFromGalleryResult(data);
-            } else if (requestCode == REQUEST_CAMERA){
-                onCaptureImageResult(data);
+            Uri selectedImage;
+            boolean isCamera = (imageReturnedIntent == null ||
+                    imageReturnedIntent.getData() == null  ||
+                    imageReturnedIntent.getData().toString().contains(imageFile.toString()));
+            if (isCamera) {     /** CAMERA **/
+                selectedImage = Uri.fromFile(imageFile);
+            } else {            /** ALBUM **/
+                selectedImage = imageReturnedIntent.getData();
+            }
+            Log.d("selected", "selectedImage: " + selectedImage);
+
+            bm = getImageResized(context, selectedImage);
+            int rotation = getRotation(context, selectedImage, isCamera);
+            bm = rotate(bm, rotation);
+        }
+        return bm;
+    }
+
+    private static File getTempFile(Context context) {
+        File imageFile = new File(context.getExternalCacheDir(), "Temp.jpg");
+        imageFile.getParentFile().mkdirs();
+        return imageFile;
+    }
+
+    public static int getRotation(Context context, Uri imageUri, boolean isCamera) {
+        int rotation;
+        if (isCamera) {
+            rotation = getRotationFromCamera(context, imageUri);
+        } else {
+            rotation = getRotationFromGallery(context, imageUri);
+        }
+        Log.d("Rotation:", "Image rotation: " + rotation);
+        return rotation;
+    }
+
+    private static Bitmap rotate(Bitmap bm, int rotation) {
+        if (rotation != 0) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(rotation);
+            Bitmap bmOut = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
+            return bmOut;
+        }
+        return bm;
+    }
+
+    public Intent getPickImageIntent(Context context) {
+        Intent chooserIntent = null;
+        List<Intent> intentList = new ArrayList<>();
+        Intent pickIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        takePhotoIntent.putExtra("return-data", true);
+        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTempFile(context)));
+        intentList = addIntentsToList(context, intentList, pickIntent);
+        intentList = addIntentsToList(context, intentList, takePhotoIntent);
+
+        if (intentList.size() > 0) {
+            chooserIntent = Intent.createChooser(intentList.remove(intentList.size() - 1),
+                    context.getString(R.string.dialog_photoMessage));
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentList.toArray(new Parcelable[]{}));
+        }
+
+        return chooserIntent;
+    }
+
+    private static List<Intent> addIntentsToList(Context context, List<Intent> list, Intent intent) {
+        List<ResolveInfo> resInfo = context.getPackageManager().queryIntentActivities(intent, 0);
+        for (ResolveInfo resolveInfo : resInfo) {
+            String packageName = resolveInfo.activityInfo.packageName;
+            Intent targetedIntent = new Intent(intent);
+            targetedIntent.setPackage(packageName);
+            list.add(targetedIntent);
+        }
+        return list;
+    }
+
+    private static Bitmap decodeBitmap(Context context, Uri theUri, int sampleSize) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = sampleSize;
+        AssetFileDescriptor fileDescriptor = null;
+        try {
+            fileDescriptor = context.getContentResolver().openAssetFileDescriptor(theUri, "r");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        Bitmap actuallyUsableBitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
+        return actuallyUsableBitmap;
+    }
+
+
+    public static Bitmap getImageResized(Context context, Uri selectedImage) {
+        Bitmap bm = null;
+        int[] sampleSizes = new int[]{5, 3, 2, 1};
+        int i = 0;
+        do {
+            bm = decodeBitmap(context, selectedImage, sampleSizes[i]);
+            Log.d("Resized", "resizer: new bitmap width = " + bm.getWidth());
+            i++;
+        } while (bm.getWidth() < 400 && i < sampleSizes.length);
+        return bm;
+    }
+
+    private static int getRotationFromCamera(Context context, Uri imageFile) {
+        int rotate = 0;
+        try {
+            context.getContentResolver().notifyChange(imageFile, null);
+            ExifInterface exif = new ExifInterface(imageFile.getPath());
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rotate;
+    }
+
+    public static int getRotationFromGallery(Context context, Uri imageUri) {
+        int result = 0;
+        String[] columns = {MediaStore.Images.Media.ORIENTATION};
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(imageUri, columns, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int orientationColumnIndex = cursor.getColumnIndex(columns[0]);
+                result = cursor.getInt(orientationColumnIndex);
+            }
+        } catch (Exception e) {
+            e.getMessage();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
             }
         }
-
-        super.onActivityResult(requestCode, resultCode, data);
-
+        return result;
     }
-
-    private static int exifToDegrees(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
-            return 90;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
-            return 180;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
-            return 270;
-        }
-        return 0;
-    }
-
-    private void onCaptureImageResult(Intent data) {
-        LinearLayout ln_photo = (LinearLayout)root.findViewById(R.id.ln_photo);
-        ImageView iv_selectedImage = (ImageView)root.findViewById(R.id.iv_selectedImage);
-        thumbnail = (Bitmap) data.getExtras().get("data");
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        assert thumbnail != null;
-        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-        String filename = System.currentTimeMillis()+".jpg";
-        File destination = new File(Environment.getRootDirectory(), filename);
-        imagePath = destination.toString();
-        FileOutputStream fo;
-        try {
-            destination.createNewFile();
-            fo = new FileOutputStream(destination);
-            fo.write(bytes.toByteArray());
-            fo.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        rotate(filename);
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = false;
-        BitmapFactory.decodeFile(imagePath, options);
-
-
-        iv_selectedImage.setImageBitmap(thumbnail);
-        //iv_selectedImage.setAdjustViewBounds(true);
-        //iv_selectedImage.setImageBitmap(getResizedBitmap(thumbnail, iv_selectedImage.getWidth(), 450));
-    }
-
-    public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // Create Matrix for Rotation
-        Matrix matrix = new Matrix();
-        // Resize Bitmap
-        matrix.postScale(scaleWidth, scaleHeight);
-        matrix.postRotate(90);
-        // Recreate Bitmap
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
-        bm.recycle();
-        return resizedBitmap;
-    }
-
-    private void getOrientation(){
-
-    }
-
-    private void rotate(String filename){
-        Matrix matrix = new Matrix();
-
-        ExifInterface exifReader = null;
-        try {
-            exifReader = new ExifInterface(filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        int orientation = exifReader.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
-
-        if (orientation ==ExifInterface.ORIENTATION_NORMAL) {
-
-        // Do nothing. The original image is fine.
-        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
-            matrix.postRotate(90);
-
-        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
-
-            matrix.postRotate(180);
-
-        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
-
-            matrix.postRotate(270);
-
-        }
-
-        else if(orientation == 0){
-            matrix.postRotate(90);
-        }
-    }
-
-    private void onSelectFromGalleryResult(Intent data) {
-        ImageView iv_selectedImage = (ImageView)root.findViewById(R.id.iv_selectedImage);
-        Uri selectedImageUri = data.getData();
-        String[] projection = { MediaColumns.DATA };
-        Cursor cursor = getActivity().getContentResolver().query(selectedImageUri, projection, null, null, null);
-        assert cursor != null;
-        int column_index = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
-        cursor.moveToFirst();
-        imagePath = cursor.getString(column_index);
-        cursor.close();
-        Bitmap bm;
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(imagePath, options);
-        final int REQUIRED_SIZE = 350;
-        int scale = 1;
-        while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-            scale *= 2;
-        options.inSampleSize = scale;
-        options.inJustDecodeBounds = false;
-        bm = BitmapFactory.decodeFile(imagePath, options);
-
-        iv_selectedImage.setImageBitmap(bm);
-        thumbnail = bm;
-    }
-
-
-
 
     private Bitmap getPicture(){
         return thumbnail;
     }
 
-    public void setPicture(Bitmap picture){
-        ImageView iv_selectedImage = (ImageView)root.findViewById(R.id.iv_selectedImage);
-        iv_selectedImage.setImageBitmap(picture);
-    }
 
     /**
      * shows textView with selected information

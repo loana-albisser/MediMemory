@@ -1,9 +1,11 @@
 package hslu.bda.medimemory.fragment.overview;
 
+import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.res.ResourcesCompat;
@@ -44,12 +46,10 @@ public class FragmentOverview extends Fragment {
         dbAdapter.open();
         getIDs(root);
         setEvents();
-        Bitmap defaultPillPicture = BitmapFactory.decodeResource(getResources(), R.drawable.example_pill);
 
         allPills = Data.getAllDataFromTable(dbAdapter);
 
         if (allPills.size() ==0){
-           //addPage("Noch kein Medikament erfasst",defaultPillPicture,0);
             root = (ViewGroup) inflater.inflate(R.layout.fragment_overview_noitem, container, false);
         } else {
             for(Data pill: allPills){
@@ -61,22 +61,17 @@ public class FragmentOverview extends Fragment {
         return root;
     }
 
-    public void onResume(){
-        super.onResume();
-        /*allPills = Data.getAllDataFromTable(dbAdapter);
 
-            for(Data pill: allPills){
-                addPage(pill.getDescription(),pill.getPicture(), pill.getId());
-            }*/
-
-    }
-
-    private void getIDs(View view) {
+   private void getIDs(View view) {
         viewPager = (ViewPager) view.findViewById(R.id.my_viewpager);
-        adapter = new FragmentOverviewPagerAdapter(getFragmentManager(), getActivity());
-        viewPager.setAdapter(adapter);
+        //adapter = new FragmentOverviewPagerAdapter(getFragmentManager(), getActivity());
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+           adapter = new FragmentOverviewPagerAdapter(getChildFragmentManager(),getActivity());
+       } else {
+           adapter = new FragmentOverviewPagerAdapter(getFragmentManager(),getActivity());
+       }
+       viewPager.setAdapter(adapter);
         tabLayout = (TabLayout) view.findViewById(R.id.my_tab_layout);
-
     }
 
     private void setEvents() {
@@ -122,9 +117,12 @@ public class FragmentOverview extends Fragment {
 
     private void setupTabLayout() {
         selectedTabPosition = viewPager.getCurrentItem();
-        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            tabLayout.getTabAt(i).setCustomView(adapter.getTabView(i));
+        if (tabLayout != null){
+            for (int i = 0; i < tabLayout.getTabCount(); i++) {
+                tabLayout.getTabAt(i).setCustomView(adapter.getTabView(i));
+            }
         }
+
     }
 
 

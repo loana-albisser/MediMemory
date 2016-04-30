@@ -6,8 +6,10 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.res.ResourcesCompat;
@@ -25,6 +27,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import hslu.bda.medimemory.R;
@@ -32,6 +35,7 @@ import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.entity.PillCoords;
 import hslu.bda.medimemory.entity.Status;
+import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
 
 /**
  * Created by Loana on 08.04.2016.
@@ -42,6 +46,7 @@ public class FragmentOverviewChild extends Fragment  {
     private Bitmap pillPhoto;
     private int id;
     private FragmentOverview fragmentOverview;
+    private FragmentRegistration fragmentRegistration;
     private ImageView iv_status;
     private RelativeLayout rl_pillImage;
     private RelativeLayout.LayoutParams params;
@@ -84,6 +89,29 @@ public class FragmentOverviewChild extends Fragment  {
         return root;
     }
 
+    public void rotate(String filename){
+        Matrix matrix = new Matrix();
+        ExifInterface exifReader = null;
+        try {
+            exifReader = new ExifInterface(filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int orientation = exifReader.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
+        if (orientation ==ExifInterface.ORIENTATION_NORMAL) {
+            // Do nothing. The original image is fine.
+        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            matrix.postRotate(90);
+        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            matrix.postRotate(180);
+        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            matrix.postRotate(270);
+        }
+        else if(orientation == 0){
+            matrix.postRotate(90);
+        }
+    }
+
     @Override
     public void onResume(){
         if(dbAdapter==null){
@@ -105,12 +133,16 @@ public class FragmentOverviewChild extends Fragment  {
 
     private void getIDs(View view) {
         ImageView iv_example = (ImageView) view.findViewById(R.id.iv_example);
+        /*Matrix matrix = new Matrix();
+        matrix.postRotate(90);
+        // Recreate Bitmap
+        Bitmap rotatedBitmap = Bitmap.createBitmap(pillPhoto, 0, 0, pillPhoto.getWidth(),pillPhoto.getHeight() , matrix, false);
+        pillPhoto.recycle();
+        iv_example.setImageBitmap(rotatedBitmap);*/
+
         iv_example.setImageBitmap(pillPhoto);
         for (PillCoords pillCoords : allPillCoordsById){
-            xPillPosition = (int)pillCoords.getCoords().x;
-            yPillPosition = (int)pillCoords.getCoords().y;
-            setTouchListener(xPillPosition,yPillPosition);
-            //setTouchListener((int) pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
+            setTouchListener((int) pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
         }
 
     }
