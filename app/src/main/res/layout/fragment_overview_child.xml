@@ -6,8 +6,7 @@
            <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-               android:id="@+id/rl_pillImage"
-               android:background="@color/colorPrimaryDark">
+               android:id="@+id/rl_pillImage">
 
                <ImageView
                 android:layout_width="wrap_content"
@@ -17,7 +16,9 @@
                 android:layout_gravity="center"
                 android:longClickable="false"
                    android:layout_alignParentTop="true"
-                   android:layout_centerInParent="true" />
+                   android:layout_centerInParent="true"
+                   android:layout_marginTop="36dp"
+                   android:layout_marginBottom="36dp" />
 
                <ImageButton
                    android:layout_width="wrap_content"
