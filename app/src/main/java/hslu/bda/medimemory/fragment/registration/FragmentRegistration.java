@@ -1402,11 +1402,6 @@ public class FragmentRegistration extends Fragment {
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         data.setCreateDate(cal);
-        try {
-            data.setId(CreateMediService.addNewMedi(data, dbAdapter));
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         android.graphics.Point size = new Point();
         display.getSize(size);
@@ -1415,7 +1410,8 @@ public class FragmentRegistration extends Fragment {
         PillDetection pillDetection = new PillDetection(getPicture(),(int)size.x,(int)size.y);
         //PillDetection pillDetection = new PillDetection(getPicture(),rl_pillImage.getWidth(),rl_pillImage.getHeight());
         try {
-            pillDetection.getAllPillPoints(data.getId());
+            data.setAllPillCoords(pillDetection.getAllPillPoints(data.getId()));
+            data.setId(CreateMediService.addNewMedi(data, dbAdapter));
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
