@@ -25,6 +25,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 
 import android.os.Bundle;
@@ -361,6 +362,7 @@ public class FragmentRegistration extends Fragment {
         switch(requestCode) {
             case 234:
                 thumbnail = getImageFromResult(getActivity(), resultCode, data);
+
                 iv_selectedImage.setImageBitmap(thumbnail);
                 break;
             default:
@@ -393,6 +395,7 @@ public class FragmentRegistration extends Fragment {
         }
         return bm;
     }
+
 
     private static File getTempFile(Context context) {
         File imageFile = new File(context.getExternalCacheDir(), "Temp.jpg");

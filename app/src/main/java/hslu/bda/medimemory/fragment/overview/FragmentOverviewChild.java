@@ -139,7 +139,11 @@ public class FragmentOverviewChild extends Fragment  {
         Bitmap rotatedBitmap = Bitmap.createBitmap(pillPhoto, 0, 0, pillPhoto.getWidth(),pillPhoto.getHeight() , matrix, false);
         pillPhoto.recycle();
         iv_example.setImageBitmap(rotatedBitmap);*/
-
+        if (pillPhoto.getWidth() > pillPhoto.getHeight()){
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            pillPhoto = Bitmap.createBitmap(pillPhoto, 0, 0, pillPhoto.getWidth(), pillPhoto.getHeight(), matrix, true);
+        }
         iv_example.setImageBitmap(pillPhoto);
         for (PillCoords pillCoords : allPillCoordsById){
             setTouchListener((int) pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
