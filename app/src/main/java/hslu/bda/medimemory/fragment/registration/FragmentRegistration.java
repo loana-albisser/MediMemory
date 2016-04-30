@@ -1342,12 +1342,10 @@ public class FragmentRegistration extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             FragmentOverview fragmentOverview = new FragmentOverview();
+                            ((MainActivity) getActivity()).getFab().show();
                             ((MainActivity) getActivity()).getNavigationView().setCheckedItem(R.id.nav_list);
                             ((MainActivity) getActivity()).getNavigationView().getMenu().getItem(0).setChecked(true);
                             ((MainActivity) getActivity()).setTitle("Übersicht");
-                            //NavigationView nvDrawer = (NavigationView) root.findViewById(R.id.nav_view);
-                            //nvDrawer.setCheckedItem(R.id.nav_list);
-                            //nvDrawer.getMenu().getItem(0).setChecked(true);
                             FragmentManager fragmentManager = getFragmentManager();
                             fragmentManager.beginTransaction().replace(R.id.main, fragmentOverview, "Fragment_Overview").commit();
                         }
