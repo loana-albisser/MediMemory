@@ -138,7 +138,7 @@ public class PillDetection {
                         Point point = new Point();
                         point.x = rect.x + (0.5*rect.width);
                         point.y = rect.y + (0.5*rect.height);
-                        PillCoords pillCoords = new PillCoords(0, mediid, point,rect.width, rect.height);
+                        PillCoords pillCoords = new PillCoords(mediid, point,rect.width, rect.height);
                         allPillPoints.add(pillCoords);
                     }
 

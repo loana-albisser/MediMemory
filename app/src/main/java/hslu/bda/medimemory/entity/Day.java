@@ -20,15 +20,14 @@ public class Day implements DbObject{
     /**
      * Empty Constructor
      */
-    public Day(){}
+    public Day(){this.setId(-1);}
 
     /**
      * Constructor to return Object with supplied fields
-     * @param id of the daypart
      * @param description of the daypart
      */
-    public Day(int id, String description){
-        this.setId(id);
+    public Day( String description){
+        this.setId(-1);
         this.setDescription(description);
     }
 

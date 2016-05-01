@@ -47,7 +47,7 @@ public class ConsumeIndividualTest extends AndroidTestCase{
         data.setActive(1);
         data.setId(dbAdapter.createDbObject(data));
         assertTrue(data.getId() > 0);
-        consumeIndividual = new ConsumeIndividual(0,data.getId(),cal,Day.getDayById("0",dbAdapter),Eat.getEatById("0", dbAdapter));
+        consumeIndividual = new ConsumeIndividual(data.getId(),cal,Day.getDayById("0",dbAdapter),Eat.getEatById("0", dbAdapter));
         assertTrue(consumeIndividual != null);
     }
 

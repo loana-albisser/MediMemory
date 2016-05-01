@@ -38,6 +38,8 @@ public class Data implements DbObject {
     private Collection<ConsumeInterval> allConsumeInterval = new ArrayList<ConsumeInterval>();
     private Collection<PillCoords> allPillCoords = new ArrayList<PillCoords>();
 
+    public Data(){this.setId(-1);}
+
     public int getId() {
         return id;
     }

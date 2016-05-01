@@ -20,15 +20,14 @@ public class Status implements DbObject{
     /**
      * Empty Constructor
      */
-    public Status(){}
+    public Status(){this.setId(-1);}
 
     /**
      * Constructor to return Object with supplied fields
-     * @param id of the status
      * @param description of the status
      */
-    public Status(int id, String description){
-        this.setId(id);
+    public Status(String description){
+        this.setId(-1);
         this.setDescription(description);
     }
 

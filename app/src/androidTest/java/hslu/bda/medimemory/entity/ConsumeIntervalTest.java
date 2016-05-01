@@ -49,7 +49,7 @@ public class ConsumeIntervalTest extends AndroidTestCase{
         assertTrue(data.getId() > 0);
         Calendar calStart = new GregorianCalendar(2016,03,21, 17,0);
         Calendar calEnd = new GregorianCalendar(2016,03,21, 7,0);
-        consumeInterval = new ConsumeInterval(0,data.getId(),calStart,calEnd,5,0);
+        consumeInterval = new ConsumeInterval(data.getId(),calStart,calEnd,5,0);
         assertTrue(consumeInterval != null);
     }
 

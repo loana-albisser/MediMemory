@@ -20,15 +20,14 @@ public class Eat implements DbObject{
     /**
      * Empty Constructor
      */
-    public Eat(){}
+    public Eat(){this.setId(-1);}
 
     /**
      * Constructor to return Object with supplied fields
-     * @param id of the eatpart
      * @param description of the eatpart
      */
-    public Eat(int id, String description){
-        this.setId(id);
+    public Eat(String description){
+        this.setId(-1);
         this.setDescription(description);
     }
 

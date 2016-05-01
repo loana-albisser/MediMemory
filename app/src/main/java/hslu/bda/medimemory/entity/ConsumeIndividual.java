@@ -26,11 +26,11 @@ public class ConsumeIndividual implements DbObject {
     /**
      * empty Constructor
      */
-    public ConsumeIndividual(){}
+    public ConsumeIndividual(){this.setId(-1);}
 
 
-    public ConsumeIndividual(int id, int mediid, Calendar consumeTime, Day daypart, Eat eatpart){
-        this.setId(id);
+    public ConsumeIndividual(int mediid, Calendar consumeTime, Day daypart, Eat eatpart){
+        this.setId(-1);
         this.setMediid(mediid);
         this.setConsumeTime(consumeTime);
         this.setDaypart(daypart);

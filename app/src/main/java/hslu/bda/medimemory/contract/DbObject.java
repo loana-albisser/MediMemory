@@ -10,5 +10,6 @@ public interface DbObject {
     public String getTableName();
     public String getPrimaryFieldName();
     public String getPrimaryFieldValue();
+    public void setId(int id);
 
 }

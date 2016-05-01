@@ -25,10 +25,10 @@ public class ConsumeInterval implements DbObject{
     private int weekday;
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    public ConsumeInterval(){};
+    public ConsumeInterval(){this.setId(-1);};
 
-    public ConsumeInterval(int id, int mediid, Calendar startTime, Calendar endTime, int interval, int weekday){
-        this.setId(id);
+    public ConsumeInterval(int mediid, Calendar startTime, Calendar endTime, int interval, int weekday){
+        this.setId(-1);
         this.setMediid(mediid);
         this.setStartTime(startTime);
         this.setEndTime(endTime);

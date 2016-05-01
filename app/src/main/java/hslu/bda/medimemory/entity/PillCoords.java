@@ -24,11 +24,11 @@ public class PillCoords implements DbObject{
     /**
      * empty Constructor
      */
-    public PillCoords(){}
+    public PillCoords(){this.setId(-1);}
 
 
-    public PillCoords(int id, int mediid, Point coords, int width, int height){
-        this.setId(id);
+    public PillCoords(int mediid, Point coords, int width, int height){
+        this.setId(-1);
         this.setMediid(mediid);
         this.setCoords(coords);
         this.setWidth(width);

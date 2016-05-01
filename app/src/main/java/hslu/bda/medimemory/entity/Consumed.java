@@ -26,10 +26,10 @@ public class Consumed implements DbObject {
     private Status status;
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public Consumed(){}
+    public Consumed(){this.setId(-1);}
 
-    public Consumed(int id, int mediid, Calendar pointInTime, Status status, PillCoords pillCoords){
-        this.setId(id);
+    public Consumed(int mediid, Calendar pointInTime, Status status, PillCoords pillCoords){
+        this.setId(-1);
         this.setMediid(mediid);
         this.setPointInTime(pointInTime);
         this.setStatus(status);

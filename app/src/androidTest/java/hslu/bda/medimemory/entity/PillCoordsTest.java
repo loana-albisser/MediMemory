@@ -52,7 +52,7 @@ public class PillCoordsTest extends AndroidTestCase{
         Point point = new Point();
         point.x = 200;
         point.y = 200;
-        pillCoords = new PillCoords(0,data.getId(),point, 200,300);
+        pillCoords = new PillCoords(data.getId(),point, 200,300);
         assertTrue(pillCoords != null);
     }
 
