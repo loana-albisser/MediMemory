@@ -16,9 +16,7 @@
                 android:layout_gravity="center"
                 android:longClickable="false"
                    android:layout_alignParentTop="true"
-                   android:layout_centerInParent="true"
-                   android:layout_marginTop="36dp"
-                   android:layout_marginBottom="36dp" />
+                   android:layout_centerInParent="true" />
 
                <ImageButton
                    android:layout_width="wrap_content"

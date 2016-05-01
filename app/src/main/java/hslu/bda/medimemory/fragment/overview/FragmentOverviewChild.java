@@ -83,33 +83,11 @@ public class FragmentOverviewChild extends Fragment  {
             setupStatus(xPillPosition, yPillPosition);
             //setTouchListener((int) pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
         }
+
         //setupStatus(50, 60);
         //setStatus(ResourcesCompat.getDrawable(getResources(), R.drawable.circle, null));
         getIDs(root);
         return root;
-    }
-
-    public void rotate(String filename){
-        Matrix matrix = new Matrix();
-        ExifInterface exifReader = null;
-        try {
-            exifReader = new ExifInterface(filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        int orientation = exifReader.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
-        if (orientation ==ExifInterface.ORIENTATION_NORMAL) {
-            // Do nothing. The original image is fine.
-        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
-            matrix.postRotate(90);
-        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
-            matrix.postRotate(180);
-        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
-            matrix.postRotate(270);
-        }
-        else if(orientation == 0){
-            matrix.postRotate(90);
-        }
     }
 
     @Override
@@ -133,12 +111,8 @@ public class FragmentOverviewChild extends Fragment  {
 
     private void getIDs(View view) {
         ImageView iv_example = (ImageView) view.findViewById(R.id.iv_example);
-        /*Matrix matrix = new Matrix();
-        matrix.postRotate(90);
-        // Recreate Bitmap
-        Bitmap rotatedBitmap = Bitmap.createBitmap(pillPhoto, 0, 0, pillPhoto.getWidth(),pillPhoto.getHeight() , matrix, false);
-        pillPhoto.recycle();
-        iv_example.setImageBitmap(rotatedBitmap);*/
+
+
         if (pillPhoto.getWidth() > pillPhoto.getHeight()){
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
