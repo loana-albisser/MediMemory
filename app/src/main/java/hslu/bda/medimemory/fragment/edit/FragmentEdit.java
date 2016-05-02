@@ -36,9 +36,11 @@ public class FragmentEdit extends Fragment {
     private DbAdapter dbAdapter;
     private ListView listView;
     private ViewGroup root;
+    private int id;
     private FragmentRegistration fragmentRegistration;
     private Context context;
     private Collection<Data> allPills;
+    private Data allPillsByID;
     private ArrayList<String> pillNames;
 
 
@@ -46,6 +48,7 @@ public class FragmentEdit extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_edit, container, false);
         allPills = new ArrayList<>();
+
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
 
@@ -73,7 +76,6 @@ public class FragmentEdit extends Fragment {
         } else {
             listView.setVisibility(View.VISIBLE);
             txt_edit.setVisibility(View.GONE);
-
             listView.setAdapter(new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, pillNames) {
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
@@ -97,7 +99,9 @@ public class FragmentEdit extends Fragment {
                 ((MainActivity) getActivity()).getFab().hide();
                 fragmentRegistration = new FragmentRegistration();
                 FragmentManager fragmentManager = getFragmentManager();
+                allPillsByID = Data.getDataById(String.valueOf(id), dbAdapter);
                 fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
+
             }
         });
     }

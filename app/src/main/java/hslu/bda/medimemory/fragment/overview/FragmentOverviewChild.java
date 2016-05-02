@@ -81,7 +81,7 @@ public class FragmentOverviewChild extends Fragment  {
             xPillPosition = (int)pillCoords.getCoords().x;
             yPillPosition = (int)pillCoords.getCoords().y;
             setupStatus(xPillPosition, yPillPosition);
-            //setTouchListener((int) pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
+            setTouchListener(xPillPosition,yPillPosition);
         }
 
         //setupStatus(50, 60);
@@ -112,17 +112,12 @@ public class FragmentOverviewChild extends Fragment  {
     private void getIDs(View view) {
         ImageView iv_example = (ImageView) view.findViewById(R.id.iv_example);
 
-
         if (pillPhoto.getWidth() > pillPhoto.getHeight()){
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
             pillPhoto = Bitmap.createBitmap(pillPhoto, 0, 0, pillPhoto.getWidth(), pillPhoto.getHeight(), matrix, true);
         }
         iv_example.setImageBitmap(pillPhoto);
-        for (PillCoords pillCoords : allPillCoordsById){
-            setTouchListener((int) pillCoords.getCoords().x,(int)pillCoords.getCoords().y);
-        }
-
     }
 
     /**
@@ -171,7 +166,7 @@ public class FragmentOverviewChild extends Fragment  {
         rl_pillImage.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     xTouchPosition = (int) event.getX();
                     yTouchPosition = (int) event.getY();
                     setXTouchPosition((int) event.getX());
@@ -248,7 +243,8 @@ public class FragmentOverviewChild extends Fragment  {
     private boolean checkHelpTextVisibility(){
         iBtn_helpOverview = (ImageButton) root.findViewById(R.id.iBtn_helpOverview);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
-        return pref.getBoolean("pref_key_showHelp",false);
+        boolean showHelp = pref.getBoolean("pref_key_showHelp",false);
+        return showHelp;
     }
 
     /**

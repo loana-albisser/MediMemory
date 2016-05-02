@@ -1260,9 +1260,7 @@ public class FragmentRegistration extends Fragment {
         final CardView cv_name = (CardView)root.findViewById(R.id.cv_name);
         final CardView cv_photo = (CardView)root.findViewById(R.id.cv_photo);
         final CardView cv_duration = (CardView)root.findViewById(R.id.cv_duration);
-        final CardView cv_dosage = (CardView)root.findViewById(R.id.cv_dosage);
         final CardView cv_foodInstruction = (CardView)root.findViewById(R.id.cv_foodInstruction);
-        final CardView cv_notes = (CardView)root.findViewById(R.id.cv_notes);
         rd_reminderdaytime = (RadioButton)root.findViewById(R.id.rd_daytime);
         final EditText edit_name = (EditText)root.findViewById(R.id.edit_name);
         final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
@@ -1402,13 +1400,7 @@ public class FragmentRegistration extends Fragment {
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         data.setCreateDate(cal);
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        android.graphics.Point size = new Point();
-        display.getSize(size);
-        RelativeLayout rl_pillImage = (RelativeLayout)root.findViewById(R.id.rl_pillImage);
-        //TODO Take relative layout
-        PillDetection pillDetection = new PillDetection(getPicture(),(int)size.x,(int)size.y);
-        //PillDetection pillDetection = new PillDetection(getPicture(),rl_pillImage.getWidth(),rl_pillImage.getHeight());
+        PillDetection pillDetection = new PillDetection(getPicture(),getPicture().getWidth(),getPicture().getHeight());
         try {
             data.setAllPillCoords(pillDetection.getAllPillPoints(data.getId()));
             data.setId(CreateMediService.addNewMedi(data, dbAdapter));
