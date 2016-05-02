@@ -59,6 +59,8 @@ public class FragmentOverviewChild extends Fragment  {
     private String status;
     private Collection<PillCoords> allPillCoordsById;
 
+    //Testkommentar
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
