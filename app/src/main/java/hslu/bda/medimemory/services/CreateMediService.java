@@ -4,6 +4,7 @@ import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.entity.ConsumeIndividual;
 import hslu.bda.medimemory.entity.ConsumeInterval;
 import hslu.bda.medimemory.entity.Data;
+import hslu.bda.medimemory.entity.PillCoords;
 
 /**
  * Created by Andy on 21.03.2016.
@@ -57,6 +58,10 @@ public class CreateMediService {
             for(ConsumeInterval consumeInterval : data.getAllConsumeInterval()){
                 consumeInterval.setId(dbAdapter.createDbObject(consumeInterval));
             }
+
+            for(PillCoords pillCoords : data.getAllPillCoords()){
+                pillCoords.setId(dbAdapter.createDbObject(pillCoords));
+            }
             dbAdapter.setTransactionSuccessful();
         }catch (Exception e){
             throw new RuntimeException(e);
@@ -73,6 +78,10 @@ public class CreateMediService {
 
             for (ConsumeInterval consumeInterval : data.getAllConsumeInterval()) {
                 consumeInterval.setMediid(data.getId());
+            }
+
+            for(PillCoords pillCoords : data.getAllPillCoords()){
+                pillCoords.setMediid(data.getId());
             }
         }catch (Exception e){
             throw new RuntimeException(e);
