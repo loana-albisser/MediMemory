@@ -1,5 +1,6 @@
 package hslu.bda.medimemory.services;
 
+import hslu.bda.medimemory.contract.DbObject;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.entity.ConsumeIndividual;
 import hslu.bda.medimemory.entity.ConsumeInterval;
@@ -86,5 +87,21 @@ public class CreateMediService {
         }catch (Exception e){
             throw new RuntimeException(e);
         }
+    }
+
+
+    public static DbObject createTableEntry(DbObject dbObject, DbAdapter dbAdapter) throws Throwable{
+
+        try{
+            dbAdapter.startTransaction();
+            dbObject.setId(dbAdapter.createDbObject(dbObject));
+            dbAdapter.setTransactionSuccessful();
+        }catch (Exception e){
+            dbObject.setId(-1);
+            throw new RuntimeException(e);
+        }finally {
+            dbAdapter.endTransaction();
+        }
+        return dbObject;
     }
 }
