@@ -37,8 +37,10 @@ public class CreateMediService {
         int dbID = -1;
         try{
             dbAdapter.startTransaction();
-            dbID = dbAdapter.createDbObject(data);
-            data.setId(dbID);
+            if(data.getId()==-1) {
+                dbID = dbAdapter.createDbObject(data);
+                data.setId(dbID);
+            }
             dbAdapter.setTransactionSuccessful();
         }catch (Exception e){
             throw new RuntimeException(e);
@@ -53,15 +55,21 @@ public class CreateMediService {
         try{
             dbAdapter.startTransaction();
             for(ConsumeIndividual consumeIndividual: data.getAllConsumeIndividual()){
-                consumeIndividual.setId(dbAdapter.createDbObject(consumeIndividual));
+                if(consumeIndividual.getId()==-1) {
+                    consumeIndividual.setId(dbAdapter.createDbObject(consumeIndividual));
+                }
             }
 
             for(ConsumeInterval consumeInterval : data.getAllConsumeInterval()){
-                consumeInterval.setId(dbAdapter.createDbObject(consumeInterval));
+                if(consumeInterval.getId()==-1) {
+                    consumeInterval.setId(dbAdapter.createDbObject(consumeInterval));
+                }
             }
 
             for(PillCoords pillCoords : data.getAllPillCoords()){
-                pillCoords.setId(dbAdapter.createDbObject(pillCoords));
+                if(pillCoords.getId()==-1) {
+                    pillCoords.setId(dbAdapter.createDbObject(pillCoords));
+                }
             }
             dbAdapter.setTransactionSuccessful();
         }catch (Exception e){
