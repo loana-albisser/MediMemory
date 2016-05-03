@@ -138,6 +138,10 @@ public class DbAdapter {
                 "=" + dbObject.getPrimaryFieldValue(), null)>0;
     }
 
+    public boolean deleteTableEntryByMedID(String table, int mediid){
+        return db.delete(table, dbHelper.COLUMN_MEDIID + "=" + mediid, null)>0;
+    }
+
     public Collection<ContentValues> getAllByTable(String table, String[] selectionField,
                                                    String[] selectionValue){
         Collection<ContentValues> allContentValues = new ArrayList<>();
