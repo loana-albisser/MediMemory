@@ -91,15 +91,22 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 if (isProtected()){
+                    fragment = new FragmentRegistration();
                     currentMenuItem = R.id.nav_registration;
                     showProtectedDialog(fragment, "Fragment_Registration");
                 } else {
+                    try {
+                        fragment = (Fragment) fragmentClass.newInstance();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     changeFragment(fragment, "Fragment_Registration");
                     nvDrawer.setCheckedItem(R.id.nav_registration);
                     currentMenuItem = R.id.nav_registration;
                     nvDrawer.getMenu().getItem(1).setChecked(true);
                     setTitle(getResources().getString(R.string.nav_registration));
                     fab.hide();
+
                 }
 
             }
@@ -289,7 +296,7 @@ public class MainActivity extends AppCompatActivity{
 
     public String getPassword(){
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String password = pref.getString("password",null);
+        String password = pref.getString("password", null);
         return password;
     }
 
