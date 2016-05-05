@@ -3,34 +3,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-           <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-               android:id="@+id/rl_pillImage">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-               <ImageView
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rl_pillImage"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:layout_centerInParent="true">
+
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/iv_example"
-                android:layout_alignParentBottom="true"
+                android:layout_alignParentBottom="false"
                 android:layout_gravity="center"
-                android:longClickable="false"
-                   android:layout_alignParentTop="true"
-                   android:layout_centerInParent="true" />
+                android:layout_centerInParent="true" />
+        </RelativeLayout>
 
-               <ImageButton
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:id="@+id/iBtn_helpOverview"
-                   android:src="@drawable/ic_help"
-                   android:contentDescription="@string/iBtn_helpOverview"
-                   android:background="#00ffffff"
-                   android:layout_alignParentRight="true"
-                   android:layout_centerVertical="true"
-                   android:scaleType="fitXY"
-                   android:layout_alignParentTop="true"
-                   android:layout_marginTop="16dp"
-                   android:layout_marginRight="16dp" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/iBtn_helpOverview"
+            android:src="@drawable/ic_help"
+            android:contentDescription="@string/iBtn_helpOverview"
+            android:background="#00ffffff"
+            android:layout_alignParentRight="true"
+            android:scaleType="fitXY"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_alignParentStart="false" />
 
-           </RelativeLayout>
+    </RelativeLayout>
 </FrameLayout>

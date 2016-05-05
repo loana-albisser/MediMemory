@@ -205,6 +205,13 @@
     <string name="iBtn_helpOverview">helOverview</string>
     <string name="title_dialogStatus">Status</string>
     <string name="txt_overview_noItem">Es wurden noch keine Medikamente erfasst!</string>
+    <string name="pref_protection">Schutz</string>
+    <string name="title_protection">Schutzmodus</string>
+    <string name="enterPassword">Bitte Passwort eingeben</string>
+    <string name="pref_general">Allgemein</string>
+    <string name="Aktiv">Status</string>
+    <string name="toast_active">Medikament ist aktiv</string>
+    <string name="toast_inactive">Medikament ist inaktiv</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

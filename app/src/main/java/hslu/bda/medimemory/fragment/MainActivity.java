@@ -2,9 +2,16 @@ package hslu.bda.medimemory.fragment;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 
+import android.support.design.widget.TabLayout;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,8 +20,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-
-import org.opencv.android.OpenCVLoader;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.fragment.edit.FragmentEdit;
@@ -25,12 +32,14 @@ import hslu.bda.medimemory.fragment.settings.FragmentSettings;
 
 public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawer;
-    private Fragment fragment = null;
+    private Fragment fragment;
     private Class fragmentClass;
     private FragmentRegistration fragmentRegistration;
     private FloatingActionButton fab;
     private NavigationView nvDrawer;
     private int currentMenuItem;
+    private AlertDialog.Builder passwordDialog;
+    private EditText password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +47,6 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         fab =(FloatingActionButton)findViewById(R.id.fab);
-        fab.hide();
         setSupportActionBar(toolbar);
         //setup Fragment
         fragmentClass = FragmentOverview.class;
@@ -47,7 +55,7 @@ public class MainActivity extends AppCompatActivity{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        getFragmentManager().beginTransaction().replace(R.id.main, fragment, "Fragment_Overview").commit();
+        changeFragment(fragment, "Fragment_Overview");
         fab.show();
 
         drawer = (DrawerLayout) findViewById(R.id.activity_main);
@@ -59,6 +67,7 @@ public class MainActivity extends AppCompatActivity{
         nvDrawer = (NavigationView) findViewById(R.id.nav_view);
         nvDrawer.setCheckedItem(R.id.nav_list);
         nvDrawer.getMenu().getItem(0).setChecked(true);
+        currentMenuItem = R.id.nav_list;
         onFloatingButtonPressed();
         // Setup drawer view
         setupDrawerContent(nvDrawer);
@@ -72,21 +81,27 @@ public class MainActivity extends AppCompatActivity{
 
 
     private void onFloatingButtonPressed(){
+        fragmentClass = FragmentRegistration.class;
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fragmentClass = FragmentRegistration.class;
-                try {
-                    fragment = (Fragment) fragmentClass.newInstance();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (isProtected()){
+                    currentMenuItem = R.id.nav_registration;
+                    showProtectedDialog(fragment, "Fragment_Registration");
+                } else {
+                    changeFragment(fragment, "Fragment_Registration");
+                    nvDrawer.setCheckedItem(R.id.nav_registration);
+                    currentMenuItem = R.id.nav_registration;
+                    nvDrawer.getMenu().getItem(1).setChecked(true);
+                    setTitle(getResources().getString(R.string.nav_registration));
+                    fab.hide();
                 }
-                changeRegistrationFragment(fragment);
-                nvDrawer.setCheckedItem(R.id.nav_registration);
-                currentMenuItem = R.id.nav_registration;
-                nvDrawer.getMenu().getItem(1).setChecked(true);
-                setTitle(getResources().getString(R.string.nav_registration));
-                fab.hide();
+
             }
         });
     }
@@ -106,10 +121,12 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    private void changeRegistrationFragment(Fragment targetFragment){
+
+
+    private void changeFragment(Fragment targetFragment, String fragmentString){
         getFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main, targetFragment, "Fragment_Registration")
+                .replace(R.id.main, targetFragment, fragmentString)
                 .commit();
     }
 
@@ -138,41 +155,53 @@ public class MainActivity extends AppCompatActivity{
                 });
     }
 
+
     public int getCurrentMenuItem(){
         return currentMenuItem;
     }
 
     private void selectDrawerItem(MenuItem menuItem) {
-        Fragment fragment = null;
+        fragment = null;
         FragmentManager fragmentManager = getFragmentManager();
         switch (menuItem.getItemId()) {
             case R.id.nav_list:
                 fragment = new FragmentOverview();
-                fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Overview").commit();
+                changeFragment(fragment, "Fragment_Overview");
                 fab.show();
                 currentMenuItem = R.id.nav_list;
                 break;
             case R.id.nav_registration:
-                fragmentRegistration = new FragmentRegistration();
-                fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
+                fragment = new FragmentRegistration();
+                if (isProtected()){
+                    showProtectedDialog(fragment, "Fragment_Registration");
+                } else {
+                    changeFragment(fragment, "Fragment_Registration");
+                    fab.hide();
+                    currentMenuItem = R.id.nav_registration;
+                }
                 fab.hide();
-                currentMenuItem = R.id.nav_registration;
                 break;
             case R.id.nav_edit:
                 fragment = new FragmentEdit();
-                fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Edit").commit();
-                fab.show();
-                currentMenuItem = R.id.nav_edit;
+                if (isProtected()){
+                    showProtectedDialog(fragment, "Fragment_Edit");
+
+                } else {
+                    fragment = new FragmentEdit();
+                    changeFragment(fragment, "Fragment_Edit");
+                    fab.show();
+                    currentMenuItem = R.id.nav_edit;
+                }
                 break;
             case R.id.nav_settings:
                 fragment = new FragmentSettings();
-                fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Settings").commit();
+                changeFragment(fragment,"Fragment_Settings");
                 fab.show();
                 currentMenuItem = R.id.nav_settings;
                 break;
             case R.id.nav_help:
                 fragment = new FragmentHelp();
-                fragmentManager.beginTransaction().replace(R.id.main, fragment, "Fragment_Help").commit();
+                changeFragment(fragment, "Fragment_Help");
                 fab.show();
                 currentMenuItem = R.id.nav_help;
                 break;
@@ -184,7 +213,85 @@ public class MainActivity extends AppCompatActivity{
         drawer.closeDrawer(GravityCompat.START);
     }
 
+    public int getTabHeigthAct(){
+        TabLayout tabLayout = (TabLayout)findViewById(R.id.my_tab_layout);
+        Log.i("tablayout", String.valueOf(tabLayout.getHeight()));
+        //Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        //Log.i("toolbar", String.valueOf(toolbar.getHeight()));
+        return tabLayout.getHeight();
+    }
 
+    public boolean isProtected(){
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        boolean showProtectionDialog = pref.getBoolean("pref_key_showPassword",false);
+        return showProtectionDialog;
+    }
+
+    public void showProtectedDialog(final Fragment fragment, final String stringFragment){
+        passwordDialog = new AlertDialog.Builder(this);
+        passwordDialog.setCancelable(false);
+        passwordDialog.setTitle(getResources().getString(R.string.enterPassword));
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        params.setMargins(16, 16, 16, 16);
+        password = new EditText(this);
+        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        layout.addView(password, params);
+        passwordDialog.setView(layout);
+        passwordDialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final String enteredPassword = password.getText().toString();
+                if (enteredPassword.equals(getPassword())) {
+                    changeFragment(fragment, stringFragment);
+                    if (currentMenuItem == R.id.nav_registration) {
+                        changeFragment(fragment, "Fragment_Registration");
+                        nvDrawer.setCheckedItem(R.id.nav_registration);
+                        currentMenuItem = R.id.nav_registration;
+                        nvDrawer.getMenu().getItem(1).setChecked(true);
+                        setTitle(getResources().getString(R.string.nav_registration));
+                        fab.hide();
+                    }
+                } else {
+                    showFalsePasswordDialog(fragment, stringFragment);
+                }
+            }
+        });
+        passwordDialog.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FragmentOverview fragmentOverview = new FragmentOverview();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.main, fragmentOverview, "Fragment_Overview").commit();
+                currentMenuItem = R.id.nav_view;
+                nvDrawer.getMenu().getItem(0).setChecked(true);
+                setTitle(getResources().getString(R.string.nav_list));
+                fab.show();
+                dialog.dismiss();
+            }
+        });
+        passwordDialog.show();
+    }
+
+
+    public void showFalsePasswordDialog(final Fragment fragment, final String stringFragment){
+        AlertDialog.Builder falsePasswordDialog = new AlertDialog.Builder(this);
+        falsePasswordDialog.setTitle("Falsches Passwort");
+        falsePasswordDialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showProtectedDialog(fragment, stringFragment);
+            }
+        });
+        falsePasswordDialog.show();
+    }
+
+    public String getPassword(){
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String password = pref.getString("password",null);
+        return password;
+    }
 
 
 }
