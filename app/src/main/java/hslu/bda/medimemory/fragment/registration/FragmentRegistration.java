@@ -17,29 +17,24 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.text.InputType;
 import android.util.Log;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -48,11 +43,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,14 +55,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.Activity;
-import android.provider.MediaStore.MediaColumns;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -92,6 +82,7 @@ import hslu.bda.medimemory.entity.Day;
 import hslu.bda.medimemory.entity.Eat;
 import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.overview.FragmentOverview;
+import hslu.bda.medimemory.fragment.settings.FragmentSettings;
 import hslu.bda.medimemory.services.CreateMediService;
 
 /**
@@ -102,6 +93,7 @@ public class FragmentRegistration extends Fragment {
     private Context context;
     private FragmentRegistration fragmentRegistration;
     private Activity mActivity;
+    private FragmentSettings fragmentSettings;
 
     private EditText edit_name;
     private final int REQUEST_CAMERA = 0;
@@ -189,17 +181,27 @@ public class FragmentRegistration extends Fragment {
         selectedYearDuration = dateCalendarDuration.get(Calendar.YEAR);
         selectedMonthDuration = dateCalendarDuration.get(Calendar.MONTH);
         selectedDayDuration = dateCalendarDuration.get(Calendar.DAY_OF_MONTH);
-    }
+     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_registration, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
-
+        fragmentSettings = new FragmentSettings();
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
 
+        init();
+
+
+        saveItem();
+        deleteItem();
+        setDeleteButtonVisibility();
+        return root;
+    }
+
+    private void init(){
         setupShowImage();
         showReminderDetails();
         setOnReminderDayTimeRadioButtonClickEvent();
@@ -223,12 +225,9 @@ public class FragmentRegistration extends Fragment {
             iBtn_helpDuration.setVisibility(View.GONE);
             iBtn_helpFoodInstruction.setVisibility(View.GONE);
         }
-
-        saveItem();
-        deleteItem();
-        setDeleteButtonVisibility();
-        return root;
     }
+
+
 
     @Override
     public void onResume(){
@@ -278,6 +277,8 @@ public class FragmentRegistration extends Fragment {
         }
         super.onStop();
     }
+
+    
 
     private void setOnReminderDayTimeRadioButtonClickEvent(){
         RadioButton rdnReminderDayTime = (RadioButton)root.findViewById((R.id.rd_daytime));
@@ -526,7 +527,7 @@ public class FragmentRegistration extends Fragment {
         return result;
     }
 
-    private Bitmap getPicture(){
+    public Bitmap getPicture(){
         return thumbnail;
     }
 

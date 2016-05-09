@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -59,8 +60,6 @@ public class FragmentOverviewChild extends Fragment  {
     private String status;
     private Collection<PillCoords> allPillCoordsById;
 
-    //Testkommentar
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -83,8 +82,9 @@ public class FragmentOverviewChild extends Fragment  {
             xPillPosition = (int)pillCoords.getCoords().x;
             yPillPosition = (int)pillCoords.getCoords().y;
             setupStatus(xPillPosition, yPillPosition);
-            setTouchListener(xPillPosition,yPillPosition);
+            setStatus(ContextCompat.getDrawable(getActivity(),R.drawable.circle));
         }
+        setTouchListener();
 
         //setupStatus(50, 60);
         //setStatus(ResourcesCompat.getDrawable(getResources(), R.drawable.circle, null));
@@ -162,7 +162,7 @@ public class FragmentOverviewChild extends Fragment  {
         return yTouchPosition;
     }
 
-    private void setTouchListener(final int xPillPosition, final int yPillPosition){
+    private void setTouchListener(){
         final int range = 40;
         rl_pillImage = (RelativeLayout)root.findViewById(R.id.rl_pillImage);
         rl_pillImage.setOnTouchListener(new View.OnTouchListener() {
@@ -173,13 +173,15 @@ public class FragmentOverviewChild extends Fragment  {
                     yTouchPosition = (int) event.getY();
                     setXTouchPosition((int) event.getX());
                     setYTouchPosition((int) event.getY());
-                    if (isBetween(getXTouchPosition() - range, getXTouchPosition() + range, xPillPosition) && isBetween(getYTouchPosition() - range, getYTouchPosition() + range, yPillPosition)) {
-                        setupStatusDialog();
+                    for (PillCoords pillCoords : allPillCoordsById){
+                        xPillPosition = (int)pillCoords.getCoords().x;
+                        yPillPosition = (int)pillCoords.getCoords().y;
+                        if (isBetween(getXTouchPosition() - range, getXTouchPosition() + range, xPillPosition) && isBetween(getYTouchPosition() - range, getYTouchPosition() + range, yPillPosition)) {
+                            setupStatusDialog();
+                        }
                     }
                     Log.i("PositionTouchx", String.valueOf(getXTouchPosition()));
                     Log.i("PositionTouchy", String.valueOf(getYTouchPosition()));
-                    Log.i("PositionPillx", String.valueOf(xPillPosition));
-                    Log.i("PositionPilly", String.valueOf(yPillPosition));
 
                 }
                 return false;
@@ -204,13 +206,13 @@ public class FragmentOverviewChild extends Fragment  {
                 Log.i("which", String.valueOf(which));
                 Log.i("checkedItem", String.valueOf(selectedItem));
                 if (selectedItem == 0) {
-                    setStatus(getResources().getDrawable(R.drawable.check_mark));
+                    setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.check_mark));
                     status = getResources().getString(R.string.txt_taken);
                 } else if (selectedItem == 1) {
-                    setStatus(getResources().getDrawable(R.drawable.question_mark));
+                    setStatus(ContextCompat.getDrawable(getActivity(),R.drawable.question_mark));
                     status = getResources().getString(R.string.txt_forgot);
                 } else if (selectedItem == 2) {
-                    setStatus(getResources().getDrawable(R.drawable.x_mark));
+                    setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.x_mark));
                     status = getResources().getString(R.string.txt_lost);
                 }
             }
