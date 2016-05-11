@@ -194,7 +194,6 @@ public class FragmentRegistration extends Fragment {
 
         init();
 
-
         saveItem();
         deleteItem();
         setDeleteButtonVisibility();
@@ -240,19 +239,18 @@ public class FragmentRegistration extends Fragment {
     }
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(getActivity()) {
-
+        /**
+         * This is the callback method called once the OpenCV //manager is connected
+         * @param status
+         */
         @Override
-        //This is the callback method called once the OpenCV //manager is connected
         public void onManagerConnected(int status) {
             switch (status) {
-                //Once the OpenCV manager is successfully connected we can enable the camera interaction with the defined OpenCV camera view
-                case LoaderCallbackInterface.SUCCESS:
-                {
+                case LoaderCallbackInterface.SUCCESS: {
                     Log.i("Example Loaded", "OpenCV loaded successfully");
                     //mOpenCvCameraView.enableView();
                 } break;
-                default:
-                {
+                default: {
                     super.onManagerConnected(status);
                 } break;
             }
@@ -528,6 +526,11 @@ public class FragmentRegistration extends Fragment {
     }
 
     public Bitmap getPicture(){
+        if (thumbnail.getWidth() > thumbnail.getHeight()){
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            thumbnail = Bitmap.createBitmap(thumbnail, 0, 0, thumbnail.getWidth(), thumbnail.getHeight(), matrix, true);
+        }
         return thumbnail;
     }
 

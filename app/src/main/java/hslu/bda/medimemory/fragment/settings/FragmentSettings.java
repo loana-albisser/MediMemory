@@ -44,14 +44,12 @@ public class FragmentSettings extends PreferenceFragment implements OnSharedPref
     @Override
     public void onResume() {
         super.onResume();
-        // Set up a listener whenever a key changes
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        // Unregister the listener whenever a key changes
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
 
@@ -123,12 +121,6 @@ public class FragmentSettings extends PreferenceFragment implements OnSharedPref
             public void onClick(DialogInterface dialog, int which) {
                 pref.unregisterOnSharedPreferenceChangeListener(listener);
                 chk_protect.setChecked(false);
-                /*pref.unregisterOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
-                    @Override
-                    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                        chk_protect.setChecked(false);
-                    }
-                });*/
                 dialog.dismiss();
                 pref.registerOnSharedPreferenceChangeListener(listener);
             }

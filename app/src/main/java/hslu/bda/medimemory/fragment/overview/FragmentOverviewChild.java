@@ -1,5 +1,6 @@
 package hslu.bda.medimemory.fragment.overview;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
@@ -9,11 +10,12 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
+import android.media.Image;
+import android.net.nsd.NsdManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,16 +28,18 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import java.io.IOException;
+import org.opencv.core.Point;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
-import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.entity.PillCoords;
 import hslu.bda.medimemory.entity.Status;
+import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
 
 /**
@@ -56,9 +60,17 @@ public class FragmentOverviewChild extends Fragment  {
     private int yTouchPosition;
     private int xPillPosition;
     private int yPillPosition;
+    private Point touchPoint;
+    private int statusWidth;
+    private int statusHeight;
+    private int pictureHeight;
+    private ArrayList<Point>points;
     private DbAdapter dbAdapter;
     private String status;
     private Collection<PillCoords> allPillCoordsById;
+    private int tabHeight = 112;
+    private ImageView statusImage;
+
 
 
     @Override
@@ -66,7 +78,7 @@ public class FragmentOverviewChild extends Fragment  {
         root = inflater.inflate(R.layout.fragment_overview_child, container, false);
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
-        fragmentOverview = new FragmentOverview();
+        tabHeight = ((MainActivity) getActivity()).getTabHeigth();
         Bundle bundle = getArguments();
         childname = bundle.getString("pagename");
         pillPhoto = bundle.getParcelable("pillPicture");
@@ -77,17 +89,9 @@ public class FragmentOverviewChild extends Fragment  {
         } else {
             iBtn_helpOverview.setVisibility(View.GONE);
         }
-        allPillCoordsById = PillCoords.getAllPillCoordsByMedid(id,dbAdapter);
-        for (PillCoords pillCoords : allPillCoordsById){
-            xPillPosition = (int)pillCoords.getCoords().x;
-            yPillPosition = (int)pillCoords.getCoords().y;
-            setupStatus(xPillPosition, yPillPosition);
-            setStatus(ContextCompat.getDrawable(getActivity(),R.drawable.circle));
-        }
-        setTouchListener();
+        points = new ArrayList<>();
+        allPillCoordsById = new ArrayList<>();
 
-        //setupStatus(50, 60);
-        //setStatus(ResourcesCompat.getDrawable(getResources(), R.drawable.circle, null));
         getIDs(root);
         return root;
     }
@@ -113,13 +117,29 @@ public class FragmentOverviewChild extends Fragment  {
 
     private void getIDs(View view) {
         ImageView iv_example = (ImageView) view.findViewById(R.id.iv_example);
-
         if (pillPhoto.getWidth() > pillPhoto.getHeight()){
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
             pillPhoto = Bitmap.createBitmap(pillPhoto, 0, 0, pillPhoto.getWidth(), pillPhoto.getHeight(), matrix, true);
         }
         iv_example.setImageBitmap(pillPhoto);
+
+        allPillCoordsById = PillCoords.getAllPillCoordsByMedid(id,dbAdapter);
+        for (PillCoords pillCoords : allPillCoordsById){
+            points.add(pillCoords.getCoords());
+            statusHeight = pillCoords.getHeight();
+            statusWidth = pillCoords.getWidth();
+            showTouchPoints((int) pillCoords.getCoords().x, (int) pillCoords.getCoords().y, pillCoords.getId());
+        }
+        setTouchListener();
+
+    }
+
+    private void showTouchPoints(int xCoord, int yCoord, int id) {
+        setupStatus(xCoord, yCoord, id);
+        iv_status.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
+        rl_pillImage.addView(iv_status,params);
+        //setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
     }
 
     /**
@@ -127,13 +147,24 @@ public class FragmentOverviewChild extends Fragment  {
      * @param x x-Position of Drawable
      * @param y y-Position of Drawable
      */
-    private void setupStatus(int x, int y){
+    private void setupStatus(int x, int y, int id){
         rl_pillImage = (RelativeLayout) root.findViewById(R.id.rl_pillImage);
+        int layoutHeight = rl_pillImage.getHeight();
+        int layoutWidth = rl_pillImage.getWidth();
+        Log.i("tabheight", String.valueOf(tabHeight));
         //size of Drawable
-        params = new RelativeLayout.LayoutParams(40, 40);
-        params.leftMargin = x;
-        params.topMargin = y;
+        /*if (statusHeight < statusWidth){
+            params = new RelativeLayout.LayoutParams(statusHeight, statusHeight);
+        } else {
+            params = new RelativeLayout.LayoutParams(statusWidth, statusWidth);
+        }*/
+        params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = x; //- statusWidth/2;
+        //params.rightMargin = x;
+        //params.bottomMargin = y - statusHeight/2;
+        params.topMargin = y; //- tabHeight;
         iv_status = new ImageView(getActivity());
+        iv_status.setId(id);
     }
 
 
@@ -142,46 +173,30 @@ public class FragmentOverviewChild extends Fragment  {
      * @param status status-Drawable
      */
     private void setStatus(Drawable status){
-        iv_status.setImageDrawable(status);
-        rl_pillImage.addView(iv_status, params);
-    }
-
-    private void setYTouchPosition(int yTouchPosition){
-        this.yTouchPosition = yTouchPosition;
-    }
-
-    private void setXTouchPosition(int xTouchPosition){
-        this.xTouchPosition = xTouchPosition;
-    }
-
-    private int getXTouchPosition(){
-        return xTouchPosition;
-    }
-
-    private int getYTouchPosition(){
-        return yTouchPosition;
+        //iv_status.setImageDrawable(status);
+        //rl_pillImage.addView(iv_status, params);
+        statusImage.setImageDrawable(status);
+        rl_pillImage.addView(statusImage,params);
     }
 
     private void setTouchListener(){
-        final int range = 40;
         rl_pillImage = (RelativeLayout)root.findViewById(R.id.rl_pillImage);
         rl_pillImage.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    xTouchPosition = (int) event.getX();
-                    yTouchPosition = (int) event.getY();
-                    setXTouchPosition((int) event.getX());
-                    setYTouchPosition((int) event.getY());
-                    for (PillCoords pillCoords : allPillCoordsById){
-                        xPillPosition = (int)pillCoords.getCoords().x;
-                        yPillPosition = (int)pillCoords.getCoords().y;
-                        if (isBetween(getXTouchPosition() - range, getXTouchPosition() + range, xPillPosition) && isBetween(getYTouchPosition() - range, getYTouchPosition() + range, yPillPosition)) {
+                    touchPoint = new Point(event.getX(), event.getY());
+                    int pointId = 0;
+                    for (Point point : points) {
+                        if (comparePoints(touchPoint, points.get(pointId))) {
+                            setupStatus((int) points.get(pointId).x, (int) points.get(pointId).y, pointId);
+                            statusImage = (ImageView)root.findViewById(pointId);
                             setupStatusDialog();
                         }
+                        pointId++;
                     }
-                    Log.i("PositionTouchx", String.valueOf(getXTouchPosition()));
-                    Log.i("PositionTouchy", String.valueOf(getYTouchPosition()));
+                    Log.i("PositionTouchx", String.valueOf(event.getX()));
+                    Log.i("PositionTouchy", String.valueOf(event.getY()));
 
                 }
                 return false;
@@ -202,14 +217,14 @@ public class FragmentOverviewChild extends Fragment  {
             public void onClick(DialogInterface dialog, int which) {
                 ListView lw = ((AlertDialog) dialog).getListView();
                 int selectedItem = (int) lw.getAdapter().getItemId(lw.getCheckedItemPosition());
-                rl_pillImage.removeView(iv_status);
-                Log.i("which", String.valueOf(which));
-                Log.i("checkedItem", String.valueOf(selectedItem));
+                statusImage.setImageDrawable(null);
+                rl_pillImage.removeView(statusImage);
+                //setStatus(ContextCompat.getDrawable(getActivity(),null));
                 if (selectedItem == 0) {
                     setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.check_mark));
                     status = getResources().getString(R.string.txt_taken);
                 } else if (selectedItem == 1) {
-                    setStatus(ContextCompat.getDrawable(getActivity(),R.drawable.question_mark));
+                    setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.question_mark));
                     status = getResources().getString(R.string.txt_forgot);
                 } else if (selectedItem == 2) {
                     setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.x_mark));
@@ -227,8 +242,16 @@ public class FragmentOverviewChild extends Fragment  {
         d.show();
     }
 
+
     private static boolean isBetween(int lowNumber, int highNumber, int compareNumber) {
         return highNumber > lowNumber ? compareNumber > lowNumber && compareNumber < highNumber : compareNumber > highNumber && compareNumber < lowNumber;
+    }
+
+    private static boolean comparePoints(Point touchPoint, Point pillPoint) {
+        int range = 40;
+        boolean x = touchPoint.x - range <= pillPoint.x && pillPoint.x <= touchPoint.x+range ;
+        boolean y = touchPoint.y - range <= pillPoint.y && pillPoint.y <= touchPoint.y+range ;
+        return x && y;
     }
 
     private void showHelpText(){
@@ -270,6 +293,15 @@ public class FragmentOverviewChild extends Fragment  {
     private void saveDataToDB(){
         Status status = new Status();
         status.setDescription(getStatus());
+    }
+
+    private boolean isStatusSet(String id){
+        Status status= Status.getStatusById(id, dbAdapter);
+        if(status == null){
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private String getStatus() {

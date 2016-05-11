@@ -22,6 +22,7 @@ import java.util.Collection;
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.entity.Data;
+import hslu.bda.medimemory.fragment.MainActivity;
 
 /**
  * Created by Loana on 04.03.2016.

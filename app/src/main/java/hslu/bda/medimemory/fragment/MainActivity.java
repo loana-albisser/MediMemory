@@ -220,12 +220,14 @@ public class MainActivity extends AppCompatActivity{
         drawer.closeDrawer(GravityCompat.START);
     }
 
-    public int getTabHeigthAct(){
+    public int getTabHeigth(){
         TabLayout tabLayout = (TabLayout)findViewById(R.id.my_tab_layout);
         Log.i("tablayout", String.valueOf(tabLayout.getHeight()));
-        //Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        //Log.i("toolbar", String.valueOf(toolbar.getHeight()));
         return tabLayout.getHeight();
+        /*Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        Log.i("toolbar", String.valueOf(toolbar.getHeight()));
+        return toolbar.getHeight();*/
+
     }
 
     public boolean isProtected(){
