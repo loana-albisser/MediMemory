@@ -16,6 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -60,6 +64,13 @@ public class FragmentOverview extends Fragment {
         viewPager.setCurrentItem(0);
 
         return root;
+    }
+
+    @Override
+    public void onResume(){
+
+
+        super.onResume();
     }
 
 

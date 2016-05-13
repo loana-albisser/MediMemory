@@ -24,6 +24,10 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.fragment.edit.FragmentEdit;
 import hslu.bda.medimemory.fragment.help.FragmentHelp;
@@ -76,9 +80,27 @@ public class MainActivity extends AppCompatActivity{
 
 
     public void onResume(){
-
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, mLoaderCallback);
         super.onResume();
     }
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        /**
+         * This is the callback method called once the OpenCV //manager is connected
+         * @param status
+         */
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS: {
+                    Log.i("Example Loaded", "OpenCV loaded successfully");
+                    //mOpenCvCameraView.enableView();
+                } break;
+                default: {
+                    super.onManagerConnected(status);
+                } break;
+            }
+        }
+    };
 
 
     private void onFloatingButtonPressed(){
