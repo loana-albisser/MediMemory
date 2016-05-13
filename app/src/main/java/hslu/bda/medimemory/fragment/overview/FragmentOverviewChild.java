@@ -29,6 +29,9 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Point;
 
 import java.util.ArrayList;
@@ -37,10 +40,12 @@ import java.util.Iterator;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
+import hslu.bda.medimemory.detection.PillDetection;
 import hslu.bda.medimemory.entity.PillCoords;
 import hslu.bda.medimemory.entity.Status;
 import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
+import hslu.bda.medimemory.services.PillDetectionService;
 
 /**
  * Created by Loana on 08.04.2016.
@@ -102,8 +107,10 @@ public class FragmentOverviewChild extends Fragment  {
             dbAdapter= new DbAdapter(getActivity().getApplicationContext());
             dbAdapter.open();
         }
+
         super.onResume();
     }
+
 
     @Override
     public void onStop(){
@@ -123,6 +130,13 @@ public class FragmentOverviewChild extends Fragment  {
             pillPhoto = Bitmap.createBitmap(pillPhoto, 0, 0, pillPhoto.getWidth(), pillPhoto.getHeight(), matrix, true);
         }
         iv_example.setImageBitmap(pillPhoto);
+        PillDetection pillDetection = new PillDetection(pillPhoto, pillPhoto.getWidth(), pillPhoto.getHeight());
+        Collection<PillCoords> pillCoordsNew;
+        try {
+            pillCoordsNew = pillDetection.getAllPillPoints(id);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
 
         allPillCoordsById = PillCoords.getAllPillCoordsByMedid(id,dbAdapter);
         for (PillCoords pillCoords : allPillCoordsById){
@@ -138,6 +152,10 @@ public class FragmentOverviewChild extends Fragment  {
     private void showTouchPoints(int xCoord, int yCoord, int id) {
         setupStatus(xCoord, yCoord, id);
         iv_status.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
+        int x = ContextCompat.getDrawable(getActivity(), R.drawable.circle).getBounds().width();
+        int y = ContextCompat.getDrawable(getActivity(), R.drawable.circle).getBounds().height();
+        params.leftMargin = params.leftMargin- 24;
+        params.topMargin = params.topMargin - 24;
         rl_pillImage.addView(iv_status,params);
         //setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
     }
@@ -176,6 +194,7 @@ public class FragmentOverviewChild extends Fragment  {
         //iv_status.setImageDrawable(status);
         //rl_pillImage.addView(iv_status, params);
         statusImage.setImageDrawable(status);
+
         rl_pillImage.addView(statusImage,params);
     }
 

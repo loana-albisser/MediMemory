@@ -134,10 +134,13 @@ public class PillDetection {
                     Rect rect = Imgproc.boundingRect(contours.get(contourIdx));
                     //System.out.println("rect.height: "+rect.height);
                     if(rect.height>10){
+                        Moments moments = Imgproc.contourMoments(contours.get(contourIdx));
 
                         Point point = new Point();
-                        point.x = rect.x + (0.5*rect.width);
-                        point.y = rect.y + (0.5*rect.height);
+                        /*point.x = rect.x + (0.5*rect.width);
+                        point.y = rect.y + (0.5*rect.height);*/
+                        point.x = moments.get_m10() / moments.get_m00();
+                        point.y = moments.get_m01() / moments.get_m00();
                         PillCoords pillCoords = new PillCoords(mediid, point,rect.width, rect.height);
                         allPillPoints.add(pillCoords);
                     }
@@ -152,5 +155,6 @@ public class PillDetection {
 
         return allPillPoints;
     }
+
 
 }
