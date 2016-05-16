@@ -34,6 +34,7 @@ import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
 public class FragmentEditAdapter extends ArrayAdapter <Data> {
     private Collection<Data> allPills;
     private FragmentRegistration fragmentRegistration;
+    private FragmentEdit fragmentEdit;
     private int [] mediId;
     private DbAdapter dbAdapter;
     private TextView pillname;
@@ -49,12 +50,14 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
         super(context, textViewResourceId);
         dbAdapter= new DbAdapter(getContext());
         dbAdapter.open();
-
+        fragmentEdit = new FragmentEdit();
         allPills = new ArrayList<>();
         allPills = Data.getAllDataFromTable(dbAdapter);
         mediId = new int[allPills.size()];
     }
 
+    //LayoutInflater inflater = getActivity().getLayoutInflater();
+    //dialogView = inflater.inflate(R.layout.dialog_reminderinterval, null);
 
     public FragmentEditAdapter(Context context, int textViewResourceId, ArrayList<Data> allPills) {
         super(context, textViewResourceId, allPills);
@@ -65,72 +68,88 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.fragment_edit,null);
+        listView = (ListView)view.findViewById(R.id.lv_edit);
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.fragment_edit_item, null);
+            pillname = (TextView) convertView.findViewById(R.id.txt_editItem);
+            chk_active = (CheckBox) convertView.findViewById(R.id.chk_active);
+            setFocus(false, chk_active);
             list = new ArrayList(allPills);
             Data data = list.get(position);
-            pillname = (TextView) convertView.findViewById(R.id.txt_editItem);
             pillname.setText(data.getDescription());
             //setId(data.getId());
             pillname.setTag(data.getId());
-            chk_active = (CheckBox) convertView.findViewById(R.id.chk_active);
-            setFocus(false);
+            setCheckBoxListener();
+            //showRegistrationFragment();
         }
-
-        showRegistrationFragment();
-        setCheckBoxListener();
+        //listClick();
+        //showRegistrationFragment();
+        //setCheckBoxListener();
         return convertView;
     }
+
+
 
     private void showRegistrationFragment(){
         //final int position = listView.getSelectedItemPosition();
         /*for (Data data : allPills){
             mediId[position] = data.getId() ;
         }*/
+        //listClick();
+        setFocus(true,pillname);
         pillname.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((MainActivity) getContext()).getFab().hide();
                 fragmentRegistration = new FragmentRegistration();
-                FragmentEdit fragmentEdit = new FragmentEdit();
-                setFocus(false);
+
+                setFocus(false, chk_active);
                 Object o = pillname.getTag();
-                setMediId(8);
+                //int id = listView.getSelectedItemPosition();
+                int id = fragmentEdit.getPosition();
+                setMediId(id);
                 //pillname.getTag();
                 //setMediId(fragmentEdit.getPosition());
-                //setMediId(list.get(listView.getSelectedItemPosition()).getId());
-                setFocus(true);
+                setMediId(list.get(listView.getSelectedItemPosition()).getId());
                 FragmentManager fragmentManager = ((MainActivity) getContext()).getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
             }
         });
     }
 
-    private void setFocus (boolean focus){
+    private void setFocus (boolean focus, View view){
         /*pillname.setFocusable(focus);
         pillname.setFocusableInTouchMode(focus);
         pillname.setClickable(focus);*/
-        chk_active.setFocusable(focus);
-        chk_active.setFocusable(focus);
+        view.setFocusable(focus);
+        view.setFocusable(focus);
     }
 
     private void setPosition(int pos){
         this.position = pos;
     }
 
-    /*private int getPosition(){
+    private int getPosition(){
         return position;
-    }*/
+    }
 
     private void setId(int id){
         this.id = id;
     }
 
+    private void listClick(){
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                setPosition(position);
+                Toast.makeText(getContext(), "listClick", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
 
     public void setCheckBoxListener(){
-        chk_active.setFocusable(true);
-        chk_active.setFocusableInTouchMode(true);
         chk_active.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

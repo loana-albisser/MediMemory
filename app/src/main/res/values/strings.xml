@@ -212,6 +212,9 @@
     <string name="Aktiv">Status</string>
     <string name="toast_active">Medikament ist aktiv</string>
     <string name="toast_inactive">Medikament ist inaktiv</string>
+    <string name="warning">Achtung</string>
+    <string name="sameTimeMessage">Start- und Endzeit können nicht identisch sein!</string>
+    <string name="littleTime">Die Endzeit muss nach der Startzeit sein!</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

@@ -2,6 +2,7 @@ package hslu.bda.medimemory.fragment.edit;
 
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -21,6 +22,7 @@ import java.util.List;
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.entity.Data;
+import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.overview.FragmentOverview;
 import hslu.bda.medimemory.fragment.overview.FragmentOverviewChild;
 import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
@@ -47,6 +49,7 @@ public class FragmentEdit extends Fragment {
     private TextView txt_edit;
     private TextView pillname;
     private CheckBox chk_active;
+    private List<Data> list;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -54,6 +57,7 @@ public class FragmentEdit extends Fragment {
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
         allPills = Data.getAllDataFromTable(dbAdapter);
+        list = new ArrayList(allPills);
         showItems();
         return root;
     }
@@ -82,30 +86,53 @@ public class FragmentEdit extends Fragment {
             }
             listView.setAdapter(editAdapter);
             listView.setVisibility(View.VISIBLE);
-            getPosition();
+
+            listClick();
         }
     }
 
-
-
+    /**
+     * set selected listview position
+     * @param pos position of clicked item
+     */
     private void setPosition(int pos){
         this.position = pos;
     }
 
+    /**
+     * get clicked listview position
+     * @return position
+     */
     public int getPosition(){
+        return position;
+    }
+
+    private void listClick(){
         listView = (ListView) root.findViewById(R.id.lv_edit);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 setPosition(position);
-                Toast.makeText(getActivity(),getPosition(),Toast.LENGTH_LONG).show();
-                editAdapter.setCheckBoxListener();
-
+                showRegistrationFragment();
             }
         });
-        return position;
     }
 
+    /**
+     * shows the RegistrationFragment from selected pill
+     */
+    private void showRegistrationFragment(){
+            ((MainActivity) getActivity()).getFab().hide();
+            fragmentRegistration = new FragmentRegistration();
+            setMediId(list.get(getPosition()).getId());
+            FragmentManager fragmentManager = ((MainActivity) getActivity()).getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
+    }
+
+    /**
+     * set selected mediId
+     * @param id the id of the pill
+     */
     private void setMediId(int id){
         Bundle bundle = new Bundle();
         bundle.putInt("mediId", id);
@@ -119,40 +146,5 @@ public class FragmentEdit extends Fragment {
         }
         return entries;
     }
-
-
-
-
-            // Populate the list, through the adapter
-
-            /*listView.setAdapter(new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_multiple_choice, pillNames) {
-                @Override
-                public View getView(int position, View convertView, ViewGroup parent) {
-                    if (convertView == null) {
-                        LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        convertView = layoutInflater.inflate(R.layout.fragment_edit_item, null);
-                        pillname = (TextView) convertView.findViewById(R.id.txt_editItem);
-                        pillname.setClickable(true);
-                        pillname.setText(pillNames.get(position));
-                        chk_active = (CheckBox) convertView.findViewById(R.id.chk_active);
-                        setCheckBoxListener();
-                        convertView.setTag(pillname);
-                        convertView.setTag(chk_active);
-                    } else {
-                        convertView.getTag();
-                    }
-                    showRegistrationFragment();
-                    return convertView;
-                }
-            });*/
-
-
-
-    /**
-     * shows the RegistrationFragment from selected pill
-     */
-
-
-
 
 }
