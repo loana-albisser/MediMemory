@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,19 +36,11 @@ public class FragmentEdit extends Fragment {
     private DbAdapter dbAdapter;
     private ListView listView;
     private ViewGroup root;
-    private ViewGroup registerView;
-    private int id;
     private FragmentRegistration fragmentRegistration;
     private FragmentEditAdapter editAdapter;
     private int position;
-    private FragmentOverview fragmentOverview;
-    private FragmentSettings fragmentSettings;
-    private Context context;
     private Collection<Data> allPills;
-    private ArrayList<Data>pills;
-    private Data pillData;
     private TextView txt_edit;
-    private TextView pillname;
     private CheckBox chk_active;
     private List<Data> list;
 

@@ -154,8 +154,8 @@ public class FragmentOverviewChild extends Fragment  {
         iv_status.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
         int x = ContextCompat.getDrawable(getActivity(), R.drawable.circle).getBounds().width();
         int y = ContextCompat.getDrawable(getActivity(), R.drawable.circle).getBounds().height();
-        params.leftMargin = params.leftMargin- 24;
-        params.topMargin = params.topMargin - 24;
+        /*params.leftMargin = params.leftMargin- 24;
+        params.topMargin = params.topMargin - 24;*/
         rl_pillImage.addView(iv_status,params);
         //setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
     }
@@ -180,7 +180,7 @@ public class FragmentOverviewChild extends Fragment  {
         params.leftMargin = x; //- statusWidth/2;
         //params.rightMargin = x;
         //params.bottomMargin = y - statusHeight/2;
-        params.topMargin = y; //- tabHeight;
+        params.topMargin = y - 50; //- tabHeight;
         iv_status = new ImageView(getActivity());
         iv_status.setId(id);
     }
@@ -194,7 +194,6 @@ public class FragmentOverviewChild extends Fragment  {
         //iv_status.setImageDrawable(status);
         //rl_pillImage.addView(iv_status, params);
         statusImage.setImageDrawable(status);
-
         rl_pillImage.addView(statusImage,params);
     }
 

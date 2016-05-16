@@ -3,7 +3,9 @@ package hslu.bda.medimemory.fragment.edit;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,31 +35,20 @@ import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
  */
 public class FragmentEditAdapter extends ArrayAdapter <Data> {
     private Collection<Data> allPills;
-    private FragmentRegistration fragmentRegistration;
-    private FragmentEdit fragmentEdit;
-    private int [] mediId;
     private DbAdapter dbAdapter;
     private TextView pillname;
     private ListView listView;
     private CheckBox chk_active;
-    private int position;
     private List<Data> list;
-    private int id;
-    private View editView;
 
 
     public FragmentEditAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
         dbAdapter= new DbAdapter(getContext());
         dbAdapter.open();
-        fragmentEdit = new FragmentEdit();
         allPills = new ArrayList<>();
         allPills = Data.getAllDataFromTable(dbAdapter);
-        mediId = new int[allPills.size()];
     }
-
-    //LayoutInflater inflater = getActivity().getLayoutInflater();
-    //dialogView = inflater.inflate(R.layout.dialog_reminderinterval, null);
 
     public FragmentEditAdapter(Context context, int textViewResourceId, ArrayList<Data> allPills) {
         super(context, textViewResourceId, allPills);
@@ -78,95 +69,33 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
             list = new ArrayList(allPills);
             Data data = list.get(position);
             pillname.setText(data.getDescription());
-            //setId(data.getId());
-            pillname.setTag(data.getId());
             setCheckBoxListener();
-            //showRegistrationFragment();
         }
-        //listClick();
-        //showRegistrationFragment();
-        //setCheckBoxListener();
         return convertView;
     }
 
-
-
-    private void showRegistrationFragment(){
-        //final int position = listView.getSelectedItemPosition();
-        /*for (Data data : allPills){
-            mediId[position] = data.getId() ;
-        }*/
-        //listClick();
-        setFocus(true,pillname);
-        pillname.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity) getContext()).getFab().hide();
-                fragmentRegistration = new FragmentRegistration();
-
-                setFocus(false, chk_active);
-                Object o = pillname.getTag();
-                //int id = listView.getSelectedItemPosition();
-                int id = fragmentEdit.getPosition();
-                setMediId(id);
-                //pillname.getTag();
-                //setMediId(fragmentEdit.getPosition());
-                setMediId(list.get(listView.getSelectedItemPosition()).getId());
-                FragmentManager fragmentManager = ((MainActivity) getContext()).getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
-            }
-        });
-    }
-
     private void setFocus (boolean focus, View view){
-        /*pillname.setFocusable(focus);
-        pillname.setFocusableInTouchMode(focus);
-        pillname.setClickable(focus);*/
         view.setFocusable(focus);
         view.setFocusable(focus);
     }
 
-    private void setPosition(int pos){
-        this.position = pos;
-    }
-
-    private int getPosition(){
-        return position;
-    }
-
-    private void setId(int id){
-        this.id = id;
-    }
-
-    private void listClick(){
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                setPosition(position);
-                Toast.makeText(getContext(), "listClick", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-
-    public void setCheckBoxListener(){
+   public void setCheckBoxListener(){
         chk_active.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     Toast.makeText(getContext(), getContext().getResources().getString(R.string.toast_active), Toast.LENGTH_LONG).show();
-                    //list.get(listView.getSelectedItemPosition()).setActive(1);
+                    /*pillname.setTextColor(ContextCompat.getColor(getContext(), R.color.itemSelected));
+                    pillname.setClickable(false);
+                    list.get(listView.getSelectedItemPosition()).setActive(1);*/
                 } else {
                     Toast.makeText(getContext(), getContext().getResources().getString(R.string.toast_inactive), Toast.LENGTH_LONG).show();
-                    //list.get(listView.getSelectedItemPosition()).setActive(0);
+                    /*pillname.setTextColor(ContextCompat.getColor(getContext(), R.color.itemUnselected));
+                    pillname.setClickable(true);
+                    list.get(listView.getSelectedItemPosition()).setActive(0);*/
                 }
             }
         });
     }
 
-    private void setMediId(int id){
-        Bundle bundle = new Bundle();
-        bundle.putInt("mediId", id);
-        fragmentRegistration.setArguments(bundle);
-    }
 }

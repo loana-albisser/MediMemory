@@ -41,7 +41,6 @@ public class FragmentOverviewPagerAdapter extends FragmentPagerAdapter{
     public void addFrag(Fragment fragment, String title) {
         mFragmentList.add(fragment);
         mFragmentTitleList.add(title);
-
     }
 
     public View getTabView(int position) {

@@ -68,8 +68,6 @@ public class FragmentOverview extends Fragment {
 
     @Override
     public void onResume(){
-
-
         super.onResume();
     }
 
@@ -84,6 +82,10 @@ public class FragmentOverview extends Fragment {
        }
        viewPager.setAdapter(adapter);
         tabLayout = (TabLayout) view.findViewById(R.id.my_tab_layout);
+    }
+
+    public ViewPager getViewPager(){
+        return viewPager;
     }
 
     private void setEvents() {

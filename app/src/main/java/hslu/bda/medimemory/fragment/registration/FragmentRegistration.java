@@ -82,8 +82,10 @@ import hslu.bda.medimemory.entity.Day;
 import hslu.bda.medimemory.entity.Eat;
 import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.overview.FragmentOverview;
+import hslu.bda.medimemory.fragment.overview.FragmentOverviewPagerAdapter;
 import hslu.bda.medimemory.fragment.settings.FragmentSettings;
 import hslu.bda.medimemory.services.CreateMediService;
+import hslu.bda.medimemory.services.DeleteMediService;
 
 /**
  * Created by Loana on 29.02.2016.
@@ -145,7 +147,6 @@ public class FragmentRegistration extends Fragment {
     private int selectedYearDuration;
     private int selectedMonthDuration;
     private int selectedDayDuration;
-    private NumberPicker np_numberofBlisters;
     private int numberOfBlisters;
     private StringBuilder dosageString;
 
@@ -190,6 +191,9 @@ public class FragmentRegistration extends Fragment {
     private StringBuilder numDaysString;
     private StringBuilder durationString;
     private ArrayList<String> strDayTimes;
+    private NumberPicker np_numberOfBlisters;
+    private AlertDialog.Builder dialogBuilderBlisters;
+    private AlertDialog.Builder saveAlertMessage;
 
 
     @Override
@@ -259,11 +263,13 @@ public class FragmentRegistration extends Fragment {
 
         dateCalendarDuration = Calendar.getInstance();
         setDurationDate(dateCalendarDuration.get(Calendar.YEAR), dateCalendarDuration.get(Calendar.MONTH), dateCalendarDuration.get(Calendar.DAY_OF_MONTH));
-
+        dialogBuilderBlisters = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        dialogNumberpickerView = inflater.inflate(R.layout.dialog_numberofblisters, null);
+        np_numberOfBlisters = (NumberPicker)dialogNumberpickerView.findViewById(R.id.np_numberOfBlisters);
+        setNumberOfBlistersValue(1);
         changeNumberOfBlisterTextField();
         intervalbuilder = new StringBuilder();
-
-
     }
 
 
@@ -557,10 +563,12 @@ public class FragmentRegistration extends Fragment {
     }
 
     public Bitmap getPicture(){
-        if (thumbnail.getWidth() > thumbnail.getHeight()){
-            Matrix matrix = new Matrix();
-            matrix.postRotate(90);
-            thumbnail = Bitmap.createBitmap(thumbnail, 0, 0, thumbnail.getWidth(), thumbnail.getHeight(), matrix, true);
+        if (thumbnail != null){
+            if (thumbnail.getWidth() > thumbnail.getHeight()){
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+                thumbnail = Bitmap.createBitmap(thumbnail, 0, 0, thumbnail.getWidth(), thumbnail.getHeight(), matrix, true);
+            }
         }
         return thumbnail;
     }
@@ -609,6 +617,7 @@ public class FragmentRegistration extends Fragment {
         for(Day day:allDayTimes){
             strDayTimes.add(day.getDescription());
         }
+        daytimes = strDayTimes.toArray(new CharSequence[allDayTimes.size()]);
     }
     public void showReminderDaytimeDialog(){
         reminderDaytimeDialog = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
@@ -629,7 +638,7 @@ public class FragmentRegistration extends Fragment {
     private void setDaytimeText(){
         daytimebuilder.setLength(0);
         daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
-        daytimes = strDayTimes.toArray(new CharSequence[allDayTimes.size()]);
+
         for (int id : selList) {
             selectedDayTimes.add(Iterables.get(allDayTimes, id));
             daytimebuilder.append(daytimes[id]).append(" ");
@@ -1130,20 +1139,10 @@ public class FragmentRegistration extends Fragment {
         if (checkedItem==0){
             dateCalendarDuration.set(Calendar.YEAR, year);
             dateCalendarDuration.set(Calendar.MONTH,month);
-            dateCalendarDuration.set(Calendar.DAY_OF_MONTH,day);
+            dateCalendarDuration.set(Calendar.DAY_OF_MONTH, day);
         } else if (checkedItem==2){
             setNumberOfBlistersValue(value);
         }
-    }
-
-    private void setNumberOfBlistersValue(int numberOfBlisters){
-        //np_numberofBlisters = (NumberPicker)root.findViewById(R.id.np_numberofBlisters);
-        this.numberOfBlisters = numberOfBlisters;
-        np_numberofBlisters.setValue(this.numberOfBlisters);
-    }
-
-    private int getNumberOfBlistersValue(){
-        return np_numberofBlisters.getValue();
     }
 
     public void showDateDialog(){
@@ -1202,9 +1201,7 @@ public class FragmentRegistration extends Fragment {
     }
 
     public void changeNumberOfBlisterTextField() {
-        np_numberofBlisters = new NumberPicker(getActivity());
-        np_numberofBlisters.setId(R.id.np_numberofBlisters);
-        np_numberofBlisters.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+        np_numberOfBlisters.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 numberOfBlisters = newVal;
@@ -1212,18 +1209,32 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
+    private void setNumberOfBlistersValue(int numberOfBlisters){
+        //np_numberofBlisters = (NumberPicker)root.findViewById(R.id.np_numberofBlisters);
+        this.numberOfBlisters = numberOfBlisters;
+        np_numberOfBlisters.setValue(this.numberOfBlisters);
+    }
+
+    private int getNumberOfBlistersValue(){
+        return np_numberOfBlisters.getValue();
+    }
+
     /**
      * toDo IllegalStateException second Call
      */
     public void showNumberOfBlistersNumberPickerDialog(){
-        AlertDialog.Builder npb_numberofBlisters = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
+        /*AlertDialog.Builder npb_numberofBlisters = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         npb_numberofBlisters.setCancelable(false);
         np_numberofBlisters.setMaxValue(20);
         np_numberofBlisters.setMinValue(1);
         setNumberOfBlistersValue(numberOfBlisters);
         FrameLayout parent = new FrameLayout(getActivity());
-        parent.removeView(np_numberofBlisters);
-        parent.addView(np_numberofBlisters, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        if (np_numberofBlisters != null){
+            ((ViewGroup)np_numberofBlisters.getParent()).removeView(np_numberofBlisters);
+        }
+        else {
+            parent.addView(np_numberofBlisters, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        }
         npb_numberofBlisters.setView(parent);
         npb_numberofBlisters.setTitle(getResources().getString(R.string.d_packagEnd));
         npb_numberofBlisters.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
@@ -1234,31 +1245,29 @@ public class FragmentRegistration extends Fragment {
         });
         npb_numberofBlisters.setCancelable(false);
         Dialog dialog = npb_numberofBlisters.create();
-        dialog.show();
-        /*AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        dialogNumberpickerView = inflater.inflate(R.layout.dialog_numberofblisters, null);
-        NumberPicker np_numberOfBlisters = (NumberPicker)root.findViewById(R.id.np_numberofBlisters);
-        dialogBuilder.setView(dialogNumberpickerView);
-        dialogBuilder.setTitle(getResources().getString(R.string.d_packagEnd));
-        dialogBuilder.setCancelable(false);
+        dialog.show();*/
+        np_numberOfBlisters.removeView(dialogNumberpickerView);
+        root.removeView(dialogNumberpickerView);
+        dialogBuilderBlisters.setView(dialogNumberpickerView);
+        dialogBuilderBlisters.setTitle(getResources().getString(R.string.d_packagEnd));
+        dialogBuilderBlisters.setCancelable(false);
         np_numberOfBlisters.setMaxValue(20);
         np_numberOfBlisters.setMinValue(1);
         setNumberOfBlistersValue(numberOfBlisters);
-        dialogBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+        dialogBuilderBlisters.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 setNumberOfBlisterText();
             }
         });
-        AlertDialog b = dialogBuilder.create();
-        b.show();*/
+
+        dialogBuilderBlisters.show();
     }
 
     private void setNumberOfBlisterText(){
         numberOfBlisterString = new StringBuilder();
         numberOfBlisterString.append(getResources().getString(R.string.taking)).append(" ");
-        numberOfBlisterString.append(numberOfBlisters);
+        numberOfBlisterString.append(getNumberOfBlistersValue());
         txt_duration.setText(numberOfBlisterString);
     }
 
@@ -1275,18 +1284,17 @@ public class FragmentRegistration extends Fragment {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 dosage = newVal;
-
+                setDosageText();
             }
         });
-        setDosageText();
         showInfoTextField(txt_dosage, ln_dosage);
     }
 
     private void setDosageText(){
         dosageString.setLength(0);
         dosageString.append(getResources().getString(R.string.txt_dosage)).append(" ");
-        dosageString.append(dosage).append(" ");
-        if (dosage == 1) {
+        dosageString.append(getDosage()).append(" ");
+        if (getDosage() == 1) {
             dosageString.append(getResources().getString(R.string.txt_dosageOneTab));
         } else {
             dosageString.append(getResources().getString(R.string.txt_dosageMoreTab));
@@ -1432,6 +1440,19 @@ public class FragmentRegistration extends Fragment {
     /**
      * checks weather required items are selected
      */
+    private void showAlertDialog (String message, final CardView cardView){
+        saveAlertMessage.setMessage(message);
+        saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                cardView.setFocusable(true);
+                cardView.setFocusableInTouchMode(true);
+                cardView.requestFocus();
+            }
+        });
+        saveAlertMessage.show();
+    }
+
     private void saveItem(){
         Button btn_save = (Button)root.findViewById(R.id.btn_save);
         final RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
@@ -1443,83 +1464,26 @@ public class FragmentRegistration extends Fragment {
         final CardView cv_foodInstruction = (CardView)root.findViewById(R.id.cv_foodInstruction);
         rd_reminderdaytime = (RadioButton)root.findViewById(R.id.rd_daytime);
         final EditText edit_name = (EditText)root.findViewById(R.id.edit_name);
-        final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
+        saveAlertMessage = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         btn_save.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (edit_name.getText().toString().trim().length() == 0) {
-                    alertBuilder.setMessage(getResources().getString(R.string.dialog_nameMessage));
-                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            cv_name.setFocusable(true);
-                            cv_name.setFocusableInTouchMode(true);
-                            cv_name.requestFocus();
-                        }
-                    });
-                    alertBuilder.show();
-                } else if (getPicture() ==null){
-                    alertBuilder.setMessage(getResources().getString(R.string.dialog_photoMessage));
-                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            cv_photo.setFocusable(true);
-                            cv_photo.setFocusableInTouchMode(true);
-                            cv_photo.requestFocus();
-
-                        }
-                    });
-                    alertBuilder.show();
-                }
-                else if (rdg_reminder.getCheckedRadioButtonId() == -1) {
-                    alertBuilder.setMessage(getResources().getString(R.string.dialog_reminderMessage));
-                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            cv_reminder.setFocusable(true);
-                            cv_reminder.setFocusableInTouchMode(true);
-                            cv_reminder.requestFocus();
-
-                        }
-                    });
-                    alertBuilder.show();
+                    showAlertDialog(getResources().getString(R.string.dialog_nameMessage), cv_name);
+                } else if (getPicture() == null){
+                    showAlertDialog(getResources().getString(R.string.dialog_photoMessage), cv_photo);
+                } else if (rdg_reminder.getCheckedRadioButtonId() == -1) {
+                    showAlertDialog(getResources().getString(R.string.dialog_reminderMessage), cv_reminder);
                 } else if (rdg_duration.getCheckedRadioButtonId() == -1) {
-                    alertBuilder.setMessage(getResources().getString(R.string.dialog_durationMessage));
-                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            cv_duration.setFocusable(true);
-                            cv_duration.setFocusableInTouchMode(true);
-                            cv_duration.requestFocus();
-                        }
-                    });
-                    alertBuilder.show();
+                    showAlertDialog(getResources().getString(R.string.dialog_durationMessage), cv_duration);
                 } else if (rd_reminderdaytime.isChecked() && selectedDayTimes.size() == 0) {
-                    alertBuilder.setMessage(getResources().getString(R.string.dialog_reminderDaytimeMessage));
-                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            cv_reminder.setFocusable(true);
-                            cv_reminder.setFocusableInTouchMode(true);
-                            cv_reminder.requestFocus();
-                        }
-                    });
-                    alertBuilder.show();
+                    showAlertDialog(getResources().getString(R.string.dialog_reminderDaytimeMessage), cv_reminder);
                 } else if (rd_reminderdaytime.isChecked() && txt_foodInstruction == null ) {
-                    alertBuilder.setMessage(getResources().getString(R.string.dialog_foodInstructionMessage));
-                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            cv_foodInstruction.setFocusableInTouchMode(true);
-                            cv_foodInstruction.setFocusable(true);
-                            cv_foodInstruction.requestFocus();
-                        }
-                    });
-                    alertBuilder.show();
+                    showAlertDialog(getResources().getString(R.string.dialog_foodInstructionMessage), cv_foodInstruction);
                 } else {
                     saveDataToDB();
-                    alertBuilder.setMessage(getResources().getString(R.string.dialog_Medisave));
-                    alertBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    saveAlertMessage.setMessage(getResources().getString(R.string.dialog_Medisave));
+                    saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             FragmentOverview fragmentOverview = new FragmentOverview();
@@ -1529,16 +1493,20 @@ public class FragmentRegistration extends Fragment {
                             ((MainActivity) getActivity()).setTitle("Übersicht");
                             FragmentManager fragmentManager = getFragmentManager();
                             fragmentManager.beginTransaction().replace(R.id.main, fragmentOverview, "Fragment_Overview").commit();
+                            //FragmentOverviewPagerAdapter fragmentOverviewPagerAdapter = new FragmentOverviewPagerAdapter(fragmentManager,getActivity());
+                            //fragmentOverview.getViewPager().setCurrentItem(fragmentOverviewPagerAdapter.getCount());
                         }
                     });
-                    alertBuilder.setCancelable(false);
-                    alertBuilder.show();
-
+                    saveAlertMessage.setCancelable(false);
+                    saveAlertMessage.show();
                 }
             }
         });
     }
 
+    /**
+     * toDo deleteItem
+     */
     public void deleteItem(){
         Button btn_delete = (Button)root.findViewById(R.id.btn_delete);
         btn_delete.setOnClickListener(new View.OnClickListener() {
@@ -1562,7 +1530,6 @@ public class FragmentRegistration extends Fragment {
                 alertBuilder.show();
             }
         });
-        //DeleteMediService.deleteAllEntryByTableAndMedId()
     }
 
     private void saveDataToDB(){
@@ -1583,6 +1550,7 @@ public class FragmentRegistration extends Fragment {
         }
         data.setAmount(getDosage());
         data.setNote(getNotes());
+        data.setActive(1);
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         data.setCreateDate(cal);
@@ -1668,21 +1636,19 @@ public class FragmentRegistration extends Fragment {
         //pillData.getAllConsumeIndividual();
         //;
 
-        /**
-         * 0: beschränkt, -1 : kontinuierlich, 1: Packung Ende if (entry == dosage * numBlister)
-         */
-        if (pillData.getDuration() == 0){
+        if (0==0/*test*/){
             setDurationRd(0,pillData);
             setDurationDate(2016, 8, 17);
             setDateText();
         } else if (pillData.getDuration() == -1){
             setDurationRd(1,pillData);
-        } else if (pillData.getDuration() == 0){
+        } else if (0==0){
             setDurationRd(2,pillData);
             setNumberOfBlistersValue(1);
             setNumberOfBlisterText();
         }
         setDosage(pillData.getAmount());
+        setDosageText();
         setNotes(pillData.getNote());
     }
 
