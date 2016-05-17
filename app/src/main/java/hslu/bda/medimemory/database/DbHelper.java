@@ -41,6 +41,7 @@ public class DbHelper extends SQLiteOpenHelper{
     public static String COLUMN_INTERVAL = "interval";
     public static String COLUMN_WEEKDAY = "weekday";
     public static String COLUMN_CREATEDATE="createDate";
+    public static String COLUMN_ENDDATE = "endDate";
     public static String COLUMN_NOTE = "note";
     public static String COLUMN_XCOORD = "xaxes";
     public static String COLUMN_YCOORD = "yaxes";
@@ -102,6 +103,7 @@ public class DbHelper extends SQLiteOpenHelper{
                 this.COLUMN_LENGTH + " INTEGER, "+
                 this.COLUMN_PICTURE + " BLOB, " +
                 this.COLUMN_CREATEDATE+ " TEXT, " +
+                this.COLUMN_ENDDATE + " TEXT, "+
                 this.COLUMN_NOTE+ " TEXT, " +
                 this.COLUMN_ACTIVE + " INTEGER " +
                 ");";

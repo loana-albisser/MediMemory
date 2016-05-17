@@ -40,6 +40,7 @@ public class DataTest extends AndroidTestCase {
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         data.setCreateDate(cal);
+        data.setEndDate(cal);
         data.setNote("Test Note");
         data.setActive(1);
 

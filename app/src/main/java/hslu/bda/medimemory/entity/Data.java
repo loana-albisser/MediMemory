@@ -29,6 +29,7 @@ public class Data implements DbObject {
     private int length;
     private Bitmap picture;
     private Calendar createDate;
+    private Calendar endDate;
     private String note;
     private int active;
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -104,6 +105,14 @@ public class Data implements DbObject {
         this.createDate = createDate;
     }
 
+    public Calendar getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Calendar endDate) {
+        this.endDate = endDate;
+    }
+
     public String getNote() {
         return note;
     }
@@ -163,6 +172,12 @@ public class Data implements DbObject {
         getPicture().compress(Bitmap.CompressFormat.PNG, 0, stream);
         values.put(DbHelper.COLUMN_PICTURE, stream.toByteArray());
         values.put(DbHelper.COLUMN_CREATEDATE, simpleDateFormat.format(getCreateDate().getTime()));
+        if(getEndDate()!=null) {
+            values.put(DbHelper.COLUMN_ENDDATE, simpleDateFormat.format(getEndDate().getTime()));
+        }
+        else{
+            values.put(DbHelper.COLUMN_ENDDATE, (String)null);
+        }
         values.put(DbHelper.COLUMN_NOTE, getNote());
         values.put(DbHelper.COLUMN_ACTIVE, getActive());
 
@@ -198,6 +213,11 @@ public class Data implements DbObject {
             calendar.setTime(simpleDateFormat.parse(contentValues.getAsString(DbHelper.COLUMN_CREATEDATE)));
             data.setCreateDate(calendar);
         }catch(Exception e) {data.setCreateDate(null);}
+        try{
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(simpleDateFormat.parse(contentValues.getAsString(DbHelper.COLUMN_ENDDATE)));
+            data.setEndDate(calendar);
+        }catch(Exception e) {data.setEndDate(null);}
         data.setNote(contentValues.getAsString(DbHelper.COLUMN_NOTE));
         data.setActive(contentValues.getAsInteger(DbHelper.COLUMN_ACTIVE));
         return data;
@@ -236,5 +256,7 @@ public class Data implements DbObject {
 
         return  allData;
     }
+
+
 }
 
