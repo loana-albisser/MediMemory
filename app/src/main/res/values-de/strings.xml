@@ -195,6 +195,8 @@
     <string name="txt_titleAlarm">Medikamenten Alarm</string>
     <string name="txt_reminderAlarm">Hast du deine Medikamente genommen?</string>
     <string name="title_dialogStatus">Status</string>
+    <string name="warning">Achtung</string>
+    <string name="littleTime">Die Endzeit muss nach der Startzeit sein!</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

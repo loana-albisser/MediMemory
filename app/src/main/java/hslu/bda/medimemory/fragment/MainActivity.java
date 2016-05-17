@@ -1,5 +1,6 @@
 package hslu.bda.medimemory.fragment;
 
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
