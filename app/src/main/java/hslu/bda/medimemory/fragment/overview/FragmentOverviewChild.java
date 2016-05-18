@@ -288,7 +288,7 @@ public class FragmentOverviewChild extends Fragment  {
     private boolean checkHelpTextVisibility(){
         iBtn_helpOverview = (ImageButton) root.findViewById(R.id.iBtn_helpOverview);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
-        boolean showHelp = pref.getBoolean("pref_key_showHelp",false);
+        boolean showHelp = pref.getBoolean("pref_key_showHelp",true);
         return showHelp;
     }
 
@@ -311,15 +311,6 @@ public class FragmentOverviewChild extends Fragment  {
     private void saveDataToDB(){
         Status status = new Status();
         status.setDescription(getStatus());
-    }
-
-    private boolean isStatusSet(String id){
-        Status status= Status.getStatusById(id, dbAdapter);
-        if(status == null){
-            return false;
-        } else {
-            return true;
-        }
     }
 
     private String getStatus() {

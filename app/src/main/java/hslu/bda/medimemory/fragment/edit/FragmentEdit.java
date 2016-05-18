@@ -79,7 +79,6 @@ public class FragmentEdit extends Fragment {
             }
             listView.setAdapter(editAdapter);
             listView.setVisibility(View.VISIBLE);
-
             listClick();
         }
     }

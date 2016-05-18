@@ -73,7 +73,8 @@
         <CheckBoxPreference
             android:key="pref_key_showPassword"
             android:title="@string/title_protection"
-            android:defaultValue="false"
-            android:persistent="true"/>
+            android:persistent="true"
+            android:checked="false"
+            android:defaultValue="false"/>
     </PreferenceCategory>
 </PreferenceScreen>

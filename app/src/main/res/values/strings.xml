@@ -161,7 +161,7 @@
     <string name="no">Nein</string>
     <string name="iBtn_helpName">help</string>
     <string name="pref_help">Hilfe</string>
-    <string name="title_showHelp">Hilfetext Anzeigen</string>
+    <string name="title_showHelp">Hilfetext anzeigen</string>
 
     <string name="question_1">Was ist MediMemory?</string>
     <string name="question_2">Wie kann ich ein Medikament hinzufügen?</string>
@@ -215,6 +215,8 @@
     <string name="warning">Achtung</string>
     <string name="sameTimeMessage">Start- und Endzeit können nicht identisch sein!</string>
     <string name="littleTime">Die Endzeit muss nach der Startzeit sein!</string>
+    <string name="wrongPW">Falsches Passwort</string>
+    <string name="pillDeleted">Medikament wurde gelöscht</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

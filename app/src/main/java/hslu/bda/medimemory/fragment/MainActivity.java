@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void showProtectedDialog(final Fragment fragment, final String stringFragment){
-        passwordDialog = new AlertDialog.Builder(this);
+        passwordDialog = new AlertDialog.Builder(this,R.style.DialogTheme);
         passwordDialog.setCancelable(false);
         passwordDialog.setTitle(getResources().getString(R.string.enterPassword));
         LinearLayout layout = new LinearLayout(this);

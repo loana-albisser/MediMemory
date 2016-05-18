@@ -13,8 +13,7 @@
         android:layout_alignParentEnd="false"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:checked="true"
-        android:layout_margin="5dp" />
+        android:checked="true" />
 
     <TextView
         android:layout_width="match_parent"
@@ -28,14 +27,14 @@
         android:layout_alignBottom="@+id/chk_active"
         android:gravity="center|left"
         android:textSize="20sp"
-        android:layout_margin="5dp"
         android:lineSpacingExtra="5dp"
         android:typeface="normal"
         android:layout_centerInParent="true"
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:clickable="false"
-        android:textColor="#666" />
+        android:textColor="@color/itemSelected"
+        android:layout_marginLeft="5dp" />
 
 
 </RelativeLayout>

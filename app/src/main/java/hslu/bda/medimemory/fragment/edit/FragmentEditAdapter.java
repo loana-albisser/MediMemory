@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.overview.FragmentOverviewChild;
 import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
+import hslu.bda.medimemory.services.UpdateMediService;
 
 /**
  * Created by Loana on 12.05.2016.
@@ -37,9 +39,9 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
     private Collection<Data> allPills;
     private DbAdapter dbAdapter;
     private TextView pillname;
-    private ListView listView;
-    private CheckBox chk_active;
+    private FragmentEdit fragmentEdit;
     private List<Data> list;
+    private Holder holder;
 
 
     public FragmentEditAdapter(Context context, int textViewResourceId) {
@@ -48,6 +50,7 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
         dbAdapter.open();
         allPills = new ArrayList<>();
         allPills = Data.getAllDataFromTable(dbAdapter);
+        fragmentEdit = new FragmentEdit();
     }
 
     public FragmentEditAdapter(Context context, int textViewResourceId, ArrayList<Data> allPills) {
@@ -59,43 +62,87 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.fragment_edit,null);
-        listView = (ListView)view.findViewById(R.id.lv_edit);
+        holder = new Holder();
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.fragment_edit_item, null);
-            pillname = (TextView) convertView.findViewById(R.id.txt_editItem);
-            chk_active = (CheckBox) convertView.findViewById(R.id.chk_active);
-            setFocus(false, chk_active);
+            holder.textView = (TextView) convertView.findViewById(R.id.txt_editItem);
+            holder.checkBox = (CheckBox) convertView.findViewById(R.id.chk_active);
+            setFocus(false, holder.checkBox);
             list = new ArrayList(allPills);
             Data data = list.get(position);
-            pillname.setText(data.getDescription());
-            setCheckBoxListener();
+            setMediActive(data);
+            holder.textView.setText(data.getDescription());
+            holder.checkBox.setTag(position);
+            setCheckBoxListener(holder.textView, holder.checkBox);
         }
         return convertView;
     }
+
+
 
     private void setFocus (boolean focus, View view){
         view.setFocusable(focus);
         view.setFocusable(focus);
     }
 
-   public void setCheckBoxListener(){
-        chk_active.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+   private void setCheckBoxListener(final TextView textView, final CheckBox checkBox){
+        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     Toast.makeText(getContext(), getContext().getResources().getString(R.string.toast_active), Toast.LENGTH_LONG).show();
-                    /*pillname.setTextColor(ContextCompat.getColor(getContext(), R.color.itemSelected));
-                    pillname.setClickable(false);
-                    list.get(listView.getSelectedItemPosition()).setActive(1);*/
+                    setTextViewActive(textView);
+                    Log.i("Checkbox.Tag", String.valueOf(checkBox.getTag()));
+                    list.get((Integer) checkBox.getTag()).setActive(1);
                 } else {
                     Toast.makeText(getContext(), getContext().getResources().getString(R.string.toast_inactive), Toast.LENGTH_LONG).show();
-                    /*pillname.setTextColor(ContextCompat.getColor(getContext(), R.color.itemUnselected));
-                    pillname.setClickable(true);
-                    list.get(listView.getSelectedItemPosition()).setActive(0);*/
+                    setTextViewInActive(textView);
+                    Log.i("Checkbox.Tag", String.valueOf(checkBox.getTag()));
+                    list.get((Integer) checkBox.getTag()).setActive(0);
+                    /**
+                     * toDo update Medi
+                     */
+                    //UpdateMediService.updateTableEntry(xxx,dbAdapter);
                 }
             }
         });
     }
+
+    private void setTextViewActive(TextView textView){
+        textView.setTextColor(ContextCompat.getColor(getContext(), R.color.itemSelected));
+        textView.setClickable(false);
+    }
+
+    private void setTextViewInActive(TextView textView){
+        textView.setTextColor(ContextCompat.getColor(getContext(), R.color.itemUnselected));
+        textView.setClickable(true);
+    }
+
+    private void setMediActive(Data data){
+        if (data.getActive()==1){
+            holder.checkBox.setChecked(true);
+            setTextViewActive(holder.textView);
+        } else {
+            holder.checkBox.setChecked(false);
+            setTextViewInActive(holder.textView);
+        }
+    }
+
+
+    private class Holder {
+        private CheckBox checkBox;
+        private TextView textView;
+
+        private Holder(CheckBox checkBox, TextView textView) {
+            this.checkBox = checkBox;
+            this.textView = textView;
+        }
+
+        private Holder(){
+
+        }
+    }
+
+
 
 }
