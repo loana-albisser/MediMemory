@@ -99,6 +99,10 @@ public class TimePickerPreference extends DialogPreference {
         setSummary(getSummary());
     }
 
+    /**
+     * sets the summary text
+     * @return the summary text
+     */
     @Override
     public CharSequence getSummary() {
         if (calendar == null) {

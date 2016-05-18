@@ -28,6 +28,9 @@ public class FragmentHelpAdapter extends BaseExpandableListAdapter {
     }
 
 
+    /**
+     * sets all shown questions
+     */
     public void setQuestion(){
         header = new String[]{
                 context.getString(R.string.question_1),
@@ -41,6 +44,9 @@ public class FragmentHelpAdapter extends BaseExpandableListAdapter {
         };
     }
 
+    /**
+     * sets all shown answers
+     */
     public void setAnswer(){
         children = new String[][]{
                 {context.getString(R.string.answer_1)},
@@ -104,8 +110,8 @@ public class FragmentHelpAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
         if (view == null) {
-            LayoutInflater infalInflater = (LayoutInflater) context.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = infalInflater.inflate(R.layout.fragment_help_child, null);
+            LayoutInflater inflater = (LayoutInflater) context.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.fragment_help_child, null);
         }
         TextView textView = (TextView)view.findViewById(R.id.txt_expListItem);
         textView.setText(getChild(i, i1).toString());

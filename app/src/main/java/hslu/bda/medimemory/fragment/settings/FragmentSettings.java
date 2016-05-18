@@ -36,7 +36,6 @@ public class FragmentSettings extends PreferenceFragment{
     private EditText password;
     private CheckBoxPreference chk_protect;
     private AlertDialog.Builder passwordDialog;
-    private int count = 0;
     private Context mActivity;
     private OnSharedPreferenceChangeListener listener;
 
@@ -44,9 +43,6 @@ public class FragmentSettings extends PreferenceFragment{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         chk_protect = (CheckBoxPreference)findPreference("pref_key_showPassword");
-        /*LayoutInflater inflater = getActivity().getLayoutInflater();
-        View dialogPasswordView = inflater.inflate(R.layout.dialog_settingspassword, null);
-        password = (EditText)dialogPasswordView.findViewById(R.id.edit_pw);*/
         pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         pref.registerOnSharedPreferenceChangeListener(listener);
         listener = new OnSharedPreferenceChangeListener() {
@@ -114,12 +110,9 @@ public class FragmentSettings extends PreferenceFragment{
 
     }
 
-    /*public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
-    }*/
-
-
-
+    /**
+     * dialog shown if a false password is entered
+     */
     public void showFalsePasswordDialog(){
         AlertDialog.Builder falsePasswordDialog = new AlertDialog.Builder(mActivity);
         falsePasswordDialog.setTitle(mActivity.getString(R.string.wrongPW));
@@ -133,6 +126,10 @@ public class FragmentSettings extends PreferenceFragment{
         });
     }
 
+    /**
+     * checks whether the save mode is checked or not
+     * @return true if checked
+     */
     public boolean isSetProtection(){
         showProtectionDialog = pref.getBoolean("pref_key_showPassword",false);
         return showProtectionDialog;
@@ -203,12 +200,10 @@ public class FragmentSettings extends PreferenceFragment{
         return password;
     }
 
-    private void resetPassword(){
-        Editor editor = pref.edit();
-        editor.putString("password", null);
-        editor.commit();
-    }
-
+    /**
+     * sets whether the fragment is run for the first time
+     * @param firstRun
+     */
     private void setFirstRun(boolean firstRun) {
         Editor editor = pref.edit();
         editor.putBoolean("firstRun", firstRun);

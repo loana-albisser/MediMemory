@@ -41,7 +41,6 @@ public class FragmentEdit extends Fragment {
     private int position;
     private Collection<Data> allPills;
     private TextView txt_edit;
-    private CheckBox chk_active;
     private List<Data> list;
 
     @Override
@@ -72,7 +71,7 @@ public class FragmentEdit extends Fragment {
         } else {
             listView.setVisibility(View.VISIBLE);
             txt_edit.setVisibility(View.GONE);
-            editAdapter = new FragmentEditAdapter(getActivity(), R.layout.fragment_edit /*,(<Data>) allPills*/);
+            editAdapter = new FragmentEditAdapter(getActivity(), R.layout.fragment_edit);
             // Populate the list, through the adapter
             for (Data data : getEntries()){
                 editAdapter.add(data);
@@ -99,6 +98,9 @@ public class FragmentEdit extends Fragment {
         return position;
     }
 
+    /**
+     * behaviour when a lsit item is clicked
+     */
     private void listClick(){
         listView = (ListView) root.findViewById(R.id.lv_edit);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -117,7 +119,7 @@ public class FragmentEdit extends Fragment {
             ((MainActivity) getActivity()).getFab().hide();
             fragmentRegistration = new FragmentRegistration();
             setMediId(list.get(getPosition()).getId());
-            FragmentManager fragmentManager = ((MainActivity) getActivity()).getFragmentManager();
+            FragmentManager fragmentManager = (getActivity()).getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.main, fragmentRegistration, "Fragment_Registration").commit();
     }
 

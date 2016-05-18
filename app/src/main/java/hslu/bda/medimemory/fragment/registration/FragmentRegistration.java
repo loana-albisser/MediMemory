@@ -79,7 +79,6 @@ import hslu.bda.medimemory.entity.Day;
 import hslu.bda.medimemory.entity.Eat;
 import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.overview.FragmentOverview;
-import hslu.bda.medimemory.fragment.settings.FragmentSettings;
 import hslu.bda.medimemory.services.CreateMediService;
 import hslu.bda.medimemory.services.DeleteMediService;
 
@@ -88,40 +87,27 @@ import hslu.bda.medimemory.services.DeleteMediService;
  */
 public class FragmentRegistration extends Fragment {
     private ViewGroup root;
-    private Context context;
-    private FragmentRegistration fragmentRegistration;
-    private Activity mActivity;
-    private FragmentSettings fragmentSettings;
 
     private EditText edit_name;
-    private final int REQUEST_CAMERA = 0;
-    private final int SELECT_FILE = 1;
     private ImageView iv_selectedImage;
-    private String imagePath;
     private Bitmap thumbnail;
 
     private TextView txt_reminder;
     private View dialogReminderView;
     private View dialogNumberpickerView;
     private int selectedIntervalPosition;
-    private boolean [] checkedDaytimes; //= {false,false,false,false,false};
+    private boolean [] checkedDaytimes;
     private int checkedWeek;
-    private ArrayList<Integer> selList = new ArrayList<Integer>();
+    private ArrayList<Integer> selList = new ArrayList<>();
     private Spinner sp_reminderInterval;
-    private int numberofCheckedItems;
     private AlertDialog.Builder reminderDaytimeDialog;
     private RadioButton rd_reminderInterval;
     private TimePickerDialog tp_startEndTimeInterval;
     private StringBuilder daytimebuilder;
     private CharSequence[] daytimes;
     private SimpleDateFormat startTime;
-    private Date startTimeDate;
     private Calendar startTimeCalendar;
     private Calendar endTimeCalendar;
-    private Calendar intervalCalendar;
-    private Date intervalDate;
-    private int intervalMinute;
-    private int intervalHour;
     private Button btn_starttime;
     private Button btn_endtime;
     private View dialogViewStartEnd;
@@ -134,16 +120,12 @@ public class FragmentRegistration extends Fragment {
     private NumberPicker np_reminderInterval;
     private TimePickerDialog tpd_interval;
     private StringBuilder intervalbuilder;
-    private int selectedValue = 1;
     private String selectedInterval;
     private CardView cv_foodInstruction;
     private RadioGroup rdg_duration;
     private TextView txt_duration = null;
     private StringBuilder numberOfBlisterString;
     private Calendar dateCalendarDuration;
-    private int selectedYearDuration;
-    private int selectedMonthDuration;
-    private int selectedDayDuration;
     private int numberOfBlisters;
     private StringBuilder dosageString;
 
@@ -151,9 +133,7 @@ public class FragmentRegistration extends Fragment {
     private NumberPicker np_dosage;
 
     private TextView txt_foodInstruction = null;
-    private RadioGroup rdg_foodInstruction;
     private RadioButton[] rd_foodinstruction;
-    private RadioButton rd_foodId;
     private DbAdapter dbAdapter;
 
 
@@ -165,7 +145,7 @@ public class FragmentRegistration extends Fragment {
     private RadioButton rd_reminderdaytime;
 
     private Collection<Day> allDayTimes;
-    private Collection<Day> selectedDayTimes = new ArrayList<Day>();
+    private Collection<Day> selectedDayTimes = new ArrayList<>();
     private Collection<Eat> allFoodInstructions;
     private Collection<ConsumeInterval> consumeIntervals = new ArrayList<>();
     private Collection<ConsumeIndividual> consumeIndividuals = new ArrayList<>();
@@ -175,12 +155,10 @@ public class FragmentRegistration extends Fragment {
     private ImageButton iBtn_helpReminder;
     private ImageButton iBtn_helpDuration;
     private ImageButton iBtn_helpFoodInstruction;
-    private ImageButton iBtn_helpOverview;
     private TextView txt_helpText;
 
     private int mediId;
     private Data pillData;
-    Collection<Object> consumeList = new ArrayList<>();
     private int spinnerIntervalPosition;
     private int intervalNpValue;
     private ViewGroup ln_dosage;
@@ -201,7 +179,6 @@ public class FragmentRegistration extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_registration, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
-        fragmentSettings = new FragmentSettings();
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
 
@@ -244,6 +221,9 @@ public class FragmentRegistration extends Fragment {
         super.onStop();
     }
 
+    /**
+     * sets all inital values
+     */
     private void init(){
         setupShowImage();
         setupReminderDaytimes();
@@ -318,6 +298,9 @@ public class FragmentRegistration extends Fragment {
         setDosage(1);
     }
 
+    /**
+     * set the help Button, if set in Settings
+     */
     private void setupHelptextVisibilty(){
         if (checkHelpTextVisibility()){
             showHelpText();
@@ -604,6 +587,10 @@ public class FragmentRegistration extends Fragment {
         return result;
     }
 
+    /**
+     * get the selected picture in right orientation
+     * @return selected picture
+     */
     public Bitmap getPicture(){
         if (thumbnail != null){
             if (thumbnail.getWidth() > thumbnail.getHeight()){
@@ -640,6 +627,9 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
+    /**
+     * setup the dialog to show the daytimes (morning, noon, afternoon, night)
+     */
     public void showReminderDaytimeDialog(){
         reminderDaytimeDialog = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         reminderDaytimeDialog.setCancelable(false);
@@ -669,6 +659,9 @@ public class FragmentRegistration extends Fragment {
         }
     };
 
+    /**
+     * sets the daytimes to the textview field
+     */
     private void setDaytimeText(){
         daytimebuilder.setLength(0);
         daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
@@ -685,10 +678,19 @@ public class FragmentRegistration extends Fragment {
         return selectedDayTimes;
     }
 
+    /**
+     *
+     * @return all selected daytimes from dialog
+     */
     private int countDayTime(){
         return selectedDayTimes.size();
     }
 
+    /**
+     * sets all daytimes to true if they need to be checked
+     * @param dayId id of the daytime
+     * @param isChecked true if checked
+     */
     private void setCheckDayItems(int dayId, boolean isChecked){
         checkedDaytimes[dayId] = isChecked;
         if (isChecked){
@@ -700,6 +702,10 @@ public class FragmentRegistration extends Fragment {
         return checkedDaytimes;
     }
 
+    /**
+     * sets all daytimes values to database
+     * @return a Collection that contains all ConsumeIndividual data
+     */
     private Collection<ConsumeIndividual> getReminderDayTime(){
         for (Day day : getDaytimes()){
             ConsumeIndividual consumeIndividual = new ConsumeIndividual();
@@ -710,6 +716,9 @@ public class FragmentRegistration extends Fragment {
         return consumeIndividuals;
     }
 
+    /**
+     * shows reminderinterval dialog
+     */
     public void showReminderIntervalDialog(){
         final AlertDialog.Builder dialogBuilderReminder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -744,6 +753,11 @@ public class FragmentRegistration extends Fragment {
         np_reminderInterval.setMinValue(1);
     }
 
+    /**
+     *
+     * @param selectedNumber the previous selected interval (1 if none)
+     * @param selectedIntervalPosition the previous selected spinnter item (0 if none)
+     */
     private void setReminderIntervalTimes(final int selectedNumber, final int selectedIntervalPosition){
         setIntervalNpValue(selectedNumber);
         setSelectedIntervalPosition(selectedIntervalPosition);
@@ -780,6 +794,10 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
+    /**
+     *
+     * @param selectedIntervalPosition position in the spinner
+     */
     private void setSelectedIntervalPosition(int selectedIntervalPosition){
         this.selectedIntervalPosition = selectedIntervalPosition;
         sp_reminderInterval.setSelection(selectedIntervalPosition);
@@ -789,6 +807,10 @@ public class FragmentRegistration extends Fragment {
         return  selectedIntervalPosition;
     }
 
+    /**
+     *
+     * @param intervalNpValue value of the interval numberpicker
+     */
     private void setIntervalNpValue(int intervalNpValue){
         this.intervalNpValue = intervalNpValue;
     }
@@ -797,6 +819,9 @@ public class FragmentRegistration extends Fragment {
         return intervalNpValue;
     }
 
+    /**
+     * sets the text to the texview field, according to selected spinner item and numberpicker value
+     */
     private void setReminderIntervalText(){
         intervalbuilder.append(getResources().getString(R.string.taking)).append(" ");
         if (getIntervalNpValue() == 1) {
@@ -830,6 +855,9 @@ public class FragmentRegistration extends Fragment {
         this.selectedInterval = selectedInterval;
     }
 
+    /**
+     * shows the dialog, if spinner item hour is checked to set starttime and endtime
+     */
     private void showStartEndTimeDialog(){
         startTimeString = "00:00";
         endTimeString = "23:59";
@@ -888,11 +916,6 @@ public class FragmentRegistration extends Fragment {
         d.show();
     }
 
-    private void setReminderTime(Calendar calendar,int hour, int minute) {
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-    }
-
     private void setTime(Calendar calendar, int hour, int minute){
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
@@ -910,12 +933,18 @@ public class FragmentRegistration extends Fragment {
         return endTimeCalendar;
     }
 
+    /**
+     * adds selected time to textview field
+     */
     private void setIntervalHourText(){
         intervalbuilder.append(" ").append(getResources().getString(R.string.from)).append(" ").append(startTimeString).append(" ")
                 .append(getResources().getString(R.string.till)).append(" ").append(endTimeString);
         txt_reminder.setText(intervalbuilder);
     }
 
+    /**
+     * sets the selected time to the starttimebutton in dialog
+     */
     private void setStartTimeButtonText(){
         final StringBuilder startString = new StringBuilder();
         startTime = new SimpleDateFormat("HH:mm");
@@ -924,6 +953,9 @@ public class FragmentRegistration extends Fragment {
         btn_starttime.setText(startString);
     }
 
+    /**
+     * sets the selected time to the endtimebutton in dialog
+     */
     private void setEndTimeButtonText(){
         final StringBuilder endString = new StringBuilder();
         SimpleDateFormat endTime = new SimpleDateFormat("HH:mm");
@@ -932,6 +964,10 @@ public class FragmentRegistration extends Fragment {
         btn_endtime.setText(endString);
     }
 
+    /**
+     * show dialog if selected end- or starttime is not correct
+     * @param message a alertmessage
+     */
     private void showAlertTimeDialog(String message){
         AlertDialog.Builder warnbuilder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         warnbuilder.setTitle(getResources().getString(R.string.warning));
@@ -952,6 +988,9 @@ public class FragmentRegistration extends Fragment {
         tp_startEndTimeInterval.show();
     }
 
+    /**
+     * shows dialog if interval day or week is selected
+     */
     private void showIntervalTimePickerDialog() {
         tpd_interval = new TimePickerDialog(getActivity(),R.style.DialogTheme, new TimePickerDialog.OnTimeSetListener() {
             @Override
@@ -966,6 +1005,9 @@ public class FragmentRegistration extends Fragment {
         tpd_interval.show();
     }
 
+    /**
+     * sets selected time to textview field
+     */
     private void setIntervalTimeText(){
         intervalTime = new SimpleDateFormat("HH:mm");
         intervalTimeString = intervalTime.format(startTimeCalendar.getTime());
@@ -973,20 +1015,9 @@ public class FragmentRegistration extends Fragment {
         txt_reminder.setText(intervalbuilder);
     }
 
-    private Collection<ConsumeInterval> getReminderInterval(){
-        ConsumeInterval consumeInterval = new ConsumeInterval();
-        consumeInterval.setStartTime(getStartTimeCalendar());
-        if (getSelectedIntervalPosition()==0){
-            consumeInterval.setEndTime(getEndTimeCalendar());
-        } else {
-            consumeInterval.setEndTime(getStartTimeCalendar());
-        }
-        consumeInterval.setInterval(getIntervalNpValue());
-        consumeInterval.setWeekday(getWeekday());
-        consumeIntervals.add(consumeInterval);
-        return consumeIntervals;
-    }
-
+    /**
+     * shows dialog if interval spinner item week is selected
+     */
     private void showWeekdayDialog(){
         dialogWeekday = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         dialogWeekday.setTitle(getResources().getString(R.string.title_dialogWeekday));
@@ -1036,6 +1067,10 @@ public class FragmentRegistration extends Fragment {
         this.checkedWeek = checkedWeek;
     }
 
+    /**
+     * get the converted checked week item
+     * @return the checked week
+     */
     private int getCheckedWeekItem(){
         if (checkedWeek == Calendar.MONDAY) {this.checkedWeek = 0;}
         else if (checkedWeek == Calendar.TUESDAY) {this.checkedWeek = 1;}
@@ -1055,6 +1090,9 @@ public class FragmentRegistration extends Fragment {
         return weekday;
     }
 
+    /**
+     * sets the selected week to the textview field
+     */
     private void setReminderWeekdayText(){
         intervalbuilder.append(" ").append(getResources().getString(R.string.on)).append(" ").append(getWeekdayString());
     }
@@ -1085,6 +1123,24 @@ public class FragmentRegistration extends Fragment {
         }
     }
 
+    /**
+     * saves all selected interval data to database
+     * @return consumeinterval data
+     */
+    private Collection<ConsumeInterval> getReminderInterval(){
+        ConsumeInterval consumeInterval = new ConsumeInterval();
+        consumeInterval.setStartTime(getStartTimeCalendar());
+        if (getSelectedIntervalPosition()==0){
+            consumeInterval.setEndTime(getEndTimeCalendar());
+        } else {
+            consumeInterval.setEndTime(getStartTimeCalendar());
+        }
+        consumeInterval.setInterval(getIntervalNpValue());
+        consumeInterval.setWeekday(getWeekday());
+        consumeIntervals.add(consumeInterval);
+        return consumeIntervals;
+    }
+
     private void showDuration() {
         rdg_duration = (RadioGroup) root.findViewById(R.id.rdg_duration);
         final LinearLayout ln_duration = (LinearLayout) root.findViewById(R.id.ln_duration);
@@ -1103,6 +1159,9 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
+    /**
+     * shows the dialog to select a specific date
+     */
     public void showDateDialog(){
         int style;
         if (isBrokenSamsungDevice()){
@@ -1123,6 +1182,9 @@ public class FragmentRegistration extends Fragment {
         dpd.show();
     }
 
+    /**
+     * sets the selected date to the textview field
+     */
     private void setDateText(){
         numDaysString = new StringBuilder();
         endDate = new SimpleDateFormat("dd.MM.yyyy");
@@ -1195,7 +1257,6 @@ public class FragmentRegistration extends Fragment {
     }
 
     public void changeNumberOfBlisterValue() {
-
         np_numberOfBlisters.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
@@ -1213,6 +1274,10 @@ public class FragmentRegistration extends Fragment {
         return np_numberOfBlisters.getValue();
     }
 
+    /**
+     * sets the selected number of blisters to the textview
+     * @param numberOfBlisters the number of blisters
+     */
     private void setNumberOfBlisterText(int numberOfBlisters){
         numberOfBlisterString = new StringBuilder();
         numberOfBlisterString.append(getResources().getString(R.string.taking)).append(" ");
@@ -1221,7 +1286,12 @@ public class FragmentRegistration extends Fragment {
         txt_duration.setText(numberOfBlisterString);
     }
 
-    private int getDuration(int pillsPerBlister){
+    /**
+     * calculates the number of intakes, according to the differnt choices
+     * @param pillsPerBlister number of pills per blister
+     * @return number of intakes
+     */
+    private int calculateNumberOfIntakes(int pillsPerBlister){
         int numberOfIntakes = -1;
         rd_numberOfDays = (RadioButton)root.findViewById(R.id.rd_numberOfDays);
         rd_always = (RadioButton)root.findViewById(R.id.rd_always);
@@ -1276,6 +1346,13 @@ public class FragmentRegistration extends Fragment {
         return time;
     }
 
+    /**
+     * calculates how many blisters a package contains
+     * @param numberOfIntakes number of intakes
+     * @param dosage number of pills per intake
+     * @param pills number of pills per blister
+     * @return the number of blisters
+     */
     private int calcNumberOfBlisters(int numberOfIntakes, int dosage, int pills ){
         int numOfBlister = (numberOfIntakes*dosage)/pills;
         return numOfBlister;
@@ -1305,6 +1382,9 @@ public class FragmentRegistration extends Fragment {
         return np_dosage.getValue();
     }
 
+    /**
+     * set the selected dosage to textview field
+     */
     private void setDosageText(){
         dosageString.setLength(0);
         dosageString.append(getResources().getString(R.string.txt_dosage)).append(" ");
@@ -1375,6 +1455,9 @@ public class FragmentRegistration extends Fragment {
         edit_notes.setText(notes);
     }
 
+    /**
+     * shows specific helptext to different topics
+     */
     private void showHelpText(){
         iBtn_helpPhoto.setOnClickListener(new OnClickListener() {
             @Override
@@ -1411,7 +1494,6 @@ public class FragmentRegistration extends Fragment {
         iBtn_helpReminder = (ImageButton) root.findViewById(R.id.iBtn_helpReminder);
         iBtn_helpDuration = (ImageButton)root.findViewById(R.id.iBtn_helpDuration);
         iBtn_helpFoodInstruction = (ImageButton) root.findViewById(R.id.iBtn_helpfoodInstruction);
-        iBtn_helpOverview = (ImageButton)root.findViewById(R.id.iBtn_helpOverview);
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         boolean showHelp = pref.getBoolean("pref_key_showHelp",false);
@@ -1454,6 +1536,9 @@ public class FragmentRegistration extends Fragment {
         saveAlertMessage.show();
     }
 
+    /**
+     * checks if there are no mistakes in registration to save item
+     */
     private void saveItem(){
         Button btn_save = (Button)root.findViewById(R.id.btn_save);
         final RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
@@ -1509,6 +1594,9 @@ public class FragmentRegistration extends Fragment {
         fragmentManager.beginTransaction().replace(R.id.main, fragmentOverview, "Fragment_Overview").commit();
     }
 
+    /**
+     * save the entered registration data to db
+     */
     private void saveDataToDB(){
         RadioButton rd_reminderDayTime = (RadioButton)root.findViewById(R.id.rd_daytime);
         Data data = new Data();
@@ -1521,7 +1609,7 @@ public class FragmentRegistration extends Fragment {
             data.setAllConsumeIndividual(getReminderDayTime());
         }
         try {
-            data.setDuration(getDuration(pillDetection.getAllPillPoints(mediId).size()));
+            data.setDuration(calculateNumberOfIntakes(pillDetection.getAllPillPoints(mediId).size()));
             if (rd_numberOfDays.isChecked()){
                 data.setEndDate(getDurationDate());
             } else if (rd_always.isChecked() || rd_packageEnd.isChecked()){
@@ -1552,6 +1640,10 @@ public class FragmentRegistration extends Fragment {
         }
     }
 
+    /**
+     * load the selected medi from edit fragment in registration fragment
+     * @param id the mediId
+     */
     public void loadData(String id){
         pillData = Data.getDataById(id,dbAdapter);
         setName(pillData.getDescription());
@@ -1629,6 +1721,9 @@ public class FragmentRegistration extends Fragment {
         }
     }
 
+    /**
+     * delete a item
+     */
     public void deleteItem(){
         Button btn_delete = (Button)root.findViewById(R.id.btn_delete);
         btn_delete.setOnClickListener(new View.OnClickListener() {

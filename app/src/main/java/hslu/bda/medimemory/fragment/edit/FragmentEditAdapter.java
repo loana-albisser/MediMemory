@@ -53,13 +53,7 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
         fragmentEdit = new FragmentEdit();
     }
 
-    public FragmentEditAdapter(Context context, int textViewResourceId, ArrayList<Data> allPills) {
-        super(context, textViewResourceId, allPills);
-        dbAdapter= new DbAdapter(getContext());
-        dbAdapter.open();
-        this.allPills = allPills;
-    }
-
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         holder = new Holder();
@@ -78,13 +72,16 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
         return convertView;
     }
 
-
-
     private void setFocus (boolean focus, View view){
         view.setFocusable(focus);
         view.setFocusable(focus);
     }
 
+    /**
+     * sets a medi active of inactive
+     * @param textView the related textview
+     * @param checkBox the selected checkbox
+     */
    private void setCheckBoxListener(final TextView textView, final CheckBox checkBox){
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -108,16 +105,28 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
         });
     }
 
+    /**
+     * sets the look of the textview if active
+     * @param textView the related textview
+     */
     private void setTextViewActive(TextView textView){
         textView.setTextColor(ContextCompat.getColor(getContext(), R.color.itemSelected));
         textView.setClickable(false);
     }
 
+    /**
+     * sets the look of the textview if active
+     * @param textView the related textview
+     */
     private void setTextViewInActive(TextView textView){
         textView.setTextColor(ContextCompat.getColor(getContext(), R.color.itemUnselected));
         textView.setClickable(true);
     }
 
+    /**
+     * sets medi active or inactive in relation to database entry
+     * @param data
+     */
     private void setMediActive(Data data){
         if (data.getActive()==1){
             holder.checkBox.setChecked(true);
@@ -129,14 +138,12 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
     }
 
 
+    /**
+     * holds item of listview
+     */
     private class Holder {
         private CheckBox checkBox;
         private TextView textView;
-
-        private Holder(CheckBox checkBox, TextView textView) {
-            this.checkBox = checkBox;
-            this.textView = textView;
-        }
 
         private Holder(){
 

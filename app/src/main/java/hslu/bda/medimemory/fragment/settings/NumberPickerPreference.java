@@ -36,6 +36,9 @@ public class NumberPickerPreference extends DialogPreference {
         }
     }
 
+    /**
+     * updates the summary text
+     */
     private void updateSummary(){
         numberString = new StringBuilder();
         numberString.append(value).append(" ").append(getContext().getResources().getString(R.string.minutes));
