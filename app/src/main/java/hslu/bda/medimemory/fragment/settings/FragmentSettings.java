@@ -15,8 +15,11 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 
 
 import hslu.bda.medimemory.R;
@@ -26,7 +29,7 @@ import static android.content.SharedPreferences.*;
 /**
  * Created by Loana on 03.03.2016.
  */
-public class FragmentSettings extends PreferenceFragment implements OnSharedPreferenceChangeListener {
+public class FragmentSettings extends PreferenceFragment{
 
     private boolean showProtectionDialog;
     private SharedPreferences pref;
@@ -35,27 +38,43 @@ public class FragmentSettings extends PreferenceFragment implements OnSharedPref
     private AlertDialog.Builder passwordDialog;
     private int count = 0;
     private Context mActivity;
+    private OnSharedPreferenceChangeListener listener;
 
 
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         chk_protect = (CheckBoxPreference)findPreference("pref_key_showPassword");
+        /*LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogPasswordView = inflater.inflate(R.layout.dialog_settingspassword, null);
+        password = (EditText)dialogPasswordView.findViewById(R.id.edit_pw);*/
         pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         pref.registerOnSharedPreferenceChangeListener(listener);
+        listener = new OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals("pref_key_showPassword")) {
+                    chk_protect = (CheckBoxPreference)findPreference("pref_key_showPassword");
+                    if (!getFirstRun()){
+                        createProtectedDialog();
+                    } else {
+                        setFirstRun(false);
+                    }
+                }
+            }
+        };
         addPreferencesFromResource(R.xml.preferences);
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     @TargetApi(23)
@@ -95,36 +114,11 @@ public class FragmentSettings extends PreferenceFragment implements OnSharedPref
 
     }
 
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    /*public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
-    }
-
-    private AlertDialog.Builder getDialog(){
-        return passwordDialog;
-    }
+    }*/
 
 
-    OnSharedPreferenceChangeListener listener = new OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals("pref_key_showPassword")) {
-                    chk_protect = (CheckBoxPreference)findPreference("pref_key_showPassword");
-                    Log.i("firstRun", String.valueOf(getFirstRun()));
-                if (!getFirstRun()){
-                    createProtectedDialog();
-                    if (isSetProtection()){
-                        protetedDialogCheck();
-                    } else {
-                        protetedDialogUncheck();
-                    }
-                    showDialog();
-                } else {
-                    setFirstRun(false);
-                }
-                Log.i("firstRun", String.valueOf(getFirstRun()));
-            }
-        }
-    };
 
     public void showFalsePasswordDialog(){
         AlertDialog.Builder falsePasswordDialog = new AlertDialog.Builder(mActivity);
@@ -132,11 +126,11 @@ public class FragmentSettings extends PreferenceFragment implements OnSharedPref
         falsePasswordDialog.setPositiveButton(mActivity.getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                dialog.dismiss();
                 createProtectedDialog();
-                protetedDialogCheck();
             }
         });
-        showDialog();
     }
 
     public boolean isSetProtection(){
@@ -155,60 +149,52 @@ public class FragmentSettings extends PreferenceFragment implements OnSharedPref
         password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         layout.addView(password, params);
         passwordDialog.setView(layout);
-    }
-
-    private void protetedDialogCheck(){
         passwordDialog.setPositiveButton(mActivity.getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                setPassword();
+                if (isSetProtection()) {
+                    setPassword(password.getText().toString());
+                    Log.i("setPW", getPassword());
+                } else {
+                    final String enteredPassword = password.getText().toString();
+                    Log.i("savedPW",getPassword());
+                    Log.i("enteredPW",enteredPassword);
+                    if (enteredPassword.equals(getPassword())) {
+                        dialog.dismiss();
+                        pref.unregisterOnSharedPreferenceChangeListener(listener);
+                        chk_protect.setChecked(false);
+                        pref.registerOnSharedPreferenceChangeListener(listener);
+                    } else {
+                        showFalsePasswordDialog();
+                    }
+                }
+
             }
         });
         passwordDialog.setNegativeButton(mActivity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                pref.unregisterOnSharedPreferenceChangeListener(listener);
-                chk_protect.setChecked(false);
-                pref.registerOnSharedPreferenceChangeListener(listener);
-            }
-        });
-    }
-
-    private void showDialog(){
-        Dialog dialog = passwordDialog.create();
-        dialog.show();
-    }
-
-    private void protetedDialogUncheck(){
-        passwordDialog.setPositiveButton(mActivity.getString(R.string.ok), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                final String enteredPassword = password.getText().toString();
-                if (enteredPassword.equals(getPassword())) {
+                if (isSetProtection()) {
                     dialog.dismiss();
                     pref.unregisterOnSharedPreferenceChangeListener(listener);
                     chk_protect.setChecked(false);
                     pref.registerOnSharedPreferenceChangeListener(listener);
                 } else {
-                    showFalsePasswordDialog();
+                    dialog.dismiss();
+                    pref.unregisterOnSharedPreferenceChangeListener(listener);
+                    chk_protect.setChecked(true);
+                    pref.registerOnSharedPreferenceChangeListener(listener);
                 }
+
             }
         });
-        passwordDialog.setNegativeButton(mActivity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                pref.unregisterOnSharedPreferenceChangeListener(listener);
-                chk_protect.setChecked(true);
-                pref.registerOnSharedPreferenceChangeListener(listener);
-            }
-        });
+        final Dialog dialog = passwordDialog.create();
+        dialog.show();
     }
 
-    private void setPassword() {
+   private void setPassword(String password) {
         Editor editor = pref.edit();
-        editor.putString("password", password.getText().toString());
+        editor.putString("password", password);
         editor.commit();
     }
 
