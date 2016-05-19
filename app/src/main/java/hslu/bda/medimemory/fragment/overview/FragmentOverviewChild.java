@@ -18,6 +18,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,11 +42,13 @@ import java.util.Iterator;
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.detection.PillDetection;
+import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.entity.PillCoords;
 import hslu.bda.medimemory.entity.Status;
 import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
 import hslu.bda.medimemory.services.PillDetectionService;
+import hslu.bda.medimemory.services.UpdateMediService;
 
 /**
  * Created by Loana on 08.04.2016.
@@ -107,9 +110,28 @@ public class FragmentOverviewChild extends Fragment  {
             dbAdapter= new DbAdapter(getActivity().getApplicationContext());
             dbAdapter.open();
         }
-
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, getActivity(), mLoaderCallback);
         super.onResume();
     }
+
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(getActivity()) {
+        /**
+         * This is the callback method called once the OpenCV //manager is connected
+         * @param status
+         */
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS: {
+                    Log.i("Example Loaded", "OpenCV loaded successfully");
+                    //mOpenCvCameraView.enableView();
+                } break;
+                default: {
+                    super.onManagerConnected(status);
+                } break;
+            }
+        }
+    };
 
 
     @Override
@@ -134,10 +156,10 @@ public class FragmentOverviewChild extends Fragment  {
         Collection<PillCoords> pillCoordsNew;
         try {
             pillCoordsNew = pillDetection.getAllPillPoints(id);
+            //UpdateMediService.updateTableEntry(,dbAdapter);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-
         allPillCoordsById = PillCoords.getAllPillCoordsByMedid(id,dbAdapter);
         for (PillCoords pillCoords : allPillCoordsById){
             points.add(pillCoords.getCoords());
@@ -154,9 +176,11 @@ public class FragmentOverviewChild extends Fragment  {
         iv_status.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
         int x = ContextCompat.getDrawable(getActivity(), R.drawable.circle).getBounds().width();
         int y = ContextCompat.getDrawable(getActivity(), R.drawable.circle).getBounds().height();
-        /*params.leftMargin = params.leftMargin- 24;
-        params.topMargin = params.topMargin - 24;*/
-        rl_pillImage.addView(iv_status,params);
+        Log.i("leftMargin"+xCoord+","+yCoord, String.valueOf(params.leftMargin));
+        params.leftMargin = params.leftMargin;
+        Log.i("topMargin"+xCoord+","+yCoord, String.valueOf(params.topMargin));
+        params.topMargin = params.topMargin;// - 112;
+        rl_pillImage.addView(iv_status, params);
         //setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
     }
 
@@ -177,10 +201,12 @@ public class FragmentOverviewChild extends Fragment  {
             params = new RelativeLayout.LayoutParams(statusWidth, statusWidth);
         }*/
         params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.leftMargin = x; //- statusWidth/2;
+        Log.i("setupLeftMargin", String.valueOf(params.leftMargin));
+        Log.i("setupTopMargin", String.valueOf(params.topMargin));
+        params.leftMargin = x -39; //- statusWidth/2;
         //params.rightMargin = x;
         //params.bottomMargin = y - statusHeight/2;
-        params.topMargin = y - 50; //- tabHeight;
+        params.topMargin = y-tabHeight; //- 50; //- tabHeight;
         iv_status = new ImageView(getActivity());
         iv_status.setId(id);
     }
@@ -193,8 +219,8 @@ public class FragmentOverviewChild extends Fragment  {
     private void setStatus(Drawable status){
         //iv_status.setImageDrawable(status);
         //rl_pillImage.addView(iv_status, params);
-        statusImage.setImageDrawable(status);
-        rl_pillImage.addView(statusImage,params);
+        iv_status.setImageDrawable(status);
+        rl_pillImage.addView(iv_status,params);
     }
 
     private void setTouchListener(){
@@ -207,8 +233,8 @@ public class FragmentOverviewChild extends Fragment  {
                     int pointId = 0;
                     for (Point point : points) {
                         if (comparePoints(touchPoint, points.get(pointId))) {
+                            statusImage = (ImageView) root.findViewById(pointId);
                             setupStatus((int) points.get(pointId).x, (int) points.get(pointId).y, pointId);
-                            statusImage = (ImageView)root.findViewById(pointId);
                             setupStatusDialog();
                         }
                         pointId++;
@@ -235,8 +261,8 @@ public class FragmentOverviewChild extends Fragment  {
             public void onClick(DialogInterface dialog, int which) {
                 ListView lw = ((AlertDialog) dialog).getListView();
                 int selectedItem = (int) lw.getAdapter().getItemId(lw.getCheckedItemPosition());
-                statusImage.setImageDrawable(null);
-                rl_pillImage.removeView(statusImage);
+                iv_status.setImageDrawable(null);
+                rl_pillImage.removeView(iv_status);
                 //setStatus(ContextCompat.getDrawable(getActivity(),null));
                 if (selectedItem == 0) {
                     setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.check_mark));
@@ -260,16 +286,20 @@ public class FragmentOverviewChild extends Fragment  {
         d.show();
     }
 
-
-    private static boolean isBetween(int lowNumber, int highNumber, int compareNumber) {
-        return highNumber > lowNumber ? compareNumber > lowNumber && compareNumber < highNumber : compareNumber > highNumber && compareNumber < lowNumber;
+    /**
+     * @param touchPoint point touched
+     * @param pillPoint point of the pill
+     * @return if they match
+     */
+    private boolean comparePoints(Point touchPoint, Point pillPoint) {
+        int range = 40;
+        boolean x = touchPoint.x - range <= pillPoint.x - 39 && pillPoint.x - 39 <= touchPoint.x+range ;
+        boolean y = touchPoint.y - range <= pillPoint.y - tabHeight && pillPoint.y - tabHeight <= touchPoint.y+range ;
+        return x && y;
     }
 
-    private static boolean comparePoints(Point touchPoint, Point pillPoint) {
-        int range = 40;
-        boolean x = touchPoint.x - range <= pillPoint.x && pillPoint.x <= touchPoint.x+range ;
-        boolean y = touchPoint.y - range <= pillPoint.y && pillPoint.y <= touchPoint.y+range ;
-        return x && y;
+    private int calcLeftMargin(){
+        return 39;
     }
 
     private void showHelpText(){
@@ -311,6 +341,7 @@ public class FragmentOverviewChild extends Fragment  {
     private void saveDataToDB(){
         Status status = new Status();
         status.setDescription(getStatus());
+
     }
 
     private String getStatus() {
