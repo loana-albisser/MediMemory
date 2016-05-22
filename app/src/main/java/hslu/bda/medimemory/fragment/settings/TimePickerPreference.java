@@ -99,6 +99,10 @@ public class TimePickerPreference extends DialogPreference {
         setSummary(getSummary());
     }
 
+    private Calendar getTime(){
+        return calendar;
+    }
+
     /**
      * sets the summary text
      * @return the summary text
@@ -110,4 +114,6 @@ public class TimePickerPreference extends DialogPreference {
         }
         return DateFormat.getTimeFormat(getContext()).format(new Date(calendar.getTimeInMillis()));
     }
+
+
 }

@@ -78,7 +78,10 @@ public class FragmentOverviewChild extends Fragment  {
     private Collection<PillCoords> allPillCoordsById;
     private int tabHeight = 112;
     private ImageView statusImage;
-
+    private int displayWidth;
+    private int displayHeight;
+    private int height;
+    private int width;
 
 
     @Override
@@ -91,6 +94,11 @@ public class FragmentOverviewChild extends Fragment  {
         childname = bundle.getString("pagename");
         pillPhoto = bundle.getParcelable("pillPicture");
         id = bundle.getInt("id");
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        android.graphics.Point size = new android.graphics.Point();
+        display.getSize(size);
+        displayWidth = size.x;
+        displayHeight = size.y;
         if (checkHelpTextVisibility()){
             showHelpText();
             iBtn_helpOverview.setVisibility(View.VISIBLE);
@@ -201,12 +209,15 @@ public class FragmentOverviewChild extends Fragment  {
             params = new RelativeLayout.LayoutParams(statusWidth, statusWidth);
         }*/
         params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        Log.i("setupLeftMargin", String.valueOf(params.leftMargin));
-        Log.i("setupTopMargin", String.valueOf(params.topMargin));
-        params.leftMargin = x -39; //- statusWidth/2;
+
+        width = (displayWidth - pillPhoto.getWidth()) / 2;
+        height = (displayHeight - pillPhoto.getHeight())/2;
+        Log.i("width", String.valueOf(width));
+        Log.i("height", String.valueOf(height));
+        params.leftMargin = x - width;//-39; //- statusWidth/2;
         //params.rightMargin = x;
         //params.bottomMargin = y - statusHeight/2;
-        params.topMargin = y-tabHeight; //- 50; //- tabHeight;
+        params.topMargin = y-height; //- 50; //- tabHeight;
         iv_status = new ImageView(getActivity());
         iv_status.setId(id);
     }
@@ -293,13 +304,9 @@ public class FragmentOverviewChild extends Fragment  {
      */
     private boolean comparePoints(Point touchPoint, Point pillPoint) {
         int range = 40;
-        boolean x = touchPoint.x - range <= pillPoint.x - 39 && pillPoint.x - 39 <= touchPoint.x+range ;
-        boolean y = touchPoint.y - range <= pillPoint.y - tabHeight && pillPoint.y - tabHeight <= touchPoint.y+range ;
+        boolean x = touchPoint.x - range <= pillPoint.x - width && pillPoint.x - width <= touchPoint.x+range ;
+        boolean y = touchPoint.y - range <= pillPoint.y - height && pillPoint.y - height <= touchPoint.y+range ;
         return x && y;
-    }
-
-    private int calcLeftMargin(){
-        return 39;
     }
 
     private void showHelpText(){

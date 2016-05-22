@@ -45,6 +45,10 @@ public class NumberPickerPreference extends DialogPreference {
         setSummary(numberString);
     }
 
+    private int getValue(){
+        return value;
+    }
+
 
     @Override
     protected void onDialogClosed(boolean positiveResult){
