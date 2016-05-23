@@ -199,14 +199,14 @@ public class FragmentOverviewChild extends Fragment  {
     private void setupStatus(int x, int y, int id){
         rl_pillImage = (RelativeLayout) root.findViewById(R.id.rl_pillImage);
         //size of Drawable
-        /*if (statusHeight < statusWidth){
-            params = new RelativeLayout.LayoutParams(statusHeight, statusHeight);
+        if (statusHeight < statusWidth){
+            params = new RelativeLayout.LayoutParams(statusHeight/2, statusHeight/2);
         } else {
-            params = new RelativeLayout.LayoutParams(statusWidth, statusWidth);
-        }*/
-        params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params = new RelativeLayout.LayoutParams(statusWidth/2, statusWidth/2);
+        }
+        //params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         width = (displayWidth - pillPhoto.getWidth()) / 2;
-        height = (displayHeight - pillPhoto.getHeight())/2;
+        height = (displayHeight - pillPhoto.getHeight());//2;
         Log.i("width", String.valueOf(width));
         Log.i("height", String.valueOf(height));
         params.leftMargin = x - width;
@@ -221,8 +221,6 @@ public class FragmentOverviewChild extends Fragment  {
      * @param status status-Drawable
      */
     private void setStatus(Drawable status){
-        //statusImage.setImageDrawable(null);
-        //rl_pillImage.addView(iv_status, params);
         statusImage.setImageDrawable(status);
         rl_pillImage.addView(statusImage,params);
     }

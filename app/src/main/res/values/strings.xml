@@ -138,7 +138,7 @@
     <string name="btn_delete">Löschen</string>
     <string name="monday">Montag</string>
     <string name="tuesday">Dienstag</string>
-    <string name="wednesday">Freitag</string>
+    <string name="wednesday">Mittwoch</string>
     <string name="thursday">Donnerstag</string>
     <string name="friday">Freitag</string>
     <string name="saturday">Samstag</string>
@@ -166,22 +166,30 @@
     <string name="question_1">Was ist MediMemory?</string>
     <string name="question_2">Wie kann ich ein Medikament hinzufügen?</string>
     <string name="question_3">Wie kann ich ein Medikament löschen?</string>
-    <string name="question_4">Wozu muss ein Foto aufgenommen werden?</string>
-    <string name="question_5">Wozu ist der „+“ Knopt unten rechts?</string>
-    <string name="question_6">Wo kann ich Erinnerungszeiten ändern?</string>
-    <string name="question_7">Wie kann ich Erinnerungen vor/ nach Mahlzeiten anpassen?</string>
-    <string name="question_8">Wie kann ich den Erinnerungston anpassen?</string>
-    <string name="question_9">Wozu sind die „?“ in der Erfassung? ?</string>
+    <string name="question_4">Wie kann ich ein Medikament bearbeiten?</string>
+    <string name="question_5">Wozu dient das Häckchen vor dem Medikament im Bearbeitungsbildschirm</string>
+    <string name="question_6">Wozu muss ein Foto aufgenommen werden?</string>
+    <string name="question_7">Wozu ist der „+“ Knopt unten rechts?</string>
+    <string name="question_8">Was bedeuten die Symbole in der Übersicht?</string>
+    <string name="question_9">Wo kann ich Erinnerungszeiten ändern?</string>
+    <string name="question_10">Wie kann ich Erinnerungen vor/ nach Mahlzeiten anpassen?</string>
+    <string name="question_11">Wie kann ich den Erinnerungston anpassen?</string>
+    <string name="question_12">Wozu dient der Schutzmodus?</string>
+    <string name="question_13">Wozu sind die „?“ in der Erfassung?</string>
 
     <string name="answer_1">MediMemory soll dazu dienen Medikamente regelmässig einzunehmen. Es erinnert dazu zuverlässig an die Einnahme und stellt alle einzunehmenden Medikamente übersichtlich dar.</string>
     <string name="answer_2">Im Erfassungsbildschirm können Medikamente einfach hinzugefügt werden. Dazu sollen allen nötigen Daten angegeben werden und mit „Speichern“ bestätigt werden.</string>
-    <string name="answer_3">Im Bearbeitungsbildschirm sind alle Medikamente in einer übersichtlichen Liste dargestellt. Wenn das entsprechende Medikament angewählt wird, kann man danach mit dem „Löschen“ Knopf das Medikament einfach löschen.m</string>
-    <string name="answer_4">Das Foto dient zum einen zur automatischen Erkennung der Anzahl der Tabletten. Zusätzlich kann so im Übersichtsbildschirm dargestellt werden wie der Blister aussehen soll.</string>
-    <string name="answer_5">Mit diesem Knopf kann man schnell ein neues Medikament hinzufügen.</string>
-    <string name="answer_6">Alle jeweiligen Zeiten können individuell in den Einstellungen angepasst werden.</string>
-    <string name="answer_7">Dies kann in den Einstellungen angepasst werden.</string>
-    <string name="answer_8">Die Klingeltöne können in den Einstellungen festgelegt werden.</string>
-    <string name="answer_9">So können Hilfestellungen angezeigt werden. Falls diese nicht mehr benötigt werden, können sie in den Einstellungen deaktiviert werden.</string>
+    <string name="answer_3">Im Bearbeitungsbildschirm sind alle Medikamente in einer übersichtlichen Liste dargestellt. Wenn das entsprechende Medikament angewählt wird, kann man danach mit dem „Löschen“ Knopf das Medikament einfach löschen.</string>
+    <string name="answer_4">Im Bearbeitungsbildschirm sind alle Medikamente in einer übersichtlichen Liste dargestellt. Wenn das entsprechende Medikament angewählt wird, erscheinen wieder die ursprünglich erfassten Daten. Diese können nun beliebig angepasst und mit dem „Speichern“ Knopf bestätigt werden.</string>
+    <string name="answer_5">Es dient dazu, ein Medikament aktiv bzw. inaktiv zu setzen. Ist ein Medikament inaktiv, wird nicht mehr an die Einnahme erinnert. Will man jedoch wieder an die Einnahme erinnert werden, kann man das Medikament aktiv setzen. </string>
+    <string name="answer_6">Das Foto dient zum einen zur automatischen Erkennung der Anzahl der Tabletten. Zusätzlich kann so im Übersichtsbildschirm dargestellt werden wie der Blister aussehen soll.</string>
+    <string name="answer_7">Mit diesem Knopf kann man schnell ein neues Medikament hinzufügen.</string>
+    <string name="answer_8">Wenn man auf das „?“ drückt, erscheint die Bedeutung der verschiedenen Symbole.</string>
+    <string name="answer_9">Alle jeweiligen Zeiten können individuell in den Einstellungen angepasst werden.</string>
+    <string name="answer_10">Dies kann in den Einstellungen angepasst werden.</string>
+    <string name="answer_11">Die Klingeltöne können in den Einstellungen festgelegt werden.</string>
+    <string name="answer_12">Der Schutzmodus kann aktiviert werden, wenn man kein Vollzugriff auf die App haben will. Das heisst, dass vor Betreten des Bearbeitungs- oder Erfassungsbildschirm nach einem Passwort gefragt wird. So wird man davor geschützt, dass man unbeabsichtigt Änderungen vornimmt. </string>
+    <string name="answer_13">So können Hilfestellungen angezeigt werden. Falls diese nicht mehr benötigt werden, können sie in den Einstellungen deaktiviert werden.</string>
 
     <string name="iBtn_helpPhoto">iBtn_helpPhoto</string>
     <string name="iBtn_helpReminder">helpReminder</string>
@@ -202,7 +210,7 @@
     <string name="txt_next">Nächste Pille</string>
     <string name="txt_lost">Verloren</string>
     <string name="txt_forgot">Vergessen</string>
-    <string name="iBtn_helpOverview">helOverview</string>
+    <string name="iBtn_helpOverview">helpOverview</string>
     <string name="title_dialogStatus">Status</string>
     <string name="txt_overview_noItem">Es wurden noch keine Medikamente erfasst!</string>
     <string name="pref_protection">Schutz</string>
@@ -217,15 +225,17 @@
     <string name="littleTime">Die Endzeit muss nach der Startzeit sein!</string>
     <string name="wrongPW">Falsches Passwort</string>
     <string name="pillDeleted">Medikament wurde gelöscht</string>
-    <string name="pref_key_reminder_settings">pref_key_reminder_settings</string>
+    <string name="pref_key_reminder_settings" translatable="false">pref_key_reminder_settings</string>
     <string name="key_reminder_time">key_reminder_time</string>
-    <string name="pref_key_morning_reminder">pref_key_morning_reminder</string>
-    <string name="pref_key_noon_reminder">pref_key_noon_reminder</string>
-    <string name="pref_key_evening_reminder">pref_key_evening_reminder</string>
-    <string name="pref_key_night_reminder">pref_key_night_reminder</string>
-    <string name="pref_key_foodinstruction">pref_key_foodinstruction</string>
-    <string name="pref_key_before_food">pref_key_before_food</string>
+    <string name="pref_key_morning_reminder" translatable="false">pref_key_morning_reminder</string>
+    <string name="pref_key_noon_reminder" translatable="false">pref_key_noon_reminder</string>
+    <string name="pref_key_evening_reminder" translatable="false">pref_key_evening_reminder</string>
+    <string name="pref_key_night_reminder" translatable="false">pref_key_night_reminder</string>
+    <string name="pref_key_foodinstruction" translatable="false">pref_key_foodinstruction</string>
+    <string name="pref_key_before_food" translatable="false">pref_key_before_food</string>
     <string name="pref_key_after_food">pref_key_after_food</string>
+    <string name="dialog_MediUpdate">Das Medikament wurde bearbeitet!</string>
+    <string name="overview">Übersicht</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

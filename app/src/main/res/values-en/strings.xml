@@ -215,6 +215,33 @@
         <item id= "saturday">@string/saturday</item>
         <item id= "sunday">@string/sunday</item>
     </string-array>
+    <string name="Aktiv">state</string>
+    <string name="chk_pillForgot">Forgot</string>
+    <string name="chk_pillLost">Lost</string>
+    <string name="chk_pillTake">Taken</string>
+    <string name="enterPassword">Please enter password</string>
+    <string name="iBtn_helpOverview">helpOverview</string>
+    <string name="key_reminder_time">key_reminder_time</string>
+    <string name="littleTime">The endtime needs to be before starttime</string>
+    <string name="pillDeleted">Medicine deleted</string>
+    <string name="pref_general">General</string>
+    <string name="pref_key_after_food">pref_key_after_food</string>
+    <string name="pref_protection">Protection</string>
+    <string name="sameTimeMessage">Starttime and endtime can\'t be identical</string>
+    <string name="title_protection">protection mode</string>
+    <string name="title_dialogStatus">state</string>
+    <string name="toast_active">Medicine is active</string>
+    <string name="toast_inactive">Medicine is inactive</string>
+    <string name="txt_forgot">Forgot</string>
+    <string name="txt_lost">Lost</string>
+    <string name="txt_next">Next pill</string>
+    <string name="txt_noMediRegistered">There\'s no registered medicinte!</string>
+    <string name="txt_overview_noItem">There\'s no registered medicine</string>
+    <string name="txt_reminderAlarm">Did you take your medicine?</string>
+    <string name="txt_taken">Taken</string>
+    <string name="txt_titleAlarm">medicine alarm</string>
+    <string name="warning">Warning</string>
+    <string name="wrongPW">wrong password</string>
 
 
 </resources>

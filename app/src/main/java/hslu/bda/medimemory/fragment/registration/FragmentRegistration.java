@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -78,6 +79,7 @@ import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.entity.Day;
 import hslu.bda.medimemory.entity.Eat;
 import hslu.bda.medimemory.fragment.MainActivity;
+import hslu.bda.medimemory.fragment.edit.FragmentEdit;
 import hslu.bda.medimemory.fragment.overview.FragmentOverview;
 import hslu.bda.medimemory.services.CreateMediService;
 import hslu.bda.medimemory.services.DeleteMediService;
@@ -591,7 +593,7 @@ public class FragmentRegistration extends Fragment {
      * get the selected picture in right orientation
      * @return selected picture
      */
-    public Bitmap getPicture(){
+    private Bitmap getPicture(){
         if (thumbnail != null){
             if (thumbnail.getWidth() > thumbnail.getHeight()){
                 Matrix matrix = new Matrix();
@@ -600,6 +602,15 @@ public class FragmentRegistration extends Fragment {
             }
         }
         return thumbnail;
+    }
+
+    private boolean isImageSet(){
+        Log.i("Imageview", String.valueOf(iv_selectedImage.getDrawable()));
+        if (iv_selectedImage.getDrawable()==null){
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private void setPicture(Bitmap bitmap){
@@ -1556,7 +1567,7 @@ public class FragmentRegistration extends Fragment {
             public void onClick(View v) {
                 if (edit_name.getText().toString().trim().length() == 0) {
                     showAlertDialog(getResources().getString(R.string.dialog_nameMessage), cv_name);
-                } else if (getPicture() == null) {
+                } else if (!isImageSet()) {
                     showAlertDialog(getResources().getString(R.string.dialog_photoMessage), cv_photo);
                 } else if (rdg_reminder.getCheckedRadioButtonId() == -1) {
                     showAlertDialog(getResources().getString(R.string.dialog_reminderMessage), cv_reminder);
@@ -1567,18 +1578,32 @@ public class FragmentRegistration extends Fragment {
                 } else if (rd_reminderdaytime.isChecked() && txt_foodInstruction == null) {
                     showAlertDialog(getResources().getString(R.string.dialog_foodInstructionMessage), cv_foodInstruction);
                 } else {
-                    saveDataToDB();
-                    saveAlertMessage.setMessage(getResources().getString(R.string.dialog_Medisave));
-                    saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            showOverviewFragment();
-                            //FragmentOverviewPagerAdapter fragmentOverviewPagerAdapter = new FragmentOverviewPagerAdapter(fragmentManager,getActivity());
-                            //fragmentOverview.getViewPager().setCurrentItem(fragmentOverviewPagerAdapter.getCount());
-                        }
-                    });
-                    saveAlertMessage.setCancelable(false);
-                    saveAlertMessage.show();
+                    if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_registration) {
+                        saveDataToDB();
+                        saveAlertMessage.setMessage(getResources().getString(R.string.dialog_Medisave));
+                        saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                showOverviewFragment();
+                                //FragmentOverviewPagerAdapter fragmentOverviewPagerAdapter = new FragmentOverviewPagerAdapter(fragmentManager,getActivity());
+                                //fragmentOverview.getViewPager().setCurrentItem(fragmentOverviewPagerAdapter.getCount());
+                            }
+                        });
+                        saveAlertMessage.setCancelable(false);
+                        saveAlertMessage.show();
+                    } else {
+                        //updateMedi();
+                        saveAlertMessage.setMessage(getResources().getString(R.string.dialog_MediUpdate));
+                        saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                showEditFragment();
+                            }
+                        });
+                        saveAlertMessage.setCancelable(false);
+                        saveAlertMessage.show();
+                    }
+
                 }
             }
         });
@@ -1589,9 +1614,19 @@ public class FragmentRegistration extends Fragment {
         ((MainActivity) getActivity()).getFab().show();
         ((MainActivity) getActivity()).getNavigationView().setCheckedItem(R.id.nav_list);
         ((MainActivity) getActivity()).getNavigationView().getMenu().getItem(0).setChecked(true);
-        getActivity().setTitle("Übersicht");
+        getActivity().setTitle(getResources().getString(R.string.nav_list));
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.main, fragmentOverview, "Fragment_Overview").commit();
+    }
+
+    private void showEditFragment(){
+        FragmentEdit fragmentEdit = new FragmentEdit();
+        ((MainActivity) getActivity()).getFab().show();
+        ((MainActivity) getActivity()).getNavigationView().setCheckedItem(R.id.nav_edit);
+        ((MainActivity) getActivity()).getNavigationView().getMenu().getItem(2).setChecked(true);
+        getActivity().setTitle(getResources().getString(R.string.nav_edit));
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.main, fragmentEdit, "Fragment_Edit").commit();
     }
 
     /**
