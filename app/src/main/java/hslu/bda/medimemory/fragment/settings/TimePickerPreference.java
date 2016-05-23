@@ -70,7 +70,7 @@ public class TimePickerPreference extends DialogPreference {
             }
             setSummary(getSummary());
             if (callChangeListener(calendar.getTimeInMillis())) {
-                persistInt((int) calendar.getTimeInMillis());
+                persistLong(calendar.getTimeInMillis());
                 notifyChanged();
             }
         }
