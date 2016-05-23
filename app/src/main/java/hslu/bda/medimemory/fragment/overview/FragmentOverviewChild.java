@@ -61,6 +61,7 @@ public class FragmentOverviewChild extends Fragment  {
     private FragmentOverview fragmentOverview;
     private FragmentRegistration fragmentRegistration;
     private ImageView iv_status;
+    private ImageView iv_touchPoint;
     private RelativeLayout rl_pillImage;
     private RelativeLayout.LayoutParams params;
     private ImageButton iBtn_helpOverview;
@@ -153,13 +154,13 @@ public class FragmentOverviewChild extends Fragment  {
 
 
     private void getIDs(View view) {
-        ImageView iv_example = (ImageView) view.findViewById(R.id.iv_example);
+        ImageView iv_pillImage = (ImageView) view.findViewById(R.id.iv_example);
         if (pillPhoto.getWidth() > pillPhoto.getHeight()){
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
             pillPhoto = Bitmap.createBitmap(pillPhoto, 0, 0, pillPhoto.getWidth(), pillPhoto.getHeight(), matrix, true);
         }
-        iv_example.setImageBitmap(pillPhoto);
+        iv_pillImage.setImageBitmap(pillPhoto);
         PillDetection pillDetection = new PillDetection(pillPhoto, pillPhoto.getWidth(), pillPhoto.getHeight());
         Collection<PillCoords> pillCoordsNew;
         try {
@@ -169,27 +170,25 @@ public class FragmentOverviewChild extends Fragment  {
             throwable.printStackTrace();
         }
         allPillCoordsById = PillCoords.getAllPillCoordsByMedid(id,dbAdapter);
+        int pointId = 0;
         for (PillCoords pillCoords : allPillCoordsById){
             points.add(pillCoords.getCoords());
             statusHeight = pillCoords.getHeight();
             statusWidth = pillCoords.getWidth();
+            setupStatus((int) points.get(pointId).x, (int) points.get(pointId).y, pointId);
             showTouchPoints((int) pillCoords.getCoords().x, (int) pillCoords.getCoords().y, pillCoords.getId());
+            pointId++;
         }
         setTouchListener();
 
     }
 
     private void showTouchPoints(int xCoord, int yCoord, int id) {
-        setupStatus(xCoord, yCoord, id);
+        //setupStatus(xCoord, yCoord, id);
         iv_status.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
-        int x = ContextCompat.getDrawable(getActivity(), R.drawable.circle).getBounds().width();
-        int y = ContextCompat.getDrawable(getActivity(), R.drawable.circle).getBounds().height();
-        Log.i("leftMargin"+xCoord+","+yCoord, String.valueOf(params.leftMargin));
         params.leftMargin = params.leftMargin;
-        Log.i("topMargin"+xCoord+","+yCoord, String.valueOf(params.topMargin));
         params.topMargin = params.topMargin;// - 112;
         rl_pillImage.addView(iv_status, params);
-        //setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
     }
 
     /**
@@ -199,9 +198,6 @@ public class FragmentOverviewChild extends Fragment  {
      */
     private void setupStatus(int x, int y, int id){
         rl_pillImage = (RelativeLayout) root.findViewById(R.id.rl_pillImage);
-        int layoutHeight = rl_pillImage.getHeight();
-        int layoutWidth = rl_pillImage.getWidth();
-        Log.i("tabheight", String.valueOf(tabHeight));
         //size of Drawable
         /*if (statusHeight < statusWidth){
             params = new RelativeLayout.LayoutParams(statusHeight, statusHeight);
@@ -209,15 +205,12 @@ public class FragmentOverviewChild extends Fragment  {
             params = new RelativeLayout.LayoutParams(statusWidth, statusWidth);
         }*/
         params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
         width = (displayWidth - pillPhoto.getWidth()) / 2;
         height = (displayHeight - pillPhoto.getHeight())/2;
         Log.i("width", String.valueOf(width));
         Log.i("height", String.valueOf(height));
-        params.leftMargin = x - width;//-39; //- statusWidth/2;
-        //params.rightMargin = x;
-        //params.bottomMargin = y - statusHeight/2;
-        params.topMargin = y-height; //- 50; //- tabHeight;
+        params.leftMargin = x - width;
+        params.topMargin = y-height;
         iv_status = new ImageView(getActivity());
         iv_status.setId(id);
     }
@@ -228,10 +221,10 @@ public class FragmentOverviewChild extends Fragment  {
      * @param status status-Drawable
      */
     private void setStatus(Drawable status){
-        //iv_status.setImageDrawable(status);
+        //statusImage.setImageDrawable(null);
         //rl_pillImage.addView(iv_status, params);
-        iv_status.setImageDrawable(status);
-        rl_pillImage.addView(iv_status,params);
+        statusImage.setImageDrawable(status);
+        rl_pillImage.addView(statusImage,params);
     }
 
     private void setTouchListener(){
@@ -244,8 +237,8 @@ public class FragmentOverviewChild extends Fragment  {
                     int pointId = 0;
                     for (Point point : points) {
                         if (comparePoints(touchPoint, points.get(pointId))) {
-                            statusImage = (ImageView) root.findViewById(pointId);
                             setupStatus((int) points.get(pointId).x, (int) points.get(pointId).y, pointId);
+                            statusImage = (ImageView)root.findViewById(pointId);
                             setupStatusDialog();
                         }
                         pointId++;
@@ -272,8 +265,8 @@ public class FragmentOverviewChild extends Fragment  {
             public void onClick(DialogInterface dialog, int which) {
                 ListView lw = ((AlertDialog) dialog).getListView();
                 int selectedItem = (int) lw.getAdapter().getItemId(lw.getCheckedItemPosition());
-                iv_status.setImageDrawable(null);
-                rl_pillImage.removeView(iv_status);
+                statusImage.setImageDrawable(null);
+                rl_pillImage.removeView(statusImage);
                 //setStatus(ContextCompat.getDrawable(getActivity(),null));
                 if (selectedItem == 0) {
                     setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.check_mark));
