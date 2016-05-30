@@ -4,6 +4,7 @@ import android.content.ContentValues;
 
 import org.opencv.core.Point;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -14,12 +15,13 @@ import hslu.bda.medimemory.database.DbHelper;
 /**
  * Created by Andy on 21.04.2016.
  */
-public class PillCoords implements DbObject{
+public class PillCoords implements DbObject {
     private int id;
     private int mediid;
     private Point coords;
     private int height;
     private int width;
+    private boolean changed;
 
     /**
      * empty Constructor
@@ -33,6 +35,7 @@ public class PillCoords implements DbObject{
         this.setCoords(coords);
         this.setWidth(width);
         this.setHeight(height);
+        this.setChanged(false);
     }
 
     public int getId() {
@@ -41,6 +44,7 @@ public class PillCoords implements DbObject{
 
     public void setId(int id) {
         this.id = id;
+        this.setChanged(true);
     }
 
     public int getMediid() {
@@ -49,6 +53,7 @@ public class PillCoords implements DbObject{
 
     public void setMediid(int mediid) {
         this.mediid = mediid;
+        this.setChanged(true);
     }
 
     public Point getCoords() {
@@ -57,6 +62,7 @@ public class PillCoords implements DbObject{
 
     public void setCoords(Point coords) {
         this.coords = coords;
+        this.setChanged(true);
     }
 
     public int getHeight() {
@@ -65,6 +71,7 @@ public class PillCoords implements DbObject{
 
     public void setHeight(int height) {
         this.height = height;
+        this.setChanged(true);
     }
 
     public int getWidth() {
@@ -73,7 +80,17 @@ public class PillCoords implements DbObject{
 
     public void setWidth(int width) {
         this.width = width;
+        this.setChanged(true);
     }
+
+    public boolean isChanged() {
+        return changed;
+    }
+
+    private void setChanged(boolean changed) {
+        this.changed = changed;
+    }
+
     @Override
     public ContentValues getContentValues() {
         final ContentValues values = new ContentValues();
@@ -107,7 +124,7 @@ public class PillCoords implements DbObject{
         Collection<PillCoords> allPillCoords = new ArrayList<PillCoords>();
         Collection<ContentValues> allContentValues =
                 dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_PILL_LOC,
-                        new String[]{DbHelper.COLUMN_MEDIID},new String[]{String.valueOf(medid)});
+                        new String[]{DbHelper.COLUMN_MEDIID}, new String[]{String.valueOf(medid)});
         if(allContentValues!=null) {
             for(ContentValues contentValues:allContentValues){
                 allPillCoords.add(copyContentValuesToObject(contentValues));
@@ -127,6 +144,7 @@ public class PillCoords implements DbObject{
         pillCoords.setWidth(contentValues.getAsInteger(DbHelper.COLUMN_WIDTH));
         pillCoords.setHeight(contentValues.getAsInteger(DbHelper.COLUMN_HEIGHT));
         pillCoords.setCoords(point);
+        pillCoords.setChanged(false);
         return  pillCoords;
     }
 
@@ -161,6 +179,7 @@ public class PillCoords implements DbObject{
         }
         return pillCoords;
     }
+
 
 
 }

@@ -17,7 +17,9 @@ public class UpdateMediService {
         boolean result = false;
         try{
             dbAdapter.startTransaction();
-            result = dbAdapter.updateDbObject(dbObject);
+            if(dbObject.isChanged()) {
+                result = dbAdapter.updateDbObject(dbObject);
+            }
             dbAdapter.setTransactionSuccessful();
         }catch (Exception e){
             result = false;
@@ -32,7 +34,9 @@ public class UpdateMediService {
         boolean result = false;
         try{
             dbAdapter.startTransaction();
-            dbAdapter.updateDbObject(data);
+            if(data.isChanged()) {
+                dbAdapter.updateDbObject(data);
+            }
             updateSubObjects(data, dbAdapter);
             dbAdapter.setTransactionSuccessful();
         }catch (Exception e){
@@ -48,19 +52,19 @@ public class UpdateMediService {
         try{
             dbAdapter.startTransaction();
             for(ConsumeIndividual consumeIndividual: data.getAllConsumeIndividual()){
-                if(consumeIndividual.getId()!=-1) {
+                if(consumeIndividual.getId()!=-1 && consumeIndividual.isChanged()) {
                     dbAdapter.updateDbObject(consumeIndividual);
                 }
             }
 
             for(ConsumeInterval consumeInterval : data.getAllConsumeInterval()){
-                if(consumeInterval.getId()!=-1) {
+                if(consumeInterval.getId()!=-1 && consumeInterval.isChanged()) {
                     dbAdapter.updateDbObject(consumeInterval);
                 }
             }
 
             for(PillCoords pillCoords : data.getAllPillCoords()){
-                if(pillCoords.getId()!=-1) {
+                if(pillCoords.getId()!=-1 && pillCoords.isChanged()) {
                     dbAdapter.updateDbObject(pillCoords);
                 }
             }
