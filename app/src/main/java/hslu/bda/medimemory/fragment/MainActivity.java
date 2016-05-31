@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawer;
     private Fragment fragment;
     private Class fragmentClass;
-    private FragmentRegistration fragmentRegistration;
+
     private FloatingActionButton fab;
     private NavigationView nvDrawer;
     private int currentMenuItem;

@@ -1,32 +1,22 @@
 package hslu.bda.medimemory.fragment.overview;
 
-import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
-
-import java.util.ArrayList;
 import java.util.Collection;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.entity.Data;
-import hslu.bda.medimemory.fragment.MainActivity;
 
 /**
  * Created by Loana on 04.03.2016.
@@ -118,7 +108,7 @@ public class FragmentOverview extends Fragment {
         bundle.putInt("id", id);
         FragmentOverviewChild fragmentChild = new FragmentOverviewChild();
         fragmentChild.setArguments(bundle);
-        adapter.addFrag(fragmentChild, pagename);
+        adapter.addFragment(fragmentChild, pagename);
         adapter.notifyDataSetChanged();
         if (adapter.getCount() > 0){
             tabLayout.setupWithViewPager(viewPager);
@@ -136,7 +126,6 @@ public class FragmentOverview extends Fragment {
                 tabLayout.getTabAt(i).setCustomView(adapter.getTabView(i));
             }
         }
-
     }
 
 

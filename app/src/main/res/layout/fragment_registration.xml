@@ -70,7 +70,7 @@
                 android:hint="@string/edit_name"
                 android:textColor="#666"
                 android:textSize="14sp"
-                android:inputType="text" />
+                android:inputType="textCapSentences" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
@@ -388,7 +388,7 @@
                 android:hint="@string/hint_notes"
                 android:textColor="#666"
                 android:textSize="14sp"
-                android:inputType="textMultiLine"
+                android:inputType="textMultiLine|textCapSentences"
                 android:ems="10"
                 android:selectAllOnFocus="false" />
 

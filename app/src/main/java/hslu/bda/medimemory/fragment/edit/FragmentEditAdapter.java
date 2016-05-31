@@ -42,6 +42,7 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
     private FragmentEdit fragmentEdit;
     private List<Data> list;
     private Holder holder;
+    private Data activeElement;
 
 
     public FragmentEditAdapter(Context context, int textViewResourceId) {
@@ -83,23 +84,26 @@ public class FragmentEditAdapter extends ArrayAdapter <Data> {
      * @param checkBox the selected checkbox
      */
    private void setCheckBoxListener(final TextView textView, final CheckBox checkBox){
-        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+       holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     Toast.makeText(getContext(), getContext().getResources().getString(R.string.toast_active), Toast.LENGTH_LONG).show();
                     setTextViewActive(textView);
                     Log.i("Checkbox.Tag", String.valueOf(checkBox.getTag()));
-                    list.get((Integer) checkBox.getTag()).setActive(1);
+                    list.get((Integer)checkBox.getTag()).setActive(1);
+
+
                 } else {
                     Toast.makeText(getContext(), getContext().getResources().getString(R.string.toast_inactive), Toast.LENGTH_LONG).show();
                     setTextViewInActive(textView);
                     Log.i("Checkbox.Tag", String.valueOf(checkBox.getTag()));
-                    list.get((Integer) checkBox.getTag()).setActive(0);
-                    /**
-                     * toDo update Medi
-                     */
-                    //UpdateMediService.updateTableEntry(xxx,dbAdapter);
+                    list.get((Integer)checkBox.getTag()).setActive(0);
+                }
+                try {
+                    UpdateMediService.updateTableEntry(list.get((Integer)checkBox.getTag()),dbAdapter);
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
                 }
             }
         });

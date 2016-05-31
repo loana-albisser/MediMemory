@@ -58,8 +58,6 @@ public class FragmentOverviewChild extends Fragment  {
     private String childname;
     private Bitmap pillPhoto;
     private int id;
-    private FragmentOverview fragmentOverview;
-    private FragmentRegistration fragmentRegistration;
     private ImageView iv_status;
     private ImageView iv_touchPoint;
     private RelativeLayout rl_pillImage;
@@ -185,7 +183,7 @@ public class FragmentOverviewChild extends Fragment  {
 
     private void showTouchPoints(int xCoord, int yCoord, int id) {
         //setupStatus(xCoord, yCoord, id);
-        iv_status.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.circle));
+        iv_status.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.transparent));
         params.leftMargin = params.leftMargin;
         params.topMargin = params.topMargin;// - 112;
         rl_pillImage.addView(iv_status, params);
@@ -336,10 +334,8 @@ public class FragmentOverviewChild extends Fragment  {
         popup.showAsDropDown(anchorView);
     }
 
-    private void saveDataToDB(){
-        Status status = new Status();
-        status.setDescription(getStatus());
-
+    private void saveStatusToDB(){
+        //
     }
 
     private String getStatus() {
