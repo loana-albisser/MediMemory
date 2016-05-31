@@ -83,6 +83,7 @@ import hslu.bda.medimemory.fragment.edit.FragmentEdit;
 import hslu.bda.medimemory.fragment.overview.FragmentOverview;
 import hslu.bda.medimemory.services.CreateMediService;
 import hslu.bda.medimemory.services.DeleteMediService;
+import hslu.bda.medimemory.services.UpdateMediService;
 
 /**
  * Created by Loana on 29.02.2016.
@@ -1592,7 +1593,7 @@ public class FragmentRegistration extends Fragment {
                         saveAlertMessage.setCancelable(false);
                         saveAlertMessage.show();
                     } else {
-                        //updateMedi();
+                        //UpdateMediService.updateDataObject(dbAdapter);
                         saveAlertMessage.setMessage(getResources().getString(R.string.dialog_MediUpdate));
                         saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
