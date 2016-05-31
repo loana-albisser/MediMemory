@@ -48,8 +48,10 @@ public class Data implements DbObject{
     }
 
     public void setId(int id) {
-        this.id = id;
-        this.setChanged(true);
+        if(this.id != id) {
+            this.id = id;
+            this.setChanged(true);
+        }
     }
 
     public String getDescription() {
@@ -57,8 +59,10 @@ public class Data implements DbObject{
     }
 
     public void setDescription(String description) {
-        this.description = description;
-        this.setChanged(true);
+        if(this.description!=description) {
+            this.description = description;
+            this.setChanged(true);
+        }
     }
 
     public int getDuration() {
@@ -66,8 +70,10 @@ public class Data implements DbObject{
     }
 
     public void setDuration(int duration) {
-        this.duration = duration;
-        this.setChanged(true);
+        if(this.duration!=duration) {
+            this.duration = duration;
+            this.setChanged(true);
+        }
     }
 
     public int getAmount() {
@@ -75,8 +81,10 @@ public class Data implements DbObject{
     }
 
     public void setAmount(int amount) {
-        this.amount = amount;
-        this.setChanged(true);
+        if(this.amount!=amount) {
+            this.amount = amount;
+            this.setChanged(true);
+        }
     }
 
     public int getWidth() {
@@ -84,8 +92,10 @@ public class Data implements DbObject{
     }
 
     public void setWidth(int width) {
-        this.width = width;
-        this.setChanged(true);
+        if(this.width!=width) {
+            this.width = width;
+            this.setChanged(true);
+        }
     }
 
     public int getLength() {
@@ -93,8 +103,10 @@ public class Data implements DbObject{
     }
 
     public void setLength(int length) {
-        this.length = length;
-        this.setChanged(true);
+        if(this.length!=length) {
+            this.length = length;
+            this.setChanged(true);
+        }
     }
 
     public Bitmap getPicture() {
@@ -102,8 +114,10 @@ public class Data implements DbObject{
     }
 
     public void setPicture(Bitmap picture) {
-        this.picture = picture;
-        this.setChanged(true);
+        if(this.picture ==null || !this.picture.equals(picture)) {
+            this.picture = picture;
+            this.setChanged(true);
+        }
     }
 
     public Calendar getCreateDate() {
@@ -111,8 +125,10 @@ public class Data implements DbObject{
     }
 
     public void setCreateDate(Calendar createDate) {
-        this.createDate = createDate;
-        this.setChanged(true);
+        if(this.createDate==null || !this.createDate.equals(createDate)) {
+            this.createDate = createDate;
+            this.setChanged(true);
+        }
     }
 
     public Calendar getEndDate() {
@@ -120,8 +136,10 @@ public class Data implements DbObject{
     }
 
     public void setEndDate(Calendar endDate) {
-        this.endDate = endDate;
-        this.setChanged(true);
+        if(this.endDate==null || this.endDate.equals(endDate)) {
+            this.endDate = endDate;
+            this.setChanged(true);
+        }
     }
 
     public String getNote() {
@@ -129,8 +147,10 @@ public class Data implements DbObject{
     }
 
     public void setNote(String note) {
-        this.note = note;
-        this.setChanged(true);
+        if(this.note!=note) {
+            this.note = note;
+            this.setChanged(true);
+        }
     }
 
     public int getActive() {
@@ -138,8 +158,10 @@ public class Data implements DbObject{
     }
 
     public void setActive(int active) {
-        this.active = active;
-        this.setChanged(true);
+        if(this.active!=active) {
+            this.active = active;
+            this.setChanged(true);
+        }
     }
 
 
