@@ -19,6 +19,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
@@ -176,6 +177,7 @@ public class FragmentRegistration extends Fragment {
     private RadioButton rd_always;
     private RadioButton rd_packageEnd;
     private LayoutInflater inflater;
+    private Data pillSaveData;
 
 
     @Override
@@ -606,12 +608,16 @@ public class FragmentRegistration extends Fragment {
     }
 
     private boolean isImageSet(){
-        Log.i("Imageview", String.valueOf(iv_selectedImage.getDrawable()));
         if (iv_selectedImage.getDrawable()==null){
             return false;
         } else {
             return true;
         }
+    }
+
+    private Bitmap getPictureFromView(){
+        Bitmap bm=((BitmapDrawable)iv_selectedImage.getDrawable()).getBitmap();
+        return bm;
     }
 
     private void setPicture(Bitmap bitmap){
@@ -1580,7 +1586,7 @@ public class FragmentRegistration extends Fragment {
                     showAlertDialog(getResources().getString(R.string.dialog_foodInstructionMessage), cv_foodInstruction);
                 } else {
                     if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_registration) {
-                        saveDataToDB();
+
                         saveAlertMessage.setMessage(getResources().getString(R.string.dialog_Medisave));
                         saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
@@ -1593,7 +1599,6 @@ public class FragmentRegistration extends Fragment {
                         saveAlertMessage.setCancelable(false);
                         saveAlertMessage.show();
                     } else {
-                        //UpdateMediService.updateDataObject(dbAdapter);
                         saveAlertMessage.setMessage(getResources().getString(R.string.dialog_MediUpdate));
                         saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
@@ -1604,7 +1609,7 @@ public class FragmentRegistration extends Fragment {
                         saveAlertMessage.setCancelable(false);
                         saveAlertMessage.show();
                     }
-
+                    saveDataToDB();
                 }
             }
         });
@@ -1635,37 +1640,60 @@ public class FragmentRegistration extends Fragment {
      */
     private void saveDataToDB(){
         RadioButton rd_reminderDayTime = (RadioButton)root.findViewById(R.id.rd_daytime);
-        Data data = new Data();
-        PillDetection pillDetection = new PillDetection(getPicture(),getPicture().getWidth(),getPicture().getHeight());
-        data.setDescription(getName());
-        data.setPicture(getPicture());
+        pillSaveData = new Data();
+        PillDetection pillDetection = new PillDetection(getPictureFromView(),getPictureFromView().getWidth(),getPictureFromView().getHeight());
+        pillSaveData.setDescription(getName());
         if (rd_reminderInterval.isChecked()){
-            data.setAllConsumeInterval(getReminderInterval());
+            pillSaveData.setAllConsumeInterval(getReminderInterval());
         } else if (rd_reminderDayTime.isChecked()) {
-            data.setAllConsumeIndividual(getReminderDayTime());
+            pillSaveData.setAllConsumeIndividual(getReminderDayTime());
         }
         try {
-            data.setDuration(calculateNumberOfIntakes(pillDetection.getAllPillPoints(mediId).size()));
+            pillSaveData.setDuration(calculateNumberOfIntakes(pillDetection.getAllPillPoints(mediId).size()));
             if (rd_numberOfDays.isChecked()){
-                data.setEndDate(getDurationDate());
+                pillSaveData.setEndDate(getDurationDate());
             } else if (rd_always.isChecked() || rd_packageEnd.isChecked()){
-                data.setEndDate(null);
+                pillSaveData.setEndDate(null);
             }
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-        data.setAmount(getDosage());
-        data.setNote(getNotes());
-        data.setActive(1);
+        pillSaveData.setAmount(getDosage());
+        pillSaveData.setNote(getNotes());
+        pillSaveData.setActive(1);
         Calendar cal = new GregorianCalendar();
         cal.setTime(new Date());
-        data.setCreateDate(cal);
+        pillSaveData.setCreateDate(cal);
         try {
-            data.setAllPillCoords(pillDetection.getAllPillPoints(data.getId()));
-            data.setId(CreateMediService.addNewMedi(data, dbAdapter));
+            pillSaveData.setAllPillCoords(pillDetection.getAllPillPoints(pillSaveData.getId()));
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
+        if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_registration){
+
+            pillSaveData.setPicture(getPicture());
+
+            try {
+                pillSaveData.setId(CreateMediService.addNewMedi(pillSaveData, dbAdapter));
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        } else {
+            try {
+                pillSaveData.setPicture(getPictureFromView());
+                UpdateMediService.updateDataObject(pillSaveData,dbAdapter);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        }
+
+
+
+
+    }
+
+    private Data getPillSaveData(){
+        return pillSaveData;
     }
 
     private void registrationInit(){
