@@ -140,6 +140,21 @@ public class Consumed implements DbObject {
         return allConsumed;
     }
 
+    public static Consumed getConsumedByPillCoord(PillCoords pillCoords, DbAdapter dbAdapter){
+        Consumed allConsumed = null;
+        Collection<ContentValues> allContentValues =
+                dbAdapter.getAllByTable(DbHelper.TABLE_MEDI_CONSUMED,
+                        new String[]{DbHelper.COLUMN_POINT},new String[]{String.valueOf(pillCoords.getId())});
+        if(allContentValues!=null) {
+            for(ContentValues contentValues:allContentValues){
+                allConsumed = copyContentValuesToObject(contentValues, dbAdapter);
+                break;
+            }
+        }
+
+        return allConsumed;
+    }
+
     private static Consumed copyContentValuesToObject(ContentValues contentValues, DbAdapter dbAdapter) {
         Consumed consumed = new Consumed();
         consumed.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));

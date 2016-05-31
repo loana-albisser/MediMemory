@@ -19,6 +19,7 @@ public class Status implements DbObject{
     private String description;
     private boolean changed;
 
+    public static String VERGESSEN = "1";
     /**
      * Empty Constructor
      */
