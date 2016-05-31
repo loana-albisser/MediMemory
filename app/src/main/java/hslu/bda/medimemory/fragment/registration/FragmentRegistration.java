@@ -19,7 +19,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
@@ -1645,18 +1644,17 @@ public class FragmentRegistration extends Fragment {
             pillSaveData = new Data();
         }else {
             pillSaveData = Data.getDataById(String.valueOf(mediId),dbAdapter);
-            pillSaveData.setId(mediId);
         }
         PillDetection pillDetection = new PillDetection(getPictureFromView(),getPictureFromView().getWidth(),getPictureFromView().getHeight());
         pillSaveData.setDescription(getName());
         if (rd_reminderInterval.isChecked()){
             if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_edit) {
-                editIntervalTimes();
+                delIndividualTimes();
             }
             pillSaveData.setAllConsumeInterval(getReminderInterval());
         } else if (rd_reminderDayTime.isChecked()) {
             if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_edit) {
-                editIndividualTimes();
+                delIntervalTimes();
             }
             pillSaveData.setAllConsumeIndividual(getReminderDayTime());
         }
@@ -1688,24 +1686,25 @@ public class FragmentRegistration extends Fragment {
             try {
                 pillSaveData.setPicture(getPictureFromView());
 
-                UpdateMediService.updateDataObject(pillSaveData,dbAdapter);
+                UpdateMediService.updateDataObject(pillSaveData, dbAdapter);
+                CreateMediService.addNewMedi(pillSaveData,dbAdapter);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }
         }
     }
 
-    private void editIntervalTimes(){
+    private void delIndividualTimes(){
         if(pillSaveData.getAllConsumeIndividual().size() != 0){
             try {
-                DeleteMediService.deleteAllEntryByTableAndMedId(DbHelper.TABLE_MEDI_CONSINDIV,mediId,dbAdapter);
+                DeleteMediService.deleteAllEntryByTableAndMedId(DbHelper.TABLE_MEDI_CONSINDIV, mediId, dbAdapter);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }
         }
     }
 
-    private void editIndividualTimes(){
+    private void delIntervalTimes(){
         if(pillSaveData.getAllConsumeInterval().size() != 0){
             try {
                 DeleteMediService.deleteAllEntryByTableAndMedId(DbHelper.TABLE_MEDI_CONSINTER,mediId,dbAdapter);

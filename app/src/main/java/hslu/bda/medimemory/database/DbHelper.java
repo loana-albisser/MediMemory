@@ -164,7 +164,8 @@ public class DbHelper extends SQLiteOpenHelper{
         String CREATE_INIT_VALUES = "INSERT INTO "+this.TABLE_MEDI_STATUS + " "+
                 "Select 0, 'eingenommen'"+
                 "UNION SELECT 1, 'verloren'"+
-                "UNION SELECT 2, 'vergessen';";
+                "UNION SELECT 2, 'vergessen'"+
+                "UNION SELECT 3, 'ausstehend'";
         db.execSQL(CREATE_INIT_VALUES);
     }
 

@@ -44,8 +44,10 @@ public class Consumed implements DbObject {
     }
 
     public void setId(int id) {
-        this.id = id;
-        this.changed=true;
+        if(this.id!=id){
+            this.id = id;
+            this.changed=true;
+        }
     }
 
     public int getMediid() {
@@ -53,8 +55,10 @@ public class Consumed implements DbObject {
     }
 
     public void setMediid(int mediid) {
-        this.mediid = mediid;
-        this.changed=true;
+        if(this.mediid != mediid) {
+            this.mediid = mediid;
+            this.changed = true;
+        }
     }
 
     /**
@@ -70,8 +74,10 @@ public class Consumed implements DbObject {
      * @param pointInTime
      */
     public void setPointInTime(Calendar pointInTime) {
-        this.pointInTime = pointInTime;
-        this.changed=true;
+        if(this.pointInTime==null || !this.pointInTime.equals(pointInTime)) {
+            this.pointInTime = pointInTime;
+            this.changed = true;
+        }
     }
 
     public Status getStatus() {
@@ -79,8 +85,10 @@ public class Consumed implements DbObject {
     }
 
     public void setStatus(Status status) {
-        this.status = status;
-        this.changed=true;
+        if(this.status == null || !this.status.getContentValues().equals(status.getContentValues())) {
+            this.status = status;
+            this.changed = true;
+        }
     }
 
     public boolean isChanged() {

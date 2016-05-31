@@ -18,7 +18,6 @@ public class ConsumeIndividual implements DbObject {
 
     private int id;
     private int mediid;
-    private Calendar consumeTime;
     private Day daypart;
     private Eat eatpart;
     private boolean changed;
@@ -29,10 +28,9 @@ public class ConsumeIndividual implements DbObject {
     public ConsumeIndividual(){this.setId(-1);}
 
 
-    public ConsumeIndividual(int mediid, Calendar consumeTime, Day daypart, Eat eatpart){
+    public ConsumeIndividual(int mediid, Day daypart, Eat eatpart){
         this.setId(-1);
         this.setMediid(mediid);
-        //this.setConsumeTime(consumeTime);
         this.setDaypart(daypart);
         this.setEatpart(eatpart);
         this.setChanged(true);
@@ -43,8 +41,10 @@ public class ConsumeIndividual implements DbObject {
     }
 
     public void setId(int id) {
-        this.id = id;
-        this.setChanged(true);
+        if(this.id!=id) {
+            this.id = id;
+            this.setChanged(true);
+        }
     }
 
     public int getMediid() {
@@ -52,25 +52,21 @@ public class ConsumeIndividual implements DbObject {
     }
 
     public void setMediid(int mediid) {
-        this.mediid = mediid;
-        this.setChanged(true);
+        if(this.mediid != mediid) {
+            this.mediid = mediid;
+            this.setChanged(true);
+        }
     }
 
-    /*public Calendar getConsumeTime() {
-        return consumeTime;
-    }
-
-    public void setConsumeTime(Calendar consumeTime) {
-        this.consumeTime = consumeTime;
-    }
-*/
     public Day getDaypart() {
         return daypart;
     }
 
     public void setDaypart(Day daypart) {
-        this.daypart = daypart;
-        this.setChanged(true);
+        if(this.daypart == null || !this.daypart.getContentValues().equals(daypart)) {
+            this.daypart = daypart;
+            this.setChanged(true);
+        }
     }
 
     public Eat getEatpart() {
@@ -78,8 +74,10 @@ public class ConsumeIndividual implements DbObject {
     }
 
     public void setEatpart(Eat eatpart) {
-        this.eatpart = eatpart;
-        this.setChanged(true);
+        if(this.eatpart == null || !this.eatpart.getContentValues().equals(eatpart)) {
+            this.eatpart = eatpart;
+            this.setChanged(true);
+        }
     }
 
     public boolean isChanged() {
@@ -94,12 +92,6 @@ public class ConsumeIndividual implements DbObject {
         final ContentValues values = new ContentValues();
         values.put(DbHelper.COLUMN_ID,getId());
         values.put(DbHelper.COLUMN_MEDIID, getMediid());
-        /*if(getConsumeTime()!=null) {
-            values.put(DbHelper.COLUMN_CONSTIME, simpleDateFormat.format(getConsumeTime().getTime()));
-        }
-        else{
-            values.put(DbHelper.COLUMN_CONSTIME, (String)null);
-        }*/
         values.put(DbHelper.COLUMN_DAYPART, getDaypart().getId());
         values.put(DbHelper.COLUMN_EATPART, getEatpart().getId());
 
@@ -160,11 +152,6 @@ public class ConsumeIndividual implements DbObject {
         ConsumeIndividual consumeIndividual = new ConsumeIndividual();
         consumeIndividual.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
         consumeIndividual.setMediid(contentValues.getAsInteger(DbHelper.COLUMN_MEDIID));
-        /*try{
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(simpleDateFormat.parse(contentValues.getAsString(DbHelper.COLUMN_CONSTIME)));
-            consumeIndividual.setConsumeTime(calendar);
-        }catch(Exception e) {consumeIndividual.setConsumeTime(null);}*/
         consumeIndividual.setDaypart(Day.getDayById(contentValues.getAsString(DbHelper.COLUMN_DAYPART), dbAdapter));
         consumeIndividual.setEatpart(Eat.getEatById(contentValues.getAsString(DbHelper.COLUMN_EATPART), dbAdapter));
         consumeIndividual.setChanged(false);

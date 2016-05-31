@@ -44,8 +44,10 @@ public class ConsumeInterval implements DbObject {
     }
 
     public void setId(int id) {
-        this.id = id;
-        this.setChanged(true);
+        if(this.id != id) {
+            this.id = id;
+            this.setChanged(true);
+        }
     }
 
     public int getMediid() {
@@ -53,8 +55,10 @@ public class ConsumeInterval implements DbObject {
     }
 
     public void setMediid(int mediid) {
-        this.mediid = mediid;
-        this.setChanged(true);
+        if(this.mediid != mediid) {
+            this.mediid = mediid;
+            this.setChanged(true);
+        }
     }
 
     public Calendar getStartTime() {
@@ -66,8 +70,10 @@ public class ConsumeInterval implements DbObject {
      * @param startTime
      */
     public void setStartTime(Calendar startTime) {
-        this.startTime = startTime;
-        this.setChanged(true);
+        if(this.startTime==null || !this.startTime.equals(startTime)) {
+            this.startTime = startTime;
+            this.setChanged(true);
+        }
     }
 
     /**
@@ -79,8 +85,10 @@ public class ConsumeInterval implements DbObject {
     }
 
     public void setEndTime(Calendar endTime) {
-        this.endTime = endTime;
-        this.setChanged(true);
+        if(this.endTime==null || !this.endTime.equals(endTime)) {
+            this.endTime = endTime;
+            this.setChanged(true);
+        }
     }
 
     public int getInterval() {
@@ -88,8 +96,10 @@ public class ConsumeInterval implements DbObject {
     }
 
     public void setInterval(int interval) {
-        this.interval = interval;
-        this.setChanged(true);
+        if(this.interval!=interval) {
+            this.interval = interval;
+            this.setChanged(true);
+        }
     }
 
     /**
@@ -105,8 +115,10 @@ public class ConsumeInterval implements DbObject {
      * @param weekday
      */
     public void setWeekday(int weekday) {
-        this.weekday = weekday;
-        this.setChanged(true);
+        if(this.weekday!=weekday) {
+            this.weekday = weekday;
+            this.setChanged(true);
+        }
     }
 
     public boolean isChanged() {
