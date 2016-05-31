@@ -1687,6 +1687,7 @@ public class FragmentRegistration extends Fragment {
         } else {
             try {
                 pillSaveData.setPicture(getPictureFromView());
+
                 UpdateMediService.updateDataObject(pillSaveData,dbAdapter);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
