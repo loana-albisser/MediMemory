@@ -2,6 +2,7 @@ package hslu.bda.medimemory.entity;
 
 import android.content.ContentValues;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -12,10 +13,11 @@ import hslu.bda.medimemory.database.DbHelper;
 /**
  * Created by tbeugste on 07.03.2016.
  */
-public class Eat implements DbObject{
+public class Eat implements DbObject {
 
     private int id;
     private String description;
+    private  boolean changed;
 
     /**
      * Empty Constructor
@@ -24,11 +26,13 @@ public class Eat implements DbObject{
 
     /**
      * Constructor to return Object with supplied fields
+     * @param id id of eatpart
      * @param description of the eatpart
      */
-    public Eat(String description){
-        this.setId(-1);
+    public Eat(int id,String description){
+        this.setId(id);
         this.setDescription(description);
+        this.setChanged(false);
     }
 
     /**
@@ -45,6 +49,7 @@ public class Eat implements DbObject{
      */
     public void setId(int id) {
         this.id = id;
+        this.setChanged(true);
     }
 
     /**
@@ -61,8 +66,17 @@ public class Eat implements DbObject{
      */
     public void setDescription(String description) {
         this.description = description;
+        this.setChanged(true);
     }
 
+    @Override
+    public boolean isChanged() {
+        return changed;
+    }
+
+    private void setChanged(boolean changed) {
+        this.changed = changed;
+    }
 
     @Override
     public ContentValues getContentValues() {
@@ -118,6 +132,9 @@ public class Eat implements DbObject{
         Eat eat = new Eat();
         eat.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
         eat.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));
+        eat.setChanged(true);
         return  eat;
     }
+
+
 }

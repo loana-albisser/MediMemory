@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,7 +20,7 @@ import hslu.bda.medimemory.database.DbHelper;
 /**
  * Created by manager on 07.03.2016.
  */
-public class Data implements DbObject {
+public class Data implements DbObject{
 
     private int id;
     private String description;
@@ -32,6 +33,7 @@ public class Data implements DbObject {
     private Calendar endDate;
     private String note;
     private int active;
+    private boolean changed;
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private Collection<Consumed> allConsumed = new ArrayList<Consumed>();
@@ -47,6 +49,7 @@ public class Data implements DbObject {
 
     public void setId(int id) {
         this.id = id;
+        this.setChanged(true);
     }
 
     public String getDescription() {
@@ -55,6 +58,7 @@ public class Data implements DbObject {
 
     public void setDescription(String description) {
         this.description = description;
+        this.setChanged(true);
     }
 
     public int getDuration() {
@@ -63,6 +67,7 @@ public class Data implements DbObject {
 
     public void setDuration(int duration) {
         this.duration = duration;
+        this.setChanged(true);
     }
 
     public int getAmount() {
@@ -71,6 +76,7 @@ public class Data implements DbObject {
 
     public void setAmount(int amount) {
         this.amount = amount;
+        this.setChanged(true);
     }
 
     public int getWidth() {
@@ -79,6 +85,7 @@ public class Data implements DbObject {
 
     public void setWidth(int width) {
         this.width = width;
+        this.setChanged(true);
     }
 
     public int getLength() {
@@ -87,6 +94,7 @@ public class Data implements DbObject {
 
     public void setLength(int length) {
         this.length = length;
+        this.setChanged(true);
     }
 
     public Bitmap getPicture() {
@@ -95,6 +103,7 @@ public class Data implements DbObject {
 
     public void setPicture(Bitmap picture) {
         this.picture = picture;
+        this.setChanged(true);
     }
 
     public Calendar getCreateDate() {
@@ -103,6 +112,7 @@ public class Data implements DbObject {
 
     public void setCreateDate(Calendar createDate) {
         this.createDate = createDate;
+        this.setChanged(true);
     }
 
     public Calendar getEndDate() {
@@ -111,6 +121,7 @@ public class Data implements DbObject {
 
     public void setEndDate(Calendar endDate) {
         this.endDate = endDate;
+        this.setChanged(true);
     }
 
     public String getNote() {
@@ -119,6 +130,7 @@ public class Data implements DbObject {
 
     public void setNote(String note) {
         this.note = note;
+        this.setChanged(true);
     }
 
     public int getActive() {
@@ -127,6 +139,16 @@ public class Data implements DbObject {
 
     public void setActive(int active) {
         this.active = active;
+        this.setChanged(true);
+    }
+
+
+    public boolean isChanged() {
+        return changed;
+    }
+
+    private void setChanged(boolean changed) {
+        this.changed = changed;
     }
 
     public Collection<Consumed> getAllConsumed() {
@@ -220,6 +242,7 @@ public class Data implements DbObject {
         }catch(Exception e) {data.setEndDate(null);}
         data.setNote(contentValues.getAsString(DbHelper.COLUMN_NOTE));
         data.setActive(contentValues.getAsInteger(DbHelper.COLUMN_ACTIVE));
+        data.setChanged(false);
         return data;
     }
 
@@ -235,6 +258,7 @@ public class Data implements DbObject {
         data.setAllConsumeIndividual(ConsumeIndividual.getAllConsumeIndividualByMedid(data.getId(), dbAdapter));
         data.setAllConsumeInterval(ConsumeInterval.getAllConsumeIntervalByMedid(data.getId(), dbAdapter));
         data.setAllPillCoords(PillCoords.getAllPillCoordsByMedid(data.getId(),dbAdapter));
+        data.setChanged(false);
         return data;
     }
 
@@ -256,6 +280,7 @@ public class Data implements DbObject {
 
         return  allData;
     }
+
 
 
 }

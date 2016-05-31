@@ -2,6 +2,7 @@ package hslu.bda.medimemory.entity;
 
 import android.content.ContentValues;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -16,6 +17,7 @@ public class Status implements DbObject{
 
     private int id;
     private String description;
+    private boolean changed;
 
     /**
      * Empty Constructor
@@ -29,6 +31,7 @@ public class Status implements DbObject{
     public Status(String description){
         this.setId(-1);
         this.setDescription(description);
+        this.setChanged(false);
     }
 
     /**
@@ -45,6 +48,7 @@ public class Status implements DbObject{
      */
     public void setId(int id) {
         this.id = id;
+        this.setChanged(true);
     }
 
     /**
@@ -61,8 +65,18 @@ public class Status implements DbObject{
      */
     public void setDescription(String description) {
         this.description = description;
+        this.setChanged(true);
     }
 
+
+    @Override
+    public boolean isChanged() {
+        return changed;
+    }
+
+    private void setChanged(boolean changed) {
+        this.changed = changed;
+    }
 
     @Override
     public ContentValues getContentValues() {
@@ -118,8 +132,10 @@ public class Status implements DbObject{
         Status status = new Status();
         status.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
         status.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));
+        status.setChanged(false);
         return  status;
     }
+
 
 
 }

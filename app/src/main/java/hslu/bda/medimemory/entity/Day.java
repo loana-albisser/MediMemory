@@ -2,6 +2,7 @@ package hslu.bda.medimemory.entity;
 
 import android.content.ContentValues;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -12,23 +13,28 @@ import hslu.bda.medimemory.database.DbHelper;
 /**
  * Created by tbeugste on 07.03.2016.
  */
-public class Day implements DbObject{
+public class Day implements DbObject {
 
     private int id;
     private String description;
+    private boolean changed;
 
     /**
      * Empty Constructor
      */
-    public Day(){this.setId(-1);}
+    public Day(){
+        this.setId(-1);
+        this.setChanged(true);
+    }
 
     /**
      * Constructor to return Object with supplied fields
      * @param description of the daypart
      */
-    public Day( String description){
-        this.setId(-1);
+    public Day(int id, String description){
+        this.setId(id);
         this.setDescription(description);
+        this.setChanged(false);
     }
 
     /**
@@ -45,6 +51,7 @@ public class Day implements DbObject{
      */
     public void setId(int id) {
         this.id = id;
+        this.setChanged(true);
     }
 
     /**
@@ -55,14 +62,27 @@ public class Day implements DbObject{
         return description;
     }
 
+    @Override
+    public String toString(){
+        return this.getDescription();
+    }
+
     /**
      * Setter-Method of the description
      * @param description of the daypart
      */
     public void setDescription(String description) {
         this.description = description;
+        this.setChanged(true);
     }
 
+    public boolean isChanged() {
+        return changed;
+    }
+
+    private void setChanged(boolean changed) {
+        this.changed = changed;
+    }
 
     @Override
     public ContentValues getContentValues() {
@@ -118,11 +138,10 @@ public class Day implements DbObject{
         Day day = new Day();
         day.setId(contentValues.getAsInteger(DbHelper.COLUMN_ID));
         day.setDescription(contentValues.getAsString(DbHelper.COLUMN_DESC));
+        day.setChanged(false);
         return day;
     }
 
-    @Override
-    public String toString(){
-        return this.getDescription();
-    }
+
+
 }

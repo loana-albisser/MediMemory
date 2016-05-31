@@ -1775,7 +1775,7 @@ public class FragmentRegistration extends Fragment {
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
-                        showEditFragment();
+                        showOverviewFragment();
                     }
                 });
                 alertBuilder.setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {

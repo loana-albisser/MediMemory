@@ -4,6 +4,7 @@ import android.content.ContentValues;
 
 import org.opencv.core.Point;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,6 +26,7 @@ public class Consumed implements DbObject {
     private Calendar pointInTime;
     private Status status;
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private boolean changed = false;
 
     public Consumed(){this.setId(-1);}
 
@@ -34,6 +36,7 @@ public class Consumed implements DbObject {
         this.setPointInTime(pointInTime);
         this.setStatus(status);
         this.setPillCoord(pillCoords);
+        this.setChanged(false);
     }
 
     public int getId() {
@@ -42,6 +45,7 @@ public class Consumed implements DbObject {
 
     public void setId(int id) {
         this.id = id;
+        this.changed=true;
     }
 
     public int getMediid() {
@@ -50,6 +54,7 @@ public class Consumed implements DbObject {
 
     public void setMediid(int mediid) {
         this.mediid = mediid;
+        this.changed=true;
     }
 
     /**
@@ -66,6 +71,7 @@ public class Consumed implements DbObject {
      */
     public void setPointInTime(Calendar pointInTime) {
         this.pointInTime = pointInTime;
+        this.changed=true;
     }
 
     public Status getStatus() {
@@ -74,6 +80,15 @@ public class Consumed implements DbObject {
 
     public void setStatus(Status status) {
         this.status = status;
+        this.changed=true;
+    }
+
+    public boolean isChanged() {
+        return changed;
+    }
+
+    private void setChanged(boolean changed) {
+        this.changed = changed;
     }
 
     public PillCoords getPillCoord() {
@@ -82,6 +97,7 @@ public class Consumed implements DbObject {
 
     public void setPillCoord(PillCoords pillCoord) {
         this.pillCoord = pillCoord;
+        this.changed=true;
     }
 
     @Override
@@ -134,9 +150,11 @@ public class Consumed implements DbObject {
             consumed.setPointInTime(calendar);
         }catch(Exception e) {consumed.setPointInTime(null);}
         consumed.setStatus(Status.getStatusById(contentValues.getAsString(DbHelper.COLUMN_STATUS),dbAdapter));
-        consumed.setPillCoord(PillCoords.getPillCoordById(contentValues.getAsString(DbHelper.COLUMN_POINT),dbAdapter));
+        consumed.setPillCoord(PillCoords.getPillCoordById(contentValues.getAsString(DbHelper.COLUMN_POINT), dbAdapter));
+        consumed.setChanged(false);
         return  consumed;
     }
+
 
 
 }
