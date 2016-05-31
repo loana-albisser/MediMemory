@@ -205,5 +205,19 @@ public class DbAdapter {
         db.setTransactionSuccessful();
     }
 
+    public boolean isMediActive(int mediid) {
+        boolean result = false;
+        String selection = DbHelper.COLUMN_ID + " =? AND "+DbHelper.COLUMN_ACTIVE + "=?";
+        String [] args = new String[]{String.valueOf(mediid),"1"};
 
+        Cursor cursorResult = db.query(DbHelper.TABLE_MEDI_DATA
+                ,null
+                ,selection
+                ,args
+                ,null
+                ,null
+                ,null);
+        result = cursorResult.getCount()>0;
+        return result;
+    }
 }

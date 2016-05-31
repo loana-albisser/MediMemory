@@ -1,10 +1,13 @@
 package hslu.bda.medimemory.fragment.registration;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,6 +33,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +41,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -71,6 +76,7 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 import hslu.bda.medimemory.R;
+import hslu.bda.medimemory.alert.AlarmReceiver;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.detection.PillDetection;
 import hslu.bda.medimemory.entity.ConsumeIndividual;
@@ -81,6 +87,9 @@ import hslu.bda.medimemory.entity.Eat;
 import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.edit.FragmentEdit;
 import hslu.bda.medimemory.fragment.overview.FragmentOverview;
+import hslu.bda.medimemory.fragment.overview.FragmentOverviewPagerAdapter;
+import hslu.bda.medimemory.fragment.settings.FragmentSettings;
+import hslu.bda.medimemory.notification.NotificationHandler;
 import hslu.bda.medimemory.services.CreateMediService;
 import hslu.bda.medimemory.services.DeleteMediService;
 
@@ -89,27 +98,39 @@ import hslu.bda.medimemory.services.DeleteMediService;
  */
 public class FragmentRegistration extends Fragment {
     private ViewGroup root;
+    private Context context;
+    private FragmentRegistration fragmentRegistration;
+    private Activity mActivity;
+    private FragmentSettings fragmentSettings;
 
     private EditText edit_name;
+    private final int REQUEST_CAMERA = 0;
+    private final int SELECT_FILE = 1;
     private ImageView iv_selectedImage;
+    private String imagePath;
     private Bitmap thumbnail;
 
     private TextView txt_reminder;
-    private View dialogReminderView;
+    private View dialogView;
     private View dialogNumberpickerView;
     private int selectedIntervalPosition;
-    private boolean [] checkedDaytimes;
-    private int checkedWeek;
-    private ArrayList<Integer> selList = new ArrayList<>();
+    private boolean [] checkItems; //= {false,false,false,false,false};
+    private ArrayList<Integer> selList = new ArrayList<Integer>();
     private Spinner sp_reminderInterval;
+    private int numberofCheckedItems;
     private AlertDialog.Builder reminderDaytimeDialog;
     private RadioButton rd_reminderInterval;
     private TimePickerDialog tp_startEndTimeInterval;
     private StringBuilder daytimebuilder;
     private CharSequence[] daytimes;
     private SimpleDateFormat startTime;
+    private Date startTimeDate;
     private Calendar startTimeCalendar;
     private Calendar endTimeCalendar;
+    private Calendar intervalCalendar;
+    private Date intervalDate;
+    private int intervalMinute;
+    private int intervalHour;
     private Button btn_starttime;
     private Button btn_endtime;
     private View dialogViewStartEnd;
@@ -122,12 +143,16 @@ public class FragmentRegistration extends Fragment {
     private NumberPicker np_reminderInterval;
     private TimePickerDialog tpd_interval;
     private StringBuilder intervalbuilder;
+    private int selectedValue = 1;
     private String selectedInterval;
     private CardView cv_foodInstruction;
     private RadioGroup rdg_duration;
     private TextView txt_duration = null;
     private StringBuilder numberOfBlisterString;
     private Calendar dateCalendarDuration;
+    private int selectedYearDuration;
+    private int selectedMonthDuration;
+    private int selectedDayDuration;
     private int numberOfBlisters;
     private StringBuilder dosageString;
 
@@ -135,7 +160,9 @@ public class FragmentRegistration extends Fragment {
     private NumberPicker np_dosage;
 
     private TextView txt_foodInstruction = null;
+    private RadioGroup rdg_foodInstruction;
     private RadioButton[] rd_foodinstruction;
+    private RadioButton rd_foodId;
     private DbAdapter dbAdapter;
 
 
@@ -147,7 +174,7 @@ public class FragmentRegistration extends Fragment {
     private RadioButton rd_reminderdaytime;
 
     private Collection<Day> allDayTimes;
-    private Collection<Day> selectedDayTimes = new ArrayList<>();
+    private Collection<Day> selectedDayTimes = new ArrayList<Day>();
     private Collection<Eat> allFoodInstructions;
     private Collection<ConsumeInterval> consumeIntervals = new ArrayList<>();
     private Collection<ConsumeIndividual> consumeIndividuals = new ArrayList<>();
@@ -157,12 +184,14 @@ public class FragmentRegistration extends Fragment {
     private ImageButton iBtn_helpReminder;
     private ImageButton iBtn_helpDuration;
     private ImageButton iBtn_helpFoodInstruction;
+    private ImageButton iBtn_helpOverview;
     private TextView txt_helpText;
 
     private int mediId;
     private Data pillData;
+    Collection<Object> consumeList = new ArrayList<>();
     private int spinnerIntervalPosition;
-    private int intervalNpValue;
+    private int number = 1;
     private ViewGroup ln_dosage;
     private int dosage;
     private StringBuilder numDaysString;
@@ -171,16 +200,13 @@ public class FragmentRegistration extends Fragment {
     private NumberPicker np_numberOfBlisters;
     private AlertDialog.Builder dialogBuilderBlisters;
     private AlertDialog.Builder saveAlertMessage;
-    private RadioButton rd_numberOfDays;
-    private RadioButton rd_always;
-    private RadioButton rd_packageEnd;
-    private LayoutInflater inflater;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (ViewGroup) inflater.inflate(R.layout.fragment_registration, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
+        fragmentSettings = new FragmentSettings();
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
 
@@ -194,116 +220,27 @@ public class FragmentRegistration extends Fragment {
         return root;
     }
 
-    @Override
-    public void onResume(){
-        if(dbAdapter==null){
-            dbAdapter= new DbAdapter(getActivity().getApplicationContext());
-            dbAdapter.open();
-        }
-        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, getActivity(), mLoaderCallback);
-        super.onResume();
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-    }
-
-    @Override
-    public void onStop(){
-        if(dbAdapter!=null) {
-            dbAdapter.close();
-            dbAdapter = null;
-        }
-        super.onStop();
-    }
-
-    /**
-     * sets all inital values
-     */
     private void init(){
         setupShowImage();
-        setupReminderDaytimes();
-        setupReminderIntervalTimes();
-        setupDuration();
-        setupDosage();
-        showFoodInstruction();
-        setupHelptextVisibilty();
-    }
-
-    private void setupReminderDaytimes(){
-        setOnReminderDayTimeRadioButtonClickEvent();
         daytimebuilder = new StringBuilder();
-        allDayTimes = Day.getAllDayValues(dbAdapter);
-        strDayTimes = new ArrayList<>();
-        for(Day day:allDayTimes){
-            strDayTimes.add(day.getDescription());
-        }
-        daytimes = strDayTimes.toArray(new CharSequence[allDayTimes.size()]);
-        checkedDaytimes = new boolean[allDayTimes.size()];
+        setupDaytimes();
         for (Day day : allDayTimes){
-            setCheckDayItems(day.getId(), false);
+            checkItems = new boolean[allDayTimes.size()];
+            //checkItems [allDayTimes.size()] = new int[];
+            setCheckItems(day.getId(),false);
         }
-    }
-
-    private void setupReminderIntervalTimes(){
-        intervalbuilder = new StringBuilder();
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        dialogReminderView = inflater.inflate(R.layout.dialog_reminderinterval, null);
-        sp_reminderInterval = (Spinner) dialogReminderView.findViewById(R.id.sp_reminderInterval);
-        weekdays = Arrays.asList(getResources().getStringArray(R.array.array_weekday));
-        setOnReminderIntervalRadioButtonClickEvent();
         showReminderDetails();
-        setupReminderIntervalHour();
-        setSelectedIntervalPosition(0);
-        setIntervalNpValue(1);
-        setCheckedWeekItem(Calendar.MONDAY);
-    }
-
-    private void setupReminderIntervalHour(){
-        LayoutInflater inflaterStartEnd = getActivity().getLayoutInflater();
-        dialogViewStartEnd = inflaterStartEnd.inflate(R.layout.dialog_reminderstartendtime, null);
-        btn_starttime = (Button)dialogViewStartEnd.findViewById(R.id.btn_starttime);
-        btn_endtime = (Button)dialogViewStartEnd.findViewById(R.id.btn_endtime);
-        startTimeCalendar = Calendar.getInstance();
-        endTimeCalendar = Calendar.getInstance();
-        setTime(startTimeCalendar, 0, 0);
-        setTime(endTimeCalendar, 23, 59);
-        //setReminderTime(getStartTimeCalendar(), 0, 0);
-        //setReminderTime(getEndTimeCalendar(), 23, 59);
-    }
-
-    private void setupDuration(){
-        dateCalendarDuration = Calendar.getInstance();
-        inflater = getActivity().getLayoutInflater();
-        dialogNumberpickerView = inflater.inflate(R.layout.dialog_numberofblisters, null);
-        np_numberOfBlisters = (NumberPicker)dialogNumberpickerView.findViewById(R.id.np_numberOfBlisters);
+        setOnReminderDayTimeRadioButtonClickEvent();
+        setOnReminderIntervalRadioButtonClickEvent();
         showDuration();
         setOnDurationDateRadioButtonClickEvent();
         setOnDurationNumOfBlistersRadioButtonClick();
-        changeNumberOfBlisterValue();
-        setDurationDate(dateCalendarDuration);
-        setNumberOfBlistersValue(1);
-    }
-
-    private void setupDosage(){
-        ln_dosage = (ViewGroup) root.findViewById(R.id.ln_dosage);
-        txt_dosage = new TextView(getActivity());
-        txt_dosage.setText(getResources().getString(R.string.txt_dosageInitial));
         dosageString = new StringBuilder();
         setupDosageNumberPicker();
+        setupDosage();
         setDosage(1);
-    }
+        showFoodInstruction();
 
-    /**
-     * set the help Button, if set in Settings
-     */
-    private void setupHelptextVisibilty(){
         if (checkHelpTextVisibility()){
             showHelpText();
             iBtn_helpPhoto.setVisibility(View.VISIBLE);
@@ -316,30 +253,59 @@ public class FragmentRegistration extends Fragment {
             iBtn_helpDuration.setVisibility(View.GONE);
             iBtn_helpFoodInstruction.setVisibility(View.GONE);
         }
+        LayoutInflater inflaterStartEnd = getActivity().getLayoutInflater();
+        dialogViewStartEnd = inflaterStartEnd.inflate(R.layout.dialog_reminderstartendtime, null);
+        btn_starttime = (Button)dialogViewStartEnd.findViewById(R.id.btn_starttime);
+        btn_endtime = (Button)dialogViewStartEnd.findViewById(R.id.btn_endtime);
+        intervalCalendar = Calendar.getInstance();
+        startTimeCalendar = Calendar.getInstance();
+        endTimeCalendar = Calendar.getInstance();
+        setTime(startTimeCalendar, 0, 0);
+        setTime(endTimeCalendar, 23, 59);
+        setReminderTime(getStartTimeCalendar(), 0, 0);
+        setReminderTime(getEndTimeCalendar(), 23, 59);
+        setNpReminderValue(1);
+        setSpinnerReminderValue(0);
+
+        dateCalendarDuration = Calendar.getInstance();
+        setDurationDate(dateCalendarDuration.get(Calendar.YEAR), dateCalendarDuration.get(Calendar.MONTH), dateCalendarDuration.get(Calendar.DAY_OF_MONTH));
+        dialogBuilderBlisters = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        dialogNumberpickerView = inflater.inflate(R.layout.dialog_numberofblisters, null);
+        np_numberOfBlisters = (NumberPicker)dialogNumberpickerView.findViewById(R.id.np_numberOfBlisters);
+        setNumberOfBlistersValue(1);
+        changeNumberOfBlisterTextField();
+        intervalbuilder = new StringBuilder();
+
+        NotificationHandler notificationHandler = new NotificationHandler(getActivity());
+        Collection<Data> data = Data.getAllDataFromTable(dbAdapter);
+        Data[] dataArray = new Data[data.size()];
+        notificationHandler.createNotification(data.toArray(dataArray));
+/*
+        Intent alarmIntent = new Intent(getActivity(), AlarmReceiver.class);
+        alarmIntent.setAction("RepeatedAlert");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, 0);
+
+        AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 18);
+        calendar.set(Calendar.MINUTE, 6);
+
+
+        manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        Toast.makeText(getActivity(), "Alarm Set", Toast.LENGTH_SHORT).show();*/
     }
 
-    /**
-     * checks whether the delete button needs to be displayed
-     */
-    public void setDeleteButtonVisibility(){
-        Button btn_delete = (Button)root.findViewById(R.id.btn_delete);
-        if (((MainActivity)getActivity()).getCurrentMenuItem() == R.id.nav_registration){
-            btn_delete.setVisibility(View.GONE);
-        } else if (((MainActivity)getActivity()).getCurrentMenuItem() == R.id.nav_edit){
-            btn_delete.setVisibility(View.VISIBLE);
+
+    @Override
+    public void onResume(){
+        if(dbAdapter==null){
+            dbAdapter= new DbAdapter(getActivity().getApplicationContext());
+            dbAdapter.open();
         }
-    }
-
-    /**
-     * shows textView with selected information
-     * @param textView selected textView
-     * @param viewGroup current view
-     */
-    private void showInfoTextField(TextView textView, ViewGroup viewGroup) {
-        viewGroup.removeView(textView);
-        textView.setPadding(10, 10, 10, 10);
-        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        viewGroup.addView(textView);
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, getActivity(), mLoaderCallback);
+        super.onResume();
     }
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(getActivity()) {
@@ -360,6 +326,25 @@ public class FragmentRegistration extends Fragment {
             }
         }
     };
+
+    @Override
+    public void onPause(){
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+    }
+
+    @Override
+    public void onStop(){
+        if(dbAdapter!=null) {
+            dbAdapter.close();
+            dbAdapter = null;
+        }
+        super.onStop();
+    }
 
     private void setOnReminderDayTimeRadioButtonClickEvent(){
         RadioButton rdnReminderDayTime = (RadioButton)root.findViewById((R.id.rd_daytime));
@@ -401,12 +386,24 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
+    /**
+     * checks whether the delete button needs to be displayed
+     */
+    public void setDeleteButtonVisibility(){
+        Button btn_delete = (Button)root.findViewById(R.id.btn_delete);
+        if (((MainActivity)getActivity()).getCurrentMenuItem() == R.id.nav_registration){
+            btn_delete.setVisibility(View.GONE);
+        } else if (((MainActivity)getActivity()).getCurrentMenuItem() == R.id.nav_edit){
+            btn_delete.setVisibility(View.VISIBLE);
+        }
+    }
+
     private String getName(){
         edit_name = (EditText) root.findViewById(R.id.edit_name);
         return String.valueOf(edit_name.getText());
     }
 
-    private void setName(String name){
+    public void setName(String name){
         EditText edit_name = (EditText) root.findViewById(R.id.edit_name);
         edit_name.setText(name);
     }
@@ -438,7 +435,8 @@ public class FragmentRegistration extends Fragment {
 
     }
 
-    private static Bitmap getImageFromResult(Context context, int resultCode, Intent imageReturnedIntent) {
+    public static Bitmap getImageFromResult(Context context, int resultCode,
+                                            Intent imageReturnedIntent) {
         Log.d("ImageResult", "getImageFromResult, resultCode: " + resultCode);
         Bitmap bm = null;
         File imageFile = getTempFile(context);
@@ -467,7 +465,7 @@ public class FragmentRegistration extends Fragment {
         return imageFile;
     }
 
-    private static int getRotation(Context context, Uri imageUri, boolean isCamera) {
+    public static int getRotation(Context context, Uri imageUri, boolean isCamera) {
         int rotation;
         if (isCamera) {
             rotation = getRotationFromCamera(context, imageUri);
@@ -488,7 +486,7 @@ public class FragmentRegistration extends Fragment {
         return bm;
     }
 
-    private Intent getPickImageIntent(Context context) {
+    public Intent getPickImageIntent(Context context) {
         Intent chooserIntent = null;
         List<Intent> intentList = new ArrayList<>();
         Intent pickIntent = new Intent(Intent.ACTION_PICK,
@@ -593,7 +591,7 @@ public class FragmentRegistration extends Fragment {
      * get the selected picture in right orientation
      * @return selected picture
      */
-    private Bitmap getPicture(){
+    public Bitmap getPicture(){
         if (thumbnail != null){
             if (thumbnail.getWidth() > thumbnail.getHeight()){
                 Matrix matrix = new Matrix();
@@ -617,6 +615,19 @@ public class FragmentRegistration extends Fragment {
         iv_selectedImage.setImageBitmap(bitmap);
     }
 
+
+    /**
+     * shows textView with selected information
+     * @param textView selected textView
+     * @param viewGroup current view
+     */
+    private void showInfoTextField(TextView textView, ViewGroup viewGroup) {
+        viewGroup.removeView(textView);
+        textView.setPadding(10, 10, 10, 10);
+        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        viewGroup.addView(textView);
+    }
+
     private void showReminderDetails(){
         RadioGroup rdg_reminder = (RadioGroup) root.findViewById(R.id.rdg_reminder);
         rd_reminderInterval = (RadioButton)root.findViewById(R.id.rd_interval);
@@ -638,14 +649,19 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
-    /**
-     * setup the dialog to show the daytimes (morning, noon, afternoon, night)
-     */
+    private void setupDaytimes(){
+        allDayTimes = Day.getAllDayValues(dbAdapter);
+        strDayTimes = new ArrayList<String>();
+        for(Day day:allDayTimes){
+            strDayTimes.add(day.getDescription());
+        }
+        daytimes = strDayTimes.toArray(new CharSequence[allDayTimes.size()]);
+    }
     public void showReminderDaytimeDialog(){
         reminderDaytimeDialog = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         reminderDaytimeDialog.setCancelable(false);
         reminderDaytimeDialog.setTitle(getResources().getString(R.string.title_reminderDaytime));
-        reminderDaytimeDialog.setMultiChoiceItems(daytimes, getCheckedDaytimes(), dayTimeListener);
+        reminderDaytimeDialog.setMultiChoiceItems(daytimes, checkItems, dayTimeListener);
         reminderDaytimeDialog.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -657,25 +673,10 @@ public class FragmentRegistration extends Fragment {
         dialog.show();
     }
 
-    DialogInterface.OnMultiChoiceClickListener dayTimeListener = new DialogInterface.OnMultiChoiceClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-            if (isChecked) {
-                selList.add(which);
-                checkedDaytimes[which] = true;
-            } else if (selList.contains(which)) {
-                selList.remove(which);
-                checkedDaytimes[which] = false;
-            }
-        }
-    };
-
-    /**
-     * sets the daytimes to the textview field
-     */
     private void setDaytimeText(){
         daytimebuilder.setLength(0);
         daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
+
         for (int id : selList) {
             selectedDayTimes.add(Iterables.get(allDayTimes, id));
             daytimebuilder.append(daytimes[id]).append(" ");
@@ -685,157 +686,70 @@ public class FragmentRegistration extends Fragment {
         }
     }
 
+    DialogInterface.OnMultiChoiceClickListener dayTimeListener = new DialogInterface.OnMultiChoiceClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+            if (isChecked) {
+                selList.add(which);
+                checkItems[which] = true;
+            } else if (selList.contains(which)) {
+                selList.remove(which);
+                checkItems[which] = false;
+            }
+        }
+    };
+
     private Collection<Day> getDaytimes(){
         return selectedDayTimes;
     }
 
-    /**
-     *
-     * @return all selected daytimes from dialog
-     */
     private int countDayTime(){
         return selectedDayTimes.size();
     }
 
-    /**
-     * sets all daytimes to true if they need to be checked
-     * @param dayId id of the daytime
-     * @param isChecked true if checked
-     */
-    private void setCheckDayItems(int dayId, boolean isChecked){
-        checkedDaytimes[dayId] = isChecked;
+    private void setCheckItems(int dayId, boolean isChecked ){
+        checkItems[dayId] = isChecked;
         if (isChecked){
             selList.add(dayId);
         }
     }
 
-    private boolean[] getCheckedDaytimes(){
-        return checkedDaytimes;
+    private void setReminderDayTime(Day day){
+       checkItems[day.getId()] = true;
+       reminderDaytimeDialog.setMultiChoiceItems(daytimes, checkItems, dayTimeListener);
     }
 
-    /**
-     * sets all daytimes values to database
-     * @return a Collection that contains all ConsumeIndividual data
-     */
-    private Collection<ConsumeIndividual> getReminderDayTime(){
-        for (Day day : getDaytimes()){
-            ConsumeIndividual consumeIndividual = new ConsumeIndividual();
-            consumeIndividual.setEatpart(getFoodInstruction());
-            consumeIndividual.setDaypart(Iterables.get(allDayTimes, day.getId()));
-            consumeIndividuals.add(consumeIndividual);
-        }
-        return consumeIndividuals;
-    }
-
-    /**
-     * shows reminderinterval dialog
-     */
     public void showReminderIntervalDialog(){
-        final AlertDialog.Builder dialogBuilderReminder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        dialogReminderView = inflater.inflate(R.layout.dialog_reminderinterval, null);
-        sp_reminderInterval = (Spinner) dialogReminderView.findViewById(R.id.sp_reminderInterval);
-        dialogBuilderReminder.setView(dialogReminderView);
-        dialogBuilderReminder.setTitle(getResources().getString(R.string.title_intervalDialog));
+        dialogView = inflater.inflate(R.layout.dialog_reminderinterval, null);
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.setTitle(getResources().getString(R.string.title_intervalDialog));
         setupReminderIntervalNumberPicker();
-        setReminderIntervalTimes(getIntervalNpValue(), getSelectedIntervalPosition());
+        setReminderIntervalTimes(getNpReminderValue());
         intervalbuilder.setLength(0);
-        dialogBuilderReminder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+        dialogBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (getSelectedIntervalPosition() == 0) {
+                if (sp_reminderInterval.getSelectedItemPosition() == 0) {
                     showStartEndTimeDialog();
-                } else if (getSelectedIntervalPosition() == 1) {
+                } else if (sp_reminderInterval.getSelectedItemPosition() == 1) {
                     showIntervalTimePickerDialog();
-                } else if (getSelectedIntervalPosition() == 2) {
+                } else if (sp_reminderInterval.getSelectedItemPosition() == 2) {
                     showWeekdayDialog();
                 }
                 setReminderIntervalText();
-                setSelectedIntervalPosition(getSelectedIntervalPosition());
             }
         });
-        dialogBuilderReminder.setCancelable(false);
-        AlertDialog b = dialogBuilderReminder.create();
+        sp_reminderInterval.setSelection(getSpinnerReminderValue());
+        dialogBuilder.setCancelable(false);
+        AlertDialog b = dialogBuilder.create();
         b.show();
     }
 
-    private void setupReminderIntervalNumberPicker(){
-        np_reminderInterval = (NumberPicker) dialogReminderView.findViewById(R.id.np_reminderInterval);
-        np_reminderInterval.setMinValue(1);
-    }
-
-    /**
-     *
-     * @param selectedNumber the previous selected interval (1 if none)
-     * @param selectedIntervalPosition the previous selected spinnter item (0 if none)
-     */
-    private void setReminderIntervalTimes(final int selectedNumber, final int selectedIntervalPosition){
-        setIntervalNpValue(selectedNumber);
-        setSelectedIntervalPosition(selectedIntervalPosition);
-        np_reminderInterval.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                setIntervalNpValue(newVal);
-            }
-        });
-        sp_reminderInterval.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                setSelectedIntervalString(parent.getItemAtPosition(position).toString());
-                if (getSelectedIntervalString().equals(getResources().getString(R.string.hour))) {
-                    np_reminderInterval.setMaxValue(23);
-                    setSelectedIntervalPosition(0);
-                    np_reminderInterval.setValue(getIntervalNpValue());
-                } else if (getSelectedIntervalString().equals(getResources().getString(R.string.day))) {
-                    np_reminderInterval.setMaxValue(31);
-                    setSelectedIntervalPosition(1);
-                    np_reminderInterval.setValue(getIntervalNpValue());
-                } else if (getSelectedIntervalString().equals(getResources().getString(R.string.week))) {
-                    np_reminderInterval.setMaxValue(60);
-                    setSelectedIntervalPosition(2);
-                    np_reminderInterval.setValue(getIntervalNpValue());
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                setSelectedIntervalPosition(getSelectedIntervalPosition());
-            }
-
-        });
-    }
-
-    /**
-     *
-     * @param selectedIntervalPosition position in the spinner
-     */
-    private void setSelectedIntervalPosition(int selectedIntervalPosition){
-        this.selectedIntervalPosition = selectedIntervalPosition;
-        sp_reminderInterval.setSelection(selectedIntervalPosition);
-    }
-
-    private int getSelectedIntervalPosition(){
-        return  selectedIntervalPosition;
-    }
-
-    /**
-     *
-     * @param intervalNpValue value of the interval numberpicker
-     */
-    private void setIntervalNpValue(int intervalNpValue){
-        this.intervalNpValue = intervalNpValue;
-    }
-
-    private int getIntervalNpValue(){
-        return intervalNpValue;
-    }
-
-    /**
-     * sets the text to the texview field, according to selected spinner item and numberpicker value
-     */
     private void setReminderIntervalText(){
         intervalbuilder.append(getResources().getString(R.string.taking)).append(" ");
-        if (getIntervalNpValue() == 1) {
+        if (getNpReminderValue() == 1) {
             if (getSelectedIntervalString().equals(getResources().getString(R.string.hour))) {
                 intervalbuilder.append(getResources().getString(R.string.everyHour));
             } else if (getSelectedIntervalString().equals(getResources().getString(R.string.day))) {
@@ -845,7 +759,7 @@ public class FragmentRegistration extends Fragment {
             }
         } else {
             intervalbuilder.append(getResources().getString(R.string.every)).append(" ");
-            intervalbuilder.append(getIntervalNpValue()).append(" ");
+            intervalbuilder.append(selectedValue).append(" ");
             if (getSelectedIntervalString().equals(getResources().getString(R.string.hour))) {
                 intervalbuilder.append(getResources().getString(R.string.hourMult));
             } else if (getSelectedIntervalString().equals(getResources().getString(R.string.day))) {
@@ -858,6 +772,62 @@ public class FragmentRegistration extends Fragment {
         txt_reminder.setText(intervalbuilder);
     }
 
+    private void setSpinnerReminderValue(int selectedIntervalPosition){
+        this.selectedIntervalPosition = selectedIntervalPosition;
+    }
+
+    private int getSpinnerReminderValue(){
+        return selectedIntervalPosition;
+    }
+
+    private void setNpReminderValue (int number){
+        this.number = number;
+    }
+
+    private int getNpReminderValue(){
+        return number;
+    }
+
+    private void setupReminderIntervalNumberPicker(){
+        np_reminderInterval = (NumberPicker)dialogView.findViewById(R.id.np_reminderInterval);
+        np_reminderInterval.setMinValue(1);
+    }
+
+    private void setReminderIntervalTimes(final int selectedNumber){
+        number = selectedNumber;
+        sp_reminderInterval = (Spinner) dialogView.findViewById(R.id.sp_reminderInterval);
+        np_reminderInterval.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                number = newVal;
+            }
+        });
+        sp_reminderInterval.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedIntervalPosition = (int) parent.getItemIdAtPosition(position);
+                setSelectedIntervalString(parent.getItemAtPosition(position).toString());
+                //selectedInterval = parent.getItemAtPosition(position).toString();
+                if (getSelectedIntervalString().equals(getResources().getString(R.string.hour))) {
+                    np_reminderInterval.setMaxValue(23);
+                    np_reminderInterval.setValue(selectedNumber);
+                } else if (getSelectedIntervalString().equals(getResources().getString(R.string.day))) {
+                    np_reminderInterval.setMaxValue(31);
+                    np_reminderInterval.setValue(selectedNumber);
+                } else if (getSelectedIntervalString().equals(getResources().getString(R.string.week))) {
+                    np_reminderInterval.setMaxValue(60);
+                    np_reminderInterval.setValue(selectedNumber);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                setSelectedIntervalString(getResources().getString(R.string.hour));
+                //selectedInterval = getResources().getString(R.string.hour);
+            }
+        });
+    }
+
     private String getSelectedIntervalString(){
         return selectedInterval;
     }
@@ -866,17 +836,132 @@ public class FragmentRegistration extends Fragment {
         this.selectedInterval = selectedInterval;
     }
 
-    /**
-     * shows the dialog, if spinner item hour is checked to set starttime and endtime
-     */
+    private void showIntervalTimePickerDialog() {
+        tpd_interval = new TimePickerDialog(getActivity(),R.style.DialogTheme, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                intervalCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                intervalCalendar.set(Calendar.MINUTE, minute);
+                intervalHour = hourOfDay;
+                intervalMinute = minute;
+                intervalTime = new SimpleDateFormat("HH:mm");
+                intervalDate = intervalCalendar.getTime();
+                intervalTimeString = intervalTime.format(intervalCalendar.getTime());
+                intervalbuilder.append(" ").append(getResources().getString(R.string.at)).append(" ").append(intervalTimeString);
+                txt_reminder.setText(intervalbuilder);
+            }
+        },intervalHour , intervalMinute, true);
+        tpd_interval.setButton(DialogInterface.BUTTON_NEGATIVE, null, tpd_interval);
+        tpd_interval.setTitle(getResources().getString(R.string.title_chooseTime));
+        tpd_interval.show();
+    }
+
+    private void showWeekdayDialog(){
+        weekdayString = getResources().getString(R.string.monday);
+        weekdays = Arrays.asList(getResources().getStringArray(R.array.array_weekday));
+        dialogWeekday = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
+
+        dialogWeekday.setTitle(getResources().getString(R.string.title_dialogWeekday));
+        dialogWeekday.setSingleChoiceItems(R.array.array_weekday, 0, dialogWeekListener);
+        dialogWeekday.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                intervalbuilder.append(" ").append(getResources().getString(R.string.on)).append(" ").append(weekdayString);
+                showIntervalTimePickerDialog();
+            }
+        });
+        dialogWeekday.setCancelable(false);
+        Dialog d = dialogWeekday.create();
+        d.show();
+    }
+
+    DialogInterface.OnClickListener dialogWeekListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == weekdays.indexOf(getString(R.string.monday))) {
+                weekday = Calendar.MONDAY;
+                weekdayString = getResources().getString(R.string.monday);
+            } else if (which == weekdays.indexOf(getString(R.string.tuesday))) {
+                weekday = Calendar.TUESDAY;
+                weekdayString = getResources().getString(R.string.tuesday);
+            } else if (which == weekdays.indexOf(getString(R.string.wednesday))) {
+                weekday = Calendar.WEDNESDAY;
+                weekdayString = getResources().getString(R.string.wednesday);
+            } else if (which == weekdays.indexOf(getString(R.string.thursday))) {
+                weekday = Calendar.THURSDAY;
+                weekdayString = getResources().getString(R.string.thursday);
+            } else if (which == weekdays.indexOf(getString(R.string.friday))) {
+                weekday = Calendar.FRIDAY;
+                weekdayString = getResources().getString(R.string.friday);
+            } else if (which == weekdays.indexOf(getString(R.string.saturday))) {
+                weekday = Calendar.SATURDAY;
+                weekdayString = getResources().getString(R.string.saturday);
+            } else if (which == weekdays.indexOf(getString(R.string.sunday))) {
+                weekday = Calendar.SUNDAY;
+                weekdayString = getResources().getString(R.string.sunday);
+            }
+        }
+
+    };
+
+    private int getWeekday(){
+        return weekday;
+    }
+
+    public void setReminderRadioButton(int checkedRadioButton){
+        RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
+        rdg_reminder.check(checkedRadioButton);
+    }
+
+    public void setReminderInterval(int position){
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_reminderinterval, null);
+        Spinner sp_reminderInterval = (Spinner)dialogView.findViewById(R.id.sp_reminderInterval);
+        sp_reminderInterval.setSelection(position);
+    }
+
+    private void setReminderValue(int value){
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_reminderinterval, null);
+        NumberPicker np_reminderInterval = (NumberPicker)dialogView.findViewById(R.id.np_reminderInterval);
+        np_reminderInterval.setValue(value);
+    }
+
+    public void setReminderTime(Calendar calendar,int hour, int minute) {
+        if (getSpinnerReminderValue()==0){
+            calendar.set(Calendar.HOUR_OF_DAY,hour);
+            calendar.set(Calendar.MINUTE,minute);
+        } else if (getSpinnerReminderValue() ==1 || getSpinnerReminderValue() ==2){
+            intervalCalendar.set(Calendar.HOUR_OF_DAY,hour);
+            intervalCalendar.set(Calendar.MINUTE,minute);
+        }
+    }
+
+    private void setTime(Calendar calendar, int hour, int minute){
+        calendar.set(Calendar.HOUR_OF_DAY,hour);
+        calendar.set(Calendar.MINUTE, minute);
+    }
+
+    private int getTime(Calendar calendar, int time){
+        return calendar.get(time);
+    }
+
+    private Calendar getStartTimeCalendar(){
+        return startTimeCalendar;
+    }
+
+    private  Calendar getEndTimeCalendar(){
+        return endTimeCalendar;
+    }
+
+    public void setWeekday(int checkedItems){
+        dialogWeekday.setSingleChoiceItems(R.array.array_weekday, checkedItems, dialogWeekListener);
+    }
+
     private void showStartEndTimeDialog(){
         startTimeString = "00:00";
         endTimeString = "23:59";
         final AlertDialog.Builder dialogStartEndTime = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
-        LayoutInflater inflaterStartEnd = getActivity().getLayoutInflater();
-        dialogViewStartEnd = inflaterStartEnd.inflate(R.layout.dialog_reminderstartendtime, null);
-        btn_starttime = (Button)dialogViewStartEnd.findViewById(R.id.btn_starttime);
-        btn_endtime = (Button)dialogViewStartEnd.findViewById(R.id.btn_endtime);
         dialogStartEndTime.setView(dialogViewStartEnd);
         dialogStartEndTime.setTitle("Start/ Endzeit festlegen");
         btn_starttime.setOnClickListener(new OnClickListener() {
@@ -902,6 +987,7 @@ public class FragmentRegistration extends Fragment {
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         endTimeCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         endTimeCalendar.set(Calendar.MINUTE, minute);
+
                         setEndTimeButtonText();
                     }
                 }, getTime(endTimeCalendar, Calendar.HOUR_OF_DAY), getTime(endTimeCalendar, Calendar.MINUTE), true);
@@ -914,7 +1000,7 @@ public class FragmentRegistration extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 if (startTimeString.equals(endTimeString)) {
                     showAlertTimeDialog(getResources().getString(R.string.sameTimeMessage));
-                } else if (getStartTimeCalendar().getTimeInMillis() > getEndTimeCalendar().getTimeInMillis()) {
+                } else if (getStartTimeCalendar().getTimeInMillis() > getEndTimeCalendar().getTimeInMillis()){
                     showAlertTimeDialog(getResources().getString(R.string.littleTime));
                 } else {
                     setIntervalHourText();
@@ -927,35 +1013,12 @@ public class FragmentRegistration extends Fragment {
         d.show();
     }
 
-    private void setTime(Calendar calendar, int hour, int minute){
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-    }
-
-    private int getTime(Calendar calendar, int time){
-        return calendar.get(time);
-    }
-
-    private Calendar getStartTimeCalendar(){
-        return startTimeCalendar;
-    }
-
-    private  Calendar getEndTimeCalendar(){
-        return endTimeCalendar;
-    }
-
-    /**
-     * adds selected time to textview field
-     */
     private void setIntervalHourText(){
         intervalbuilder.append(" ").append(getResources().getString(R.string.from)).append(" ").append(startTimeString).append(" ")
                 .append(getResources().getString(R.string.till)).append(" ").append(endTimeString);
         txt_reminder.setText(intervalbuilder);
     }
 
-    /**
-     * sets the selected time to the starttimebutton in dialog
-     */
     private void setStartTimeButtonText(){
         final StringBuilder startString = new StringBuilder();
         startTime = new SimpleDateFormat("HH:mm");
@@ -964,9 +1027,6 @@ public class FragmentRegistration extends Fragment {
         btn_starttime.setText(startString);
     }
 
-    /**
-     * sets the selected time to the endtimebutton in dialog
-     */
     private void setEndTimeButtonText(){
         final StringBuilder endString = new StringBuilder();
         SimpleDateFormat endTime = new SimpleDateFormat("HH:mm");
@@ -975,10 +1035,6 @@ public class FragmentRegistration extends Fragment {
         btn_endtime.setText(endString);
     }
 
-    /**
-     * show dialog if selected end- or starttime is not correct
-     * @param message a alertmessage
-     */
     private void showAlertTimeDialog(String message){
         AlertDialog.Builder warnbuilder = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         warnbuilder.setTitle(getResources().getString(R.string.warning));
@@ -999,161 +1055,40 @@ public class FragmentRegistration extends Fragment {
         tp_startEndTimeInterval.show();
     }
 
-    /**
-     * shows dialog if interval day or week is selected
-     */
-    private void showIntervalTimePickerDialog() {
-        tpd_interval = new TimePickerDialog(getActivity(),R.style.DialogTheme, new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                startTimeCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                startTimeCalendar.set(Calendar.MINUTE, minute);
-                setIntervalTimeText();
-            }
-        },getTime(startTimeCalendar,Calendar.HOUR_OF_DAY) , getTime(startTimeCalendar, Calendar.MINUTE), true);
-        tpd_interval.setButton(DialogInterface.BUTTON_NEGATIVE, null, tpd_interval);
-        tpd_interval.setTitle(getResources().getString(R.string.title_chooseTime));
-        tpd_interval.show();
+    private int getIntervalValue(){
+        return np_reminderInterval.getValue();
     }
 
-    /**
-     * sets selected time to textview field
-     */
-    private void setIntervalTimeText(){
-        intervalTime = new SimpleDateFormat("HH:mm");
-        intervalTimeString = intervalTime.format(startTimeCalendar.getTime());
-        intervalbuilder.append(" ").append(getResources().getString(R.string.at)).append(" ").append(intervalTimeString);
-        txt_reminder.setText(intervalbuilder);
+    private int getInterval(){
+        return sp_reminderInterval.getSelectedItemPosition();
     }
 
-    /**
-     * shows dialog if interval spinner item week is selected
-     */
-    private void showWeekdayDialog(){
-        dialogWeekday = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
-        dialogWeekday.setTitle(getResources().getString(R.string.title_dialogWeekday));
-        dialogWeekday.setSingleChoiceItems(R.array.array_weekday, getCheckedWeekItem(), dialogWeekListener);
-        dialogWeekday.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                setReminderWeekdayText();
-                showIntervalTimePickerDialog();
-            }
-        });
-        dialogWeekday.setCancelable(false);
-        Dialog d = dialogWeekday.create();
-        d.show();
+    private long getPeriodOfTime(){
+        return startTimeCalendar.getTimeInMillis() - endTimeCalendar.getTimeInMillis();
     }
 
-    DialogInterface.OnClickListener dialogWeekListener = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            if (which == 0) {
-                setWeekday(Calendar.MONDAY);
-                setWeekdayString(getResources().getString(R.string.monday));
-            } else if (which == 1) {
-                setWeekday(Calendar.TUESDAY);
-                setWeekdayString(getResources().getString(R.string.tuesday));
-            } else if (which == 2) {
-                setWeekday(Calendar.WEDNESDAY);
-                setWeekdayString(getResources().getString(R.string.wednesday));
-            } else if (which == 3) {
-                setWeekday(Calendar.THURSDAY);
-                setWeekdayString(getResources().getString(R.string.thursday));
-            } else if (which == 4) {
-                setWeekday(Calendar.FRIDAY);
-                setWeekdayString(getResources().getString(R.string.friday));
-            } else if (which == 5) {
-                setWeekday(Calendar.SATURDAY);
-                setWeekdayString(getResources().getString(R.string.saturday));
-            } else if (which == 6) {
-                setWeekday(Calendar.SUNDAY);
-                setWeekdayString(getResources().getString(R.string.sunday));
-            }
-            setCheckedWeekItem(getWeekday());
-        }
-    };
-
-    private void setCheckedWeekItem(int checkedWeek){
-        this.checkedWeek = checkedWeek;
-    }
-
-    /**
-     * get the converted checked week item
-     * @return the checked week
-     */
-    private int getCheckedWeekItem(){
-        if (checkedWeek == Calendar.MONDAY) {this.checkedWeek = 0;}
-        else if (checkedWeek == Calendar.TUESDAY) {this.checkedWeek = 1;}
-        else if (checkedWeek == Calendar.WEDNESDAY) {this.checkedWeek = 2;}
-        else if (checkedWeek == Calendar.THURSDAY) {this.checkedWeek = 3;}
-        else if (checkedWeek == Calendar.FRIDAY) {this.checkedWeek = 4;}
-        else if (checkedWeek == Calendar.SATURDAY) {this.checkedWeek = 5;}
-        else if (checkedWeek == Calendar.SUNDAY) {this.checkedWeek = 6;}
-        return checkedWeek;
-    }
-
-    private void setWeekday(int weekday){
-        this.weekday = weekday;
-    }
-
-    private int getWeekday(){
-        return weekday;
-    }
-
-    /**
-     * sets the selected week to the textview field
-     */
-    private void setReminderWeekdayText(){
-        intervalbuilder.append(" ").append(getResources().getString(R.string.on)).append(" ").append(getWeekdayString());
-    }
-
-    private void setWeekdayString(String weekdayString){
-        this.weekdayString = weekdayString;
-    }
-
-    private String getWeekdayString(){
-        return weekdayString;
-    }
-
-    private void setWeekdayStringById(int weekday){
-        if (weekday == Calendar.MONDAY) {
-            setWeekdayString(getResources().getString(R.string.monday));
-        } else if (weekday == Calendar.TUESDAY) {
-            setWeekdayString(getResources().getString(R.string.tuesday));
-        } else if (weekday == Calendar.WEDNESDAY) {
-            setWeekdayString(getResources().getString(R.string.wednesday));
-        } else if (weekday == Calendar.THURSDAY) {
-            setWeekdayString(getResources().getString(R.string.thursday));
-        } else if (weekday == Calendar.FRIDAY) {
-            setWeekdayString(getResources().getString(R.string.friday));
-        } else if (weekday == Calendar.SATURDAY) {
-            setWeekdayString(getResources().getString(R.string.saturday));
-        } else if (weekday == Calendar.SUNDAY) {
-            setWeekdayString(getResources().getString(R.string.sunday));
-        }
-    }
-
-    /**
-     * saves all selected interval data to database
-     * @return consumeinterval data
-     */
     private Collection<ConsumeInterval> getReminderInterval(){
         ConsumeInterval consumeInterval = new ConsumeInterval();
         consumeInterval.setStartTime(getStartTimeCalendar());
-        if (getSelectedIntervalPosition()==0){
-            consumeInterval.setEndTime(getEndTimeCalendar());
-        } else {
-            consumeInterval.setEndTime(getStartTimeCalendar());
-        }
-        consumeInterval.setInterval(getIntervalNpValue());
+        consumeInterval.setEndTime(getEndTimeCalendar());
+        consumeInterval.setInterval(getIntervalValue());
         consumeInterval.setWeekday(getWeekday());
         consumeIntervals.add(consumeInterval);
         return consumeIntervals;
     }
 
+    private Collection<ConsumeIndividual> getReminderDayTime(){
+        for (Day day : getDaytimes()){
+            ConsumeIndividual consumeIndividual = new ConsumeIndividual();
+            consumeIndividual.setEatpart(getFoodInstruction());
+            consumeIndividual.setDaypart(Iterables.get(allDayTimes, day.getId()));
+            consumeIndividuals.add(consumeIndividual);
+        }
+        return consumeIndividuals;
+    }
+
     private void showDuration() {
-        rdg_duration = (RadioGroup) root.findViewById(R.id.rdg_duration);
+        rdg_duration = (RadioGroup)root.findViewById(R.id.rdg_duration);
         final LinearLayout ln_duration = (LinearLayout) root.findViewById(R.id.ln_duration);
         txt_duration = new TextView(getActivity());
         showInfoTextField(txt_duration, ln_duration);
@@ -1170,9 +1105,84 @@ public class FragmentRegistration extends Fragment {
         });
     }
 
-    /**
-     * shows the dialog to select a specific date
-     */
+    private void setDurationAlwaysText(){
+        durationString.append(getResources().getString(R.string.txt_durationAlways));
+        txt_duration.setText(durationString);
+    }
+
+    private long getSelectedDate(){
+        Log.i("Selected Date", String.valueOf(dateCalendarDuration.getTimeInMillis()));
+        return dateCalendarDuration.getTimeInMillis();
+
+    }
+
+    private long getCurrentSystemTime(){
+        Calendar currentDateCal = Calendar.getInstance();
+        long currentDate = currentDateCal.getTimeInMillis();
+        Log.i("Current Date", String.valueOf(currentDate));
+        return currentDate;
+    }
+
+    private int numberOfDays(){
+        int days = ((int)getSelectedDate()/(24*60*60*1000))-((int)getCurrentSystemTime()/(24*60*60*1000));
+        Log.i("Number Of Days", String.valueOf(days));
+        return days;
+    }
+
+    private int getDuration(int pillsPerBlister){
+        int numberOfIntakes = -1;
+        RadioButton rd_numberOfDays = (RadioButton)root.findViewById(R.id.rd_numberOfDays);
+        RadioButton rd_always = (RadioButton)root.findViewById(R.id.rd_always);
+        RadioButton rd_packageEnd = (RadioButton)root.findViewById(R.id.rd_durationPackageEnd);
+        if (rd_numberOfDays.isChecked()){
+            if (rd_reminderInterval.isChecked()){
+                if (getInterval() ==0){
+                    numberOfIntakes = (int) ((getPeriodOfTime()/getIntervalValue()) * numberOfDays());
+                } else if (getInterval() == 1){
+                    numberOfIntakes = numberOfDays() * getIntervalValue();
+                } else if (getInterval() == 2){
+                    numberOfIntakes = (numberOfDays()/7) * getIntervalValue();
+                }
+            } else if (rd_reminderdaytime.isChecked()){
+                numberOfIntakes = numberOfDays() / (getDosage()*countDayTime());
+            }
+        } else if (rd_always.isChecked()){
+            numberOfIntakes = -1;
+        } else if (rd_packageEnd.isChecked()){
+            int totalPills = getNumberOfBlistersValue() *pillsPerBlister;
+            if (rd_reminderInterval.isChecked()){
+                numberOfIntakes = totalPills / getDosage();
+            } else if (rd_reminderdaytime.isChecked()){
+                numberOfIntakes = totalPills / getDosage()*countDayTime();
+            }
+        }
+        Log.i("Number Of Intakes", String.valueOf(numberOfIntakes));
+        return numberOfIntakes;
+    }
+
+    public void setDurationRd(int duration, Data data){
+        if (duration == 0){
+            rdg_duration.check(R.id.rd_numberOfDays);
+        } else if (duration == 1){
+            rdg_duration.check(R.id.rd_always);
+        } else if (duration == 2){
+            rdg_duration.check(R.id.rd_durationPackageEnd);
+        }
+
+        data.getDuration();
+        data.getAllPillCoords().size();
+    }
+
+    public void setDuration(int checkedItem,int value,int year,int month, int day){
+        if (checkedItem==0){
+            dateCalendarDuration.set(Calendar.YEAR, year);
+            dateCalendarDuration.set(Calendar.MONTH,month);
+            dateCalendarDuration.set(Calendar.DAY_OF_MONTH, day);
+        } else if (checkedItem==2){
+            setNumberOfBlistersValue(value);
+        }
+    }
+
     public void showDateDialog(){
         int style;
         if (isBrokenSamsungDevice()){
@@ -1193,9 +1203,6 @@ public class FragmentRegistration extends Fragment {
         dpd.show();
     }
 
-    /**
-     * sets the selected date to the textview field
-     */
     private void setDateText(){
         numDaysString = new StringBuilder();
         endDate = new SimpleDateFormat("dd.MM.yyyy");
@@ -1211,18 +1218,9 @@ public class FragmentRegistration extends Fragment {
         dateCalendarDuration.set(Calendar.DAY_OF_MONTH, day);
     }
 
-    private void setDurationDate(Calendar calendar){
-        dateCalendarDuration.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-        dateCalendarDuration.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
-        dateCalendarDuration.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH));
-    }
-
     private int getDurationDate(int time){
         return dateCalendarDuration.get(time);
-    }
 
-    private Calendar getDurationDate(){
-        return dateCalendarDuration;
     }
 
     /**
@@ -1240,34 +1238,7 @@ public class FragmentRegistration extends Fragment {
         return Build.VERSION.SDK_INT >= min && Build.VERSION.SDK_INT <= max;
     }
 
-    private void setDurationAlwaysText(){
-        durationString.append(getResources().getString(R.string.txt_durationAlways));
-        txt_duration.setText(durationString);
-    }
-
-    public void showNumberOfBlistersNumberPickerDialog(){
-        dialogBuilderBlisters = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        dialogNumberpickerView = inflater.inflate(R.layout.dialog_numberofblisters, null);
-        np_numberOfBlisters = (NumberPicker)dialogNumberpickerView.findViewById(R.id.np_numberOfBlisters);
-        dialogBuilderBlisters.setView(dialogNumberpickerView);
-        dialogBuilderBlisters.setTitle(getResources().getString(R.string.d_packagEnd));
-        dialogBuilderBlisters.setCancelable(false);
-        np_numberOfBlisters.setMaxValue(20);
-        np_numberOfBlisters.setMinValue(1);
-        setNumberOfBlistersValue(numberOfBlisters);
-        dialogBuilderBlisters.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                setNumberOfBlisterText(getNumberOfBlistersValue());
-                setNumberOfBlistersValue(getNumberOfBlistersValue());
-            }
-        });
-        final Dialog dialog = dialogBuilderBlisters.create();
-        dialog.show();
-    }
-
-    public void changeNumberOfBlisterValue() {
+    public void changeNumberOfBlisterTextField() {
         np_numberOfBlisters.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
@@ -1277,6 +1248,7 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void setNumberOfBlistersValue(int numberOfBlisters){
+        //np_numberofBlisters = (NumberPicker)root.findViewById(R.id.np_numberofBlisters);
         this.numberOfBlisters = numberOfBlisters;
         np_numberOfBlisters.setValue(this.numberOfBlisters);
     }
@@ -1286,94 +1258,61 @@ public class FragmentRegistration extends Fragment {
     }
 
     /**
-     * sets the selected number of blisters to the textview
-     * @param numberOfBlisters the number of blisters
+     * toDo IllegalStateException second Call
      */
-    private void setNumberOfBlisterText(int numberOfBlisters){
+    public void showNumberOfBlistersNumberPickerDialog(){
+        /*AlertDialog.Builder npb_numberofBlisters = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
+        npb_numberofBlisters.setCancelable(false);
+        np_numberofBlisters.setMaxValue(20);
+        np_numberofBlisters.setMinValue(1);
+        setNumberOfBlistersValue(numberOfBlisters);
+        FrameLayout parent = new FrameLayout(getActivity());
+        if (np_numberofBlisters != null){
+            ((ViewGroup)np_numberofBlisters.getParent()).removeView(np_numberofBlisters);
+        }
+        else {
+            parent.addView(np_numberofBlisters, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        }
+        npb_numberofBlisters.setView(parent);
+        npb_numberofBlisters.setTitle(getResources().getString(R.string.d_packagEnd));
+        npb_numberofBlisters.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                setNumberOfBlisterText();
+            }
+        });
+        npb_numberofBlisters.setCancelable(false);
+        Dialog dialog = npb_numberofBlisters.create();
+        dialog.show();*/
+        np_numberOfBlisters.removeView(dialogNumberpickerView);
+        root.removeView(dialogNumberpickerView);
+        dialogBuilderBlisters.setView(dialogNumberpickerView);
+        dialogBuilderBlisters.setTitle(getResources().getString(R.string.d_packagEnd));
+        dialogBuilderBlisters.setCancelable(false);
+        np_numberOfBlisters.setMaxValue(20);
+        np_numberOfBlisters.setMinValue(1);
+        setNumberOfBlistersValue(numberOfBlisters);
+        dialogBuilderBlisters.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                setNumberOfBlisterText();
+            }
+        });
+
+        dialogBuilderBlisters.show();
+    }
+
+    private void setNumberOfBlisterText(){
         numberOfBlisterString = new StringBuilder();
         numberOfBlisterString.append(getResources().getString(R.string.taking)).append(" ");
-        numberOfBlisterString.append(numberOfBlisters).append(" ");
-        numberOfBlisterString.append(getResources().getString(R.string.blister));
+        numberOfBlisterString.append(getNumberOfBlistersValue());
         txt_duration.setText(numberOfBlisterString);
     }
 
-    /**
-     * calculates the number of intakes, according to the differnt choices
-     * @param pillsPerBlister number of pills per blister
-     * @return number of intakes
-     */
-    private int calculateNumberOfIntakes(int pillsPerBlister){
-        int numberOfIntakes = -1;
-        rd_numberOfDays = (RadioButton)root.findViewById(R.id.rd_numberOfDays);
-        rd_always = (RadioButton)root.findViewById(R.id.rd_always);
-        rd_packageEnd = (RadioButton)root.findViewById(R.id.rd_durationPackageEnd);
-        if (rd_numberOfDays.isChecked()){
-            if (rd_reminderInterval.isChecked()){
-                if (getSelectedIntervalPosition() ==0){
-                    numberOfIntakes = (int) ((getTimeInUnit(2,getStartTimeCalendar(),getEndTimeCalendar())/ getIntervalNpValue()) * getTimeInUnit(3,getStartTimeCalendar(),getEndTimeCalendar()));
-                } else if (getSelectedIntervalPosition() == 1){
-                    numberOfIntakes = (int) (getTimeInUnit(3,getStartTimeCalendar(),getEndTimeCalendar()) * getIntervalNpValue());
-                } else if (getSelectedIntervalPosition() == 2){
-                    numberOfIntakes = (int) ((getTimeInUnit(3,getStartTimeCalendar(),getEndTimeCalendar())/7) * getIntervalNpValue());
-                }
-            } else if (rd_reminderdaytime.isChecked()){
-                numberOfIntakes = (int) (getTimeInUnit(3,getStartTimeCalendar(),getEndTimeCalendar()) * countDayTime());
-            }
-        } else if (rd_always.isChecked()){
-            numberOfIntakes = -1;
-        } else if (rd_packageEnd.isChecked()){
-            int totalPills = getNumberOfBlistersValue() *pillsPerBlister;
-            if (rd_reminderInterval.isChecked()){
-                numberOfIntakes = totalPills / getDosage();
-            } else if (rd_reminderdaytime.isChecked()){
-                numberOfIntakes = totalPills / getDosage()*countDayTime();
-            }
-        }
-        Log.i("Number Of Intakes", String.valueOf(numberOfIntakes));
-        return numberOfIntakes;
-    }
-
-    /**
-     * returns time in given unit
-     * @param unit 0:second , 1:minute, 2:hours, 3:minute
-     * @return time
-     */
-    private long getTimeInUnit(int unit, Calendar startTimeCalendar, Calendar endTimeCalendar){
-        long difference = endTimeCalendar.getTimeInMillis()-startTimeCalendar.getTimeInMillis();
-        long x = difference / 1000;
-        long time = 0;
-        if (unit == 0){
-            time = x % 60;
-        } else if (unit == 1){
-            x /= 60;
-            time = x % 60;
-        } else if (unit ==2){
-            x = x/60/60;
-            time = x % 24;
-        } else if (unit == 3){
-            x = x/60/60/24;
-            time = x;
-        }
-        return time;
-    }
-
-    /**
-     * calculates how many blisters a package contains
-     * @param numberOfIntakes number of intakes
-     * @param dosage number of pills per intake
-     * @param pills number of pills per blister
-     * @return the number of blisters
-     */
-    private int calcNumberOfBlisters(int numberOfIntakes, int dosage, int pills ){
-        int numOfBlister = (numberOfIntakes*dosage)/pills;
-        return numOfBlister;
-    }
-
-   private void setupDosageNumberPicker(){
-        np_dosage = (NumberPicker)root.findViewById(R.id.np_dosage);
-        np_dosage.setMinValue(1);
-        np_dosage.setMaxValue(20);
-        np_dosage.setValue(1);
+    private void setupDosage(){
+        ln_dosage = (ViewGroup) root.findViewById(R.id.ln_dosage);
+        txt_dosage = new TextView(getActivity());
+        txt_dosage.setText(getResources().getString(R.string.txt_dosageInitial));
     }
 
     private void setDosage(int value){
@@ -1389,13 +1328,6 @@ public class FragmentRegistration extends Fragment {
         showInfoTextField(txt_dosage, ln_dosage);
     }
 
-    private int getDosage(){
-        return np_dosage.getValue();
-    }
-
-    /**
-     * set the selected dosage to textview field
-     */
     private void setDosageText(){
         dosageString.setLength(0);
         dosageString.append(getResources().getString(R.string.txt_dosage)).append(" ");
@@ -1406,6 +1338,17 @@ public class FragmentRegistration extends Fragment {
             dosageString.append(getResources().getString(R.string.txt_dosageMoreTab));
         }
         txt_dosage.setText(dosageString);
+    }
+
+    private int getDosage(){
+        return np_dosage.getValue();
+    }
+
+    private void setupDosageNumberPicker(){
+        np_dosage = (NumberPicker)root.findViewById(R.id.np_dosage);
+        np_dosage.setMinValue(1);
+        np_dosage.setMaxValue(20);
+        np_dosage.setValue(1);
     }
 
     private void showFoodInstruction() {
@@ -1436,12 +1379,15 @@ public class FragmentRegistration extends Fragment {
                 if (checkedId == rd_foodinstruction[0].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatBefore));
                     selectedFoodInstruction = 0;
+
                 } else if (checkedId == rd_foodinstruction[1].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatAfter));
                     selectedFoodInstruction = 1;
+
                 } else if (checkedId == rd_foodinstruction[2].getId()) {
                     eatString.append(getResources().getString(R.string.txt_eatDuring));
                     selectedFoodInstruction = 2;
+
                 }
                 txt_foodInstruction.setText(eatString);
             }
@@ -1466,9 +1412,6 @@ public class FragmentRegistration extends Fragment {
         edit_notes.setText(notes);
     }
 
-    /**
-     * shows specific helptext to different topics
-     */
     private void showHelpText(){
         iBtn_helpPhoto.setOnClickListener(new OnClickListener() {
             @Override
@@ -1505,6 +1448,7 @@ public class FragmentRegistration extends Fragment {
         iBtn_helpReminder = (ImageButton) root.findViewById(R.id.iBtn_helpReminder);
         iBtn_helpDuration = (ImageButton)root.findViewById(R.id.iBtn_helpDuration);
         iBtn_helpFoodInstruction = (ImageButton) root.findViewById(R.id.iBtn_helpfoodInstruction);
+        iBtn_helpOverview = (ImageButton)root.findViewById(R.id.iBtn_helpOverview);
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         boolean showHelp = pref.getBoolean("pref_key_showHelp",false);
@@ -1547,9 +1491,6 @@ public class FragmentRegistration extends Fragment {
         saveAlertMessage.show();
     }
 
-    /**
-     * checks if there are no mistakes in registration to save item
-     */
     private void saveItem(){
         Button btn_save = (Button)root.findViewById(R.id.btn_save);
         final RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
@@ -1567,7 +1508,7 @@ public class FragmentRegistration extends Fragment {
             public void onClick(View v) {
                 if (edit_name.getText().toString().trim().length() == 0) {
                     showAlertDialog(getResources().getString(R.string.dialog_nameMessage), cv_name);
-                } else if (!isImageSet()) {
+                } else if (getPicture() == null) {
                     showAlertDialog(getResources().getString(R.string.dialog_photoMessage), cv_photo);
                 } else if (rdg_reminder.getCheckedRadioButtonId() == -1) {
                     showAlertDialog(getResources().getString(R.string.dialog_reminderMessage), cv_reminder);
@@ -1575,35 +1516,21 @@ public class FragmentRegistration extends Fragment {
                     showAlertDialog(getResources().getString(R.string.dialog_durationMessage), cv_duration);
                 } else if (rd_reminderdaytime.isChecked() && selectedDayTimes.size() == 0) {
                     showAlertDialog(getResources().getString(R.string.dialog_reminderDaytimeMessage), cv_reminder);
-                } else if (rd_reminderdaytime.isChecked() && txt_foodInstruction == null) {
+                } else if (rd_reminderdaytime.isChecked() && txt_foodInstruction == null ) {
                     showAlertDialog(getResources().getString(R.string.dialog_foodInstructionMessage), cv_foodInstruction);
                 } else {
-                    if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_registration) {
-                        saveDataToDB();
-                        saveAlertMessage.setMessage(getResources().getString(R.string.dialog_Medisave));
-                        saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                showOverviewFragment();
-                                //FragmentOverviewPagerAdapter fragmentOverviewPagerAdapter = new FragmentOverviewPagerAdapter(fragmentManager,getActivity());
-                                //fragmentOverview.getViewPager().setCurrentItem(fragmentOverviewPagerAdapter.getCount());
-                            }
-                        });
-                        saveAlertMessage.setCancelable(false);
-                        saveAlertMessage.show();
-                    } else {
-                        //updateMedi();
-                        saveAlertMessage.setMessage(getResources().getString(R.string.dialog_MediUpdate));
-                        saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                showEditFragment();
-                            }
-                        });
-                        saveAlertMessage.setCancelable(false);
-                        saveAlertMessage.show();
-                    }
-
+                    saveDataToDB();
+                    saveAlertMessage.setMessage(getResources().getString(R.string.dialog_Medisave));
+                    saveAlertMessage.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            showOverviewFragment();
+                            //FragmentOverviewPagerAdapter fragmentOverviewPagerAdapter = new FragmentOverviewPagerAdapter(fragmentManager,getActivity());
+                            //fragmentOverview.getViewPager().setCurrentItem(fragmentOverviewPagerAdapter.getCount());
+                        }
+                    });
+                    saveAlertMessage.setCancelable(false);
+                    saveAlertMessage.show();
                 }
             }
         });
@@ -1614,24 +1541,39 @@ public class FragmentRegistration extends Fragment {
         ((MainActivity) getActivity()).getFab().show();
         ((MainActivity) getActivity()).getNavigationView().setCheckedItem(R.id.nav_list);
         ((MainActivity) getActivity()).getNavigationView().getMenu().getItem(0).setChecked(true);
-        getActivity().setTitle(getResources().getString(R.string.nav_list));
+        getActivity().setTitle("Übersicht");
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.main, fragmentOverview, "Fragment_Overview").commit();
     }
 
-    private void showEditFragment(){
-        FragmentEdit fragmentEdit = new FragmentEdit();
-        ((MainActivity) getActivity()).getFab().show();
-        ((MainActivity) getActivity()).getNavigationView().setCheckedItem(R.id.nav_edit);
-        ((MainActivity) getActivity()).getNavigationView().getMenu().getItem(2).setChecked(true);
-        getActivity().setTitle(getResources().getString(R.string.nav_edit));
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.main, fragmentEdit, "Fragment_Edit").commit();
+    /**
+     * toDo deleteItem
+     */
+    public void deleteItem(){
+        Button btn_delete = (Button)root.findViewById(R.id.btn_delete);
+        btn_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity(), R.style.DialogTheme);
+                alertBuilder.setTitle(getResources().getString(R.string.title_dialogDelete));
+                alertBuilder.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getActivity(), "Medikament wurde gelöscht", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                alertBuilder.setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alertBuilder.setCancelable(false);
+                alertBuilder.show();
+            }
+        });
     }
 
-    /**
-     * save the entered registration data to db
-     */
     private void saveDataToDB(){
         RadioButton rd_reminderDayTime = (RadioButton)root.findViewById(R.id.rd_daytime);
         Data data = new Data();
@@ -1644,12 +1586,7 @@ public class FragmentRegistration extends Fragment {
             data.setAllConsumeIndividual(getReminderDayTime());
         }
         try {
-            data.setDuration(calculateNumberOfIntakes(pillDetection.getAllPillPoints(mediId).size()));
-            if (rd_numberOfDays.isChecked()){
-                data.setEndDate(getDurationDate());
-            } else if (rd_always.isChecked() || rd_packageEnd.isChecked()){
-                data.setEndDate(null);
-            }
+            data.setDuration(getDuration(pillDetection.getAllPillPoints(mediId).size()));
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
@@ -1673,124 +1610,89 @@ public class FragmentRegistration extends Fragment {
             mediId = bundle.getInt("mediId");
             loadData(String.valueOf(mediId));
         }
+
     }
 
-    /**
-     * load the selected medi from edit fragment in registration fragment
-     * @param id the mediId
-     */
     public void loadData(String id){
         pillData = Data.getDataById(id,dbAdapter);
         setName(pillData.getDescription());
         setPicture(pillData.getPicture());
+        /**
+         * toDo Id??
+         */
+        //int interval = 0;
         if (pillData.getAllConsumeIndividual().size() != 0){
             setReminderRadioButton(R.id.rd_daytime);
             Collection<ConsumeIndividual> consumeIndividuals;
             consumeIndividuals = ConsumeIndividual.getAllConsumeIndividualByMedid(mediId, dbAdapter);
             for (ConsumeIndividual consume: consumeIndividuals){
-                setCheckDayItems(consume.getDaypart().getId(), true);
+                setCheckItems(consume.getDaypart().getId(),true);
                 setDaytimeText();
+                //setReminderDayTime(consume.getDaypart());
                 setFoodInstruction(consume.getEatpart().getId());
             }
+
         } else {
             setReminderRadioButton(R.id.rd_interval);
             Collection<ConsumeInterval> consumeInterval;
             consumeInterval = ConsumeInterval.getAllConsumeIntervalByMedid(mediId, dbAdapter);
             for (ConsumeInterval consume: consumeInterval){
-                setIntervalNpValue(consume.getInterval());
-                setTime(getStartTimeCalendar(), getTime(consume.getStartTime(), Calendar.HOUR_OF_DAY), getTime(consume.getStartTime(), Calendar.MINUTE));
-                if (getTime(consume.getStartTime(),Calendar.HOUR_OF_DAY)!=getTime(consume.getEndTime(),Calendar.HOUR_OF_DAY)){
+                if (!consume.getStartTime().equals(consume.getEndTime())){
                     spinnerIntervalPosition = 0;
                     setSelectedIntervalString(getResources().getString(R.string.hour));
-                    setTime(getEndTimeCalendar(), getTime(consume.getEndTime(), Calendar.HOUR_OF_DAY), getTime(consume.getEndTime(), Calendar.MINUTE));
+                    setTime(getStartTimeCalendar(), consume.getStartTime().HOUR_OF_DAY, consume.getStartTime().MINUTE);
+                    setTime(getEndTimeCalendar(), consume.getEndTime().HOUR_OF_DAY, consume.getEndTime().MINUTE);
                     setStartTimeButtonText();
                     setEndTimeButtonText();
-                    setReminderIntervalText();
                     setIntervalHourText();
-                } else if (consume.getWeekday() != 0){
+                    //consume.getStartTime().HOUR_OF_DAY;
+                    //setReminderStartTime(consume.getStartTime());
+                } if (consume.getWeekday() != 0){
                     spinnerIntervalPosition = 2;
                     setSelectedIntervalString(getResources().getString(R.string.week));
-                    setCheckedWeekItem(consume.getWeekday());
+                    setWeekday(consume.getWeekday());
+                    setTime(intervalCalendar, consume.getStartTime().HOUR_OF_DAY, consume.getStartTime().MINUTE);
                     setReminderIntervalText();
-                    setWeekdayStringById(consume.getWeekday());
-                    setReminderWeekdayText();
-                    setIntervalTimeText();
                 } else {
                     spinnerIntervalPosition = 1;
                     setSelectedIntervalString(getResources().getString(R.string.day));
+                    setTime(intervalCalendar, consume.getStartTime().HOUR_OF_DAY, consume.getStartTime().MINUTE);
                     setReminderIntervalText();
-                    setIntervalTimeText();
                 }
-                setSelectedIntervalPosition(spinnerIntervalPosition);
+
+                /**
+                 * toDo consume.getInterval always returns 1
+                 */
+                setNpReminderValue(consume.getInterval());
+                setSpinnerReminderValue(spinnerIntervalPosition);
+                /*setSpinnerReminderValue(0);
+                setTime(getStartTimeCalendar(), 15, 23);
+                setTime(getEndTimeCalendar(), 20, 50);*/
             }
         }
 
-        if (pillData.getEndDate()!=null){
-            setDurationRadioButton(0);
-            setDurationDate(pillData.getEndDate());
+
+
+        //ConsumeInterval.getAllConsumeIntervalByMedid(id,dbAdapter);
+        //Log.i("consumeIndividual", String.valueOf(pillData.getAllConsumeIndividual()));
+        //pillData.getAllConsumeIndividual();
+        //;
+
+        if (0==0/*test*/){
+            setDurationRd(0,pillData);
+            setDurationDate(2016, 8, 17);
             setDateText();
         } else if (pillData.getDuration() == -1){
-            setDurationRadioButton(1);
-        } else {
-            setDurationRadioButton(2);
-            setNumberOfBlistersValue(calcNumberOfBlisters(pillData.getDuration(), pillData.getAmount(), pillData.getAllPillCoords().size() ));
-            setNumberOfBlisterText(calcNumberOfBlisters(pillData.getDuration(), pillData.getAmount(), pillData.getAllPillCoords().size() ));
+            setDurationRd(1,pillData);
+        } else if (0==0){
+            setDurationRd(2,pillData);
+            setNumberOfBlistersValue(1);
+            setNumberOfBlisterText();
         }
         setDosage(pillData.getAmount());
         setDosageText();
         setNotes(pillData.getNote());
     }
-
-    private void setReminderRadioButton(int checkedRadioButton){
-        RadioGroup rdg_reminder = (RadioGroup)root.findViewById(R.id.rdg_reminder);
-        rdg_reminder.check(checkedRadioButton);
-    }
-
-    private void setDurationRadioButton(int duration){
-        if (duration == 0){
-            rdg_duration.check(R.id.rd_numberOfDays);
-        } else if (duration == 1){
-            rdg_duration.check(R.id.rd_always);
-        } else if (duration == 2){
-            rdg_duration.check(R.id.rd_durationPackageEnd);
-        }
-    }
-
-    /**
-     * delete a item
-     */
-    public void deleteItem(){
-        Button btn_delete = (Button)root.findViewById(R.id.btn_delete);
-        btn_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity(), R.style.DialogTheme);
-                alertBuilder.setTitle(getResources().getString(R.string.title_dialogDelete));
-                alertBuilder.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getActivity(), getResources().getString(R.string.pillDeleted), Toast.LENGTH_SHORT).show();
-                        try {
-                            DeleteMediService.deleteDbObject(pillData, dbAdapter);
-                        } catch (Throwable throwable) {
-                            throwable.printStackTrace();
-                        }
-                        showOverviewFragment();
-                    }
-                });
-                alertBuilder.setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                alertBuilder.setCancelable(false);
-                alertBuilder.show();
-            }
-        });
-    }
-
-
 
 
 }
