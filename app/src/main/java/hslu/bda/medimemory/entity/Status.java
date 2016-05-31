@@ -19,7 +19,10 @@ public class Status implements DbObject{
     private String description;
     private boolean changed;
 
-    public static String VERGESSEN = "1";
+    public static String STATUS_EINGENOMMEN = "0";
+    public static String STATUS_VERLOREN = "1";
+    public static String STATUS_VERGESSEN = "2";
+    public static String STATUS_AUSSTEHEND = "3";
     /**
      * Empty Constructor
      */
@@ -48,8 +51,10 @@ public class Status implements DbObject{
      * @param id of the status
      */
     public void setId(int id) {
-        this.id = id;
-        this.setChanged(true);
+        if(this.id!=id) {
+            this.id = id;
+            this.setChanged(true);
+        }
     }
 
     /**
