@@ -1650,12 +1650,12 @@ public class FragmentRegistration extends Fragment {
         pillSaveData.setDescription(getName());
         if (rd_reminderInterval.isChecked()){
             if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_edit) {
-                editIntervalTimes();
+                delIndividualTimes();
             }
             pillSaveData.setAllConsumeInterval(getReminderInterval());
         } else if (rd_reminderDayTime.isChecked()) {
             if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_edit) {
-                editIndividualTimes();
+                delIntervalTimes();
             }
             pillSaveData.setAllConsumeIndividual(getReminderDayTime());
         }
@@ -1688,14 +1688,14 @@ public class FragmentRegistration extends Fragment {
                 pillSaveData.setPicture(getPictureFromView());
 
                 UpdateMediService.updateDataObject(pillSaveData, dbAdapter);
-                CreateMediService.addNewMedi(pillSaveData,dbAdapter);
+                CreateMediService.addNewMedi(pillSaveData, dbAdapter);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }
         }
     }
 
-    private void editIntervalTimes(){
+    private void delIndividualTimes(){
         if(pillSaveData.getAllConsumeIndividual().size() != 0){
             try {
                 DeleteMediService.deleteAllEntryByTableAndMedId(DbHelper.TABLE_MEDI_CONSINDIV,mediId,dbAdapter);
@@ -1705,7 +1705,7 @@ public class FragmentRegistration extends Fragment {
         }
     }
 
-    private void editIndividualTimes(){
+    private void delIntervalTimes(){
         if(pillSaveData.getAllConsumeInterval().size() != 0){
             try {
                 DeleteMediService.deleteAllEntryByTableAndMedId(DbHelper.TABLE_MEDI_CONSINTER,mediId,dbAdapter);
