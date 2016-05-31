@@ -73,6 +73,7 @@ import org.opencv.android.OpenCVLoader;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
+import hslu.bda.medimemory.database.DbHelper;
 import hslu.bda.medimemory.detection.PillDetection;
 import hslu.bda.medimemory.entity.ConsumeIndividual;
 import hslu.bda.medimemory.entity.ConsumeInterval;
@@ -282,6 +283,9 @@ public class FragmentRegistration extends Fragment {
     }
 
     private void setupDuration(){
+        rd_numberOfDays = (RadioButton)root.findViewById(R.id.rd_numberOfDays);
+        rd_always = (RadioButton)root.findViewById(R.id.rd_always);
+        rd_packageEnd = (RadioButton)root.findViewById(R.id.rd_durationPackageEnd);
         dateCalendarDuration = Calendar.getInstance();
         inflater = getActivity().getLayoutInflater();
         dialogNumberpickerView = inflater.inflate(R.layout.dialog_numberofblisters, null);
@@ -1311,9 +1315,6 @@ public class FragmentRegistration extends Fragment {
      */
     private int calculateNumberOfIntakes(int pillsPerBlister){
         int numberOfIntakes = -1;
-        rd_numberOfDays = (RadioButton)root.findViewById(R.id.rd_numberOfDays);
-        rd_always = (RadioButton)root.findViewById(R.id.rd_always);
-        rd_packageEnd = (RadioButton)root.findViewById(R.id.rd_durationPackageEnd);
         if (rd_numberOfDays.isChecked()){
             if (rd_reminderInterval.isChecked()){
                 if (getSelectedIntervalPosition() ==0){
@@ -1640,39 +1641,44 @@ public class FragmentRegistration extends Fragment {
      */
     private void saveDataToDB(){
         RadioButton rd_reminderDayTime = (RadioButton)root.findViewById(R.id.rd_daytime);
-        pillSaveData = new Data();
+        if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_registration) {
+            pillSaveData = new Data();
+        }else {
+            pillSaveData = Data.getDataById(String.valueOf(mediId),dbAdapter);
+            pillSaveData.setId(mediId);
+        }
         PillDetection pillDetection = new PillDetection(getPictureFromView(),getPictureFromView().getWidth(),getPictureFromView().getHeight());
         pillSaveData.setDescription(getName());
         if (rd_reminderInterval.isChecked()){
+            if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_edit) {
+                editIntervalTimes();
+            }
             pillSaveData.setAllConsumeInterval(getReminderInterval());
         } else if (rd_reminderDayTime.isChecked()) {
+            if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_edit) {
+                editIndividualTimes();
+            }
             pillSaveData.setAllConsumeIndividual(getReminderDayTime());
+        }
+        if (rd_numberOfDays.isChecked()){
+            pillSaveData.setEndDate(getDurationDate());
+        } else if (rd_always.isChecked() || rd_packageEnd.isChecked()){
+            pillSaveData.setEndDate(null);
         }
         try {
             pillSaveData.setDuration(calculateNumberOfIntakes(pillDetection.getAllPillPoints(mediId).size()));
-            if (rd_numberOfDays.isChecked()){
-                pillSaveData.setEndDate(getDurationDate());
-            } else if (rd_always.isChecked() || rd_packageEnd.isChecked()){
-                pillSaveData.setEndDate(null);
-            }
+            pillSaveData.setAllPillCoords(pillDetection.getAllPillPoints(pillSaveData.getId()));
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
         pillSaveData.setAmount(getDosage());
         pillSaveData.setNote(getNotes());
         pillSaveData.setActive(1);
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(new Date());
-        pillSaveData.setCreateDate(cal);
-        try {
-            pillSaveData.setAllPillCoords(pillDetection.getAllPillPoints(pillSaveData.getId()));
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
         if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_registration){
-
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(new Date());
+            pillSaveData.setCreateDate(cal);
             pillSaveData.setPicture(getPicture());
-
             try {
                 pillSaveData.setId(CreateMediService.addNewMedi(pillSaveData, dbAdapter));
             } catch (Throwable throwable) {
@@ -1686,10 +1692,26 @@ public class FragmentRegistration extends Fragment {
                 throwable.printStackTrace();
             }
         }
+    }
 
+    private void editIntervalTimes(){
+        if(pillSaveData.getAllConsumeIndividual().size() != 0){
+            try {
+                DeleteMediService.deleteAllEntryByTableAndMedId(DbHelper.TABLE_MEDI_CONSINDIV,mediId,dbAdapter);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        }
+    }
 
-
-
+    private void editIndividualTimes(){
+        if(pillSaveData.getAllConsumeInterval().size() != 0){
+            try {
+                DeleteMediService.deleteAllEntryByTableAndMedId(DbHelper.TABLE_MEDI_CONSINTER,mediId,dbAdapter);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        }
     }
 
     private Data getPillSaveData(){

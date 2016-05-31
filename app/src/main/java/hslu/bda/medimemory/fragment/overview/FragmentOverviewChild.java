@@ -42,6 +42,7 @@ import java.util.Iterator;
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.detection.PillDetection;
+import hslu.bda.medimemory.entity.Consumed;
 import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.entity.PillCoords;
 import hslu.bda.medimemory.entity.Status;
@@ -50,38 +51,35 @@ import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
 import hslu.bda.medimemory.services.PillDetectionService;
 import hslu.bda.medimemory.services.UpdateMediService;
 
+import static hslu.bda.medimemory.entity.Consumed.getAllConsumedByMedid;
+
 /**
  * Created by Loana on 08.04.2016.
  */
 public class FragmentOverviewChild extends Fragment  {
     private View root;
-    private String childname;
     private Bitmap pillPhoto;
     private int id;
     private ImageView iv_status;
-    private ImageView iv_touchPoint;
     private RelativeLayout rl_pillImage;
     private RelativeLayout.LayoutParams params;
     private ImageButton iBtn_helpOverview;
-    private int xTouchPosition;
-    private int yTouchPosition;
-    private int xPillPosition;
-    private int yPillPosition;
     private Point touchPoint;
     private int statusWidth;
     private int statusHeight;
-    private int pictureHeight;
     private ArrayList<Point>points;
     private ArrayList<PillCoords>allpillCoords;
+    private Collection<Consumed> allConsumed;
     private DbAdapter dbAdapter;
     private String status;
     private Collection<PillCoords> allPillCoordsById;
-    private int tabHeight = 112;
+    ArrayList <Status> statusList;
     private ImageView statusImage;
     private int displayWidth;
     private int displayHeight;
     private int height;
     private int width;
+    private PillCoords selectedPoint;
 
 
     @Override
@@ -89,9 +87,7 @@ public class FragmentOverviewChild extends Fragment  {
         root = inflater.inflate(R.layout.fragment_overview_child, container, false);
         dbAdapter= new DbAdapter(getActivity().getApplicationContext());
         dbAdapter.open();
-        tabHeight = ((MainActivity) getActivity()).getTabHeigth();
         Bundle bundle = getArguments();
-        childname = bundle.getString("pagename");
         pillPhoto = bundle.getParcelable("pillPicture");
         id = bundle.getInt("id");
         Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -108,7 +104,8 @@ public class FragmentOverviewChild extends Fragment  {
         points = new ArrayList<>();
         allpillCoords = new ArrayList<>();
         allPillCoordsById = new ArrayList<>();
-
+        statusList = new ArrayList<>();
+        allConsumed = new ArrayList<>();
         getIDs(root);
         return root;
     }
@@ -149,7 +146,7 @@ public class FragmentOverviewChild extends Fragment  {
             throwable.printStackTrace();
         }
         allPillCoordsById = PillCoords.getAllPillCoordsByMedid(id,dbAdapter);
-
+        allConsumed =  getAllConsumedByMedid(id, dbAdapter);
         int pointId = 0;
         for (PillCoords pillCoords : allPillCoordsById){
             points.add(pillCoords.getCoords());
@@ -161,14 +158,27 @@ public class FragmentOverviewChild extends Fragment  {
             pointId++;
         }
         showNextPill();
+        showAllStatus();
         setTouchListener();
-
-
     }
 
     private void showTouchPoints() {
         statusImage.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.transparent));
         rl_pillImage.addView(statusImage, params);
+    }
+
+    private void showAllStatus(){
+        for (Consumed consumed:allConsumed){
+            consumed.getStatus();
+            iv_status = (ImageView) root.findViewById(consumed.getPillCoord().getId());
+            if (consumed.getStatus().getId() == Integer.valueOf(Status.STATUS_EINGENOMMEN)){
+                iv_status.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.check_mark));
+            } else if (consumed.getStatus().getId() == Integer.valueOf(Status.STATUS_VERGESSEN)){
+                iv_status.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.question_mark));
+            }else if(consumed.getStatus().getId() == Integer.valueOf(Status.STATUS_VERLOREN)){
+                iv_status.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.x_mark));
+            }
+        }
     }
 
     /**
@@ -217,6 +227,7 @@ public class FragmentOverviewChild extends Fragment  {
                             setupStatus((int) points.get(pointId).x, (int) points.get(pointId).y, allpillCoords.get(pointId).getId());
                             //setupStatus((int) points.get(pointId).x, (int) points.get(pointId).y, pointId);
                             statusImage = (ImageView) root.findViewById(allpillCoords.get(pointId).getId());
+                            selectedPoint = allpillCoords.get(pointId);
                             setupStatusDialog();
                         }
                         pointId++;
@@ -245,19 +256,28 @@ public class FragmentOverviewChild extends Fragment  {
                 int selectedItem = (int) lw.getAdapter().getItemId(lw.getCheckedItemPosition());
                 statusImage.setImageDrawable(null);
                 rl_pillImage.removeView(statusImage);
-                //setStatus(ContextCompat.getDrawable(getActivity(),null));
                 if (selectedItem == 0) {
                     setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.check_mark));
-                    status = getResources().getString(R.string.txt_taken);
-                    //PillDetectionService.setConsumed(Status.getStatusById(Status.),);
+                    try {
+                        PillDetectionService.setConsumed(Status.getStatusById(Status.STATUS_EINGENOMMEN, dbAdapter), selectedPoint, dbAdapter);
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
                 } else if (selectedItem == 1) {
                     setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.question_mark));
-                    status = getResources().getString(R.string.txt_forgot);
-                    //PillDetectionService.setConsumed(Status.getStatusById(Status.),);
+                    try {
+                        PillDetectionService.setConsumed(Status.getStatusById(Status.STATUS_VERGESSEN,dbAdapter),selectedPoint,dbAdapter);
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
                 } else if (selectedItem == 2) {
                     setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.x_mark));
-                    status = getResources().getString(R.string.txt_lost);
-                    //PillDetectionService.setConsumed(Status.getStatusById(Status.),);
+                    try {
+                        PillDetectionService.setConsumed(Status.getStatusById(Status.STATUS_VERLOREN, dbAdapter), selectedPoint, dbAdapter);
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+
                 }
             }
         });
@@ -325,7 +345,4 @@ public class FragmentOverviewChild extends Fragment  {
         popup.showAsDropDown(anchorView);
     }
 
-    private String getStatus() {
-        return status;
-    }
 }
