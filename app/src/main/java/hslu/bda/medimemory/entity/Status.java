@@ -31,7 +31,7 @@ public class Status implements DbObject{
     public Status(String description){
         this.setId(-1);
         this.setDescription(description);
-        this.setChanged(false);
+        this.setChanged(true);
     }
 
     /**

@@ -35,7 +35,7 @@ public class ConsumeIndividual implements DbObject {
         //this.setConsumeTime(consumeTime);
         this.setDaypart(daypart);
         this.setEatpart(eatpart);
-        this.setChanged(false);
+        this.setChanged(true);
     }
 
     public int getId() {

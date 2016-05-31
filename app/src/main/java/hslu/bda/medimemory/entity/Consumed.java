@@ -36,7 +36,7 @@ public class Consumed implements DbObject {
         this.setPointInTime(pointInTime);
         this.setStatus(status);
         this.setPillCoord(pillCoords);
-        this.setChanged(false);
+        this.setChanged(true);
     }
 
     public int getId() {

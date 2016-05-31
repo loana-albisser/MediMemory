@@ -35,7 +35,7 @@ public class PillCoords implements DbObject {
         this.setCoords(coords);
         this.setWidth(width);
         this.setHeight(height);
-        this.setChanged(false);
+        this.setChanged(true);
     }
 
     public int getId() {

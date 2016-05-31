@@ -26,13 +26,12 @@ public class Eat implements DbObject {
 
     /**
      * Constructor to return Object with supplied fields
-     * @param id id of eatpart
      * @param description of the eatpart
      */
-    public Eat(int id,String description){
-        this.setId(id);
+    public Eat(String description){
+        this.setId(-1);
         this.setDescription(description);
-        this.setChanged(false);
+        this.setChanged(true);
     }
 
     /**

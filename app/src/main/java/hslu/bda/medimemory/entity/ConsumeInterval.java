@@ -36,7 +36,7 @@ public class ConsumeInterval implements DbObject {
         this.setEndTime(endTime);
         this.setInterval(interval);
         this.setWeekday(weekday);
-        this.setChanged(false);
+        this.setChanged(true);
     }
 
     public int getId() {
