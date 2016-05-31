@@ -104,6 +104,7 @@ public class Consumed implements DbObject {
     }
 
     public void setPillCoord(PillCoords pillCoord) {
+        if(pillCoord==null || !this.pillCoord.getContentValues().equals(pillCoord.getContentValues()))
         this.pillCoord = pillCoord;
         this.changed=true;
     }

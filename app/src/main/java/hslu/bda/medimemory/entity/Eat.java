@@ -47,8 +47,10 @@ public class Eat implements DbObject {
      * @param id of the eatpart
      */
     public void setId(int id) {
-        this.id = id;
-        this.setChanged(true);
+        if(this.id!=id) {
+            this.id = id;
+            this.setChanged(true);
+        }
     }
 
     /**
@@ -64,8 +66,10 @@ public class Eat implements DbObject {
      * @param description of the eatpart
      */
     public void setDescription(String description) {
-        this.description = description;
-        this.setChanged(true);
+        if(this.description!=description) {
+            this.description = description;
+            this.setChanged(true);
+        }
     }
 
     @Override

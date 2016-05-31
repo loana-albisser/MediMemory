@@ -43,8 +43,10 @@ public class PillCoords implements DbObject {
     }
 
     public void setId(int id) {
-        this.id = id;
-        this.setChanged(true);
+        if(this.id!=id) {
+            this.id = id;
+            this.setChanged(true);
+        }
     }
 
     public int getMediid() {
@@ -52,8 +54,10 @@ public class PillCoords implements DbObject {
     }
 
     public void setMediid(int mediid) {
-        this.mediid = mediid;
-        this.setChanged(true);
+        if(this.mediid!=mediid){
+            this.mediid = mediid;
+            this.setChanged(true);
+        }
     }
 
     public Point getCoords() {
@@ -61,8 +65,10 @@ public class PillCoords implements DbObject {
     }
 
     public void setCoords(Point coords) {
-        this.coords = coords;
-        this.setChanged(true);
+        if(this.coords==null || !coords.equals(coords)) {
+            this.coords = coords;
+            this.setChanged(true);
+        }
     }
 
     public int getHeight() {
@@ -70,8 +76,10 @@ public class PillCoords implements DbObject {
     }
 
     public void setHeight(int height) {
-        this.height = height;
-        this.setChanged(true);
+        if(this.height!=height) {
+            this.height = height;
+            this.setChanged(true);
+        }
     }
 
     public int getWidth() {
@@ -79,8 +87,10 @@ public class PillCoords implements DbObject {
     }
 
     public void setWidth(int width) {
-        this.width = width;
-        this.setChanged(true);
+        if(this.width!=width) {
+            this.width = width;
+            this.setChanged(true);
+        }
     }
 
     public boolean isChanged() {

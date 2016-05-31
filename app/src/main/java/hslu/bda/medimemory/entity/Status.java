@@ -70,8 +70,10 @@ public class Status implements DbObject{
      * @param description of the status
      */
     public void setDescription(String description) {
-        this.description = description;
-        this.setChanged(true);
+        if(this.description!=description) {
+            this.description = description;
+            this.setChanged(true);
+        }
     }
 
 
