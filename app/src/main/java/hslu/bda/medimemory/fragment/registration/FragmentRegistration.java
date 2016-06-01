@@ -728,12 +728,14 @@ public class FragmentRegistration extends Fragment {
      * @return a Collection that contains all ConsumeIndividual data
      */
     private Collection<ConsumeIndividual> getReminderDayTime(){
+        consumeIndividuals.clear();
         for (Day day : getDaytimes()){
             ConsumeIndividual consumeIndividual = new ConsumeIndividual();
             consumeIndividual.setEatpart(getFoodInstruction());
             consumeIndividual.setDaypart(Iterables.get(allDayTimes, day.getId()));
             consumeIndividuals.add(consumeIndividual);
         }
+
         return consumeIndividuals;
     }
 
@@ -1148,8 +1150,19 @@ public class FragmentRegistration extends Fragment {
      * saves all selected interval data to database
      * @return consumeinterval data
      */
-    private Collection<ConsumeInterval> getReminderInterval(){
-        ConsumeInterval consumeInterval = new ConsumeInterval();
+    private Collection<ConsumeInterval> getReminderInterval(int mediId){
+        ConsumeInterval consumeInterval = null;
+        Collection<ConsumeInterval>allConsumedInterval = new ArrayList<>();
+        ArrayList <ConsumeInterval>list = new ArrayList<>();
+        if (ConsumeInterval.getAllConsumeIntervalByMedid(mediId,dbAdapter).size()!=0){
+            allConsumedInterval = ConsumeInterval.getAllConsumeIntervalByMedid(mediId,dbAdapter);
+            for (ConsumeInterval cosumeInterval: allConsumedInterval){
+                list.add(cosumeInterval);
+            }
+            consumeInterval = list.get(0);
+        } else {
+            consumeInterval = new ConsumeInterval();
+        }
         consumeInterval.setStartTime(getStartTimeCalendar());
         if (getSelectedIntervalPosition()==0){
             consumeInterval.setEndTime(getEndTimeCalendar());
@@ -1652,12 +1665,14 @@ public class FragmentRegistration extends Fragment {
             if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_edit) {
                 delIndividualTimes();
             }
-            pillSaveData.setAllConsumeInterval(getReminderInterval());
+            pillSaveData.setAllConsumeInterval(getReminderInterval(mediId));
         } else if (rd_reminderDayTime.isChecked()) {
             if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_edit) {
                 delIntervalTimes();
+                delIndividualTimes();
             }
             pillSaveData.setAllConsumeIndividual(getReminderDayTime());
+            selectedDayTimes.clear();
         }
         if (rd_numberOfDays.isChecked()){
             pillSaveData.setEndDate(getDurationDate());
@@ -1686,7 +1701,6 @@ public class FragmentRegistration extends Fragment {
         } else {
             try {
                 pillSaveData.setPicture(getPictureFromView());
-
                 UpdateMediService.updateDataObject(pillSaveData, dbAdapter);
                 CreateMediService.addNewMedi(pillSaveData, dbAdapter);
             } catch (Throwable throwable) {
