@@ -31,10 +31,10 @@ public class Day implements DbObject {
      * Constructor to return Object with supplied fields
      * @param description of the daypart
      */
-    public Day(int id, String description){
-        this.setId(id);
+    public Day(String description){
+        this.setId(-1);
         this.setDescription(description);
-        this.setChanged(false);
+        this.setChanged(true);
     }
 
     /**
@@ -50,8 +50,10 @@ public class Day implements DbObject {
      * @param id of the daypart
      */
     public void setId(int id) {
-        this.id = id;
-        this.setChanged(true);
+        if(this.id!=id){
+            this.id = id;
+            this.setChanged(true);
+        }
     }
 
     /**
@@ -72,8 +74,10 @@ public class Day implements DbObject {
      * @param description of the daypart
      */
     public void setDescription(String description) {
-        this.description = description;
-        this.setChanged(true);
+        if(this.description!=description) {
+            this.description = description;
+            this.setChanged(true);
+        }
     }
 
     public boolean isChanged() {
