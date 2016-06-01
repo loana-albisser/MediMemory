@@ -178,6 +178,7 @@ public class FragmentRegistration extends Fragment {
     private RadioButton rd_packageEnd;
     private LayoutInflater inflater;
     private Data pillSaveData;
+    private boolean deleted;
 
 
     @Override
@@ -652,6 +653,7 @@ public class FragmentRegistration extends Fragment {
      * setup the dialog to show the daytimes (morning, noon, afternoon, night)
      */
     public void showReminderDaytimeDialog(){
+        deleted = false;
         reminderDaytimeDialog = new AlertDialog.Builder(getActivity(),R.style.DialogTheme);
         reminderDaytimeDialog.setCancelable(false);
         reminderDaytimeDialog.setTitle(getResources().getString(R.string.title_reminderDaytime));
@@ -671,11 +673,18 @@ public class FragmentRegistration extends Fragment {
         @Override
         public void onClick(DialogInterface dialog, int which, boolean isChecked) {
             if (isChecked) {
-                selList.add(which);
+                if(!selList.contains(which)){
+                    selList.add(which);
+                }
                 checkedDaytimes[which] = true;
             } else if (selList.contains(which)) {
                 selList.remove(which);
                 checkedDaytimes[which] = false;
+                deleted = true;
+                if(selectedDayTimes.size()>0){
+                    ((ArrayList)selectedDayTimes).remove(which);
+                }
+
             }
         }
     };
@@ -686,13 +695,22 @@ public class FragmentRegistration extends Fragment {
     private void setDaytimeText(){
         daytimebuilder.setLength(0);
         daytimebuilder.append(getResources().getString(R.string.taking)).append(" ");
+        setSelectedDays();
         for (int id : selList) {
-            selectedDayTimes.add(Iterables.get(allDayTimes, id));
             daytimebuilder.append(daytimes[id]).append(" ");
         }
         if (selectedDayTimes.size() > 0) {
             txt_reminder.setText(daytimebuilder);
         }
+    }
+
+    private void setSelectedDays(){
+            for(int id:selList){
+                if(!selectedDayTimes.contains(Iterables.get(allDayTimes,id))){
+                    selectedDayTimes.add(Iterables.get(allDayTimes, id));
+                }
+
+            }
     }
 
     private Collection<Day> getDaytimes(){
@@ -715,7 +733,9 @@ public class FragmentRegistration extends Fragment {
     private void setCheckDayItems(int dayId, boolean isChecked){
         checkedDaytimes[dayId] = isChecked;
         if (isChecked){
-            selList.add(dayId);
+            if(!selList.contains(dayId)){
+                selList.add(dayId);
+            }
         }
     }
 
@@ -727,16 +747,32 @@ public class FragmentRegistration extends Fragment {
      * sets all daytimes values to database
      * @return a Collection that contains all ConsumeIndividual data
      */
-    private Collection<ConsumeIndividual> getReminderDayTime(){
-        consumeIndividuals.clear();
-        for (Day day : getDaytimes()){
-            ConsumeIndividual consumeIndividual = new ConsumeIndividual();
-            consumeIndividual.setEatpart(getFoodInstruction());
-            consumeIndividual.setDaypart(Iterables.get(allDayTimes, day.getId()));
-            consumeIndividuals.add(consumeIndividual);
-        }
+    private Collection<ConsumeIndividual> getReminderDayTime(int mediId){
 
+        if (ConsumeIndividual.getAllConsumeIndividualByMedid(mediId,dbAdapter).size() != 0){
+            if(deleted){
+                delIndividualTimes();
+            }
+            Collection<ConsumeIndividual> allConsumeIndividual = ConsumeIndividual.getAllConsumeIndividualByMedid(mediId,dbAdapter);
+            for (Day day : getDaytimes()){
+                if(!allConsumeIndividual.contains(day)){
+                    addNewDay(day);
+                }
+            }
+
+        } else {
+            for (Day day : getDaytimes()){
+                addNewDay(day);
+            }
+        }
         return consumeIndividuals;
+    }
+
+    private void addNewDay(Day day){
+        ConsumeIndividual consumeIndividual = new ConsumeIndividual();
+        consumeIndividual.setEatpart(getFoodInstruction());
+        consumeIndividual.setDaypart(Iterables.get(allDayTimes, day.getId()));
+        consumeIndividuals.add(consumeIndividual);
     }
 
     /**
@@ -1669,10 +1705,10 @@ public class FragmentRegistration extends Fragment {
         } else if (rd_reminderDayTime.isChecked()) {
             if (((MainActivity) getActivity()).getCurrentMenuItem() == R.id.nav_edit) {
                 delIntervalTimes();
-                delIndividualTimes();
+                //delIndividualTimes();
             }
-            pillSaveData.setAllConsumeIndividual(getReminderDayTime());
-            selectedDayTimes.clear();
+            pillSaveData.setAllConsumeIndividual(getReminderDayTime(mediId));
+
         }
         if (rd_numberOfDays.isChecked()){
             pillSaveData.setEndDate(getDurationDate());
@@ -1703,10 +1739,13 @@ public class FragmentRegistration extends Fragment {
                 pillSaveData.setPicture(getPictureFromView());
                 UpdateMediService.updateDataObject(pillSaveData, dbAdapter);
                 CreateMediService.addNewMedi(pillSaveData, dbAdapter);
+
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }
         }
+        consumeIndividuals.clear();
+
     }
 
     private void delIndividualTimes(){
@@ -1757,6 +1796,7 @@ public class FragmentRegistration extends Fragment {
                 setCheckDayItems(consume.getDaypart().getId(), true);
                 setDaytimeText();
                 setFoodInstruction(consume.getEatpart().getId());
+
             }
         } else {
             setReminderRadioButton(R.id.rd_interval);
