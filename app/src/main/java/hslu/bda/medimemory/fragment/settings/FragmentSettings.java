@@ -43,7 +43,7 @@ public class FragmentSettings extends PreferenceFragment{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         chk_protect = (CheckBoxPreference)findPreference("pref_key_showPassword");
-        pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
+        pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         pref.registerOnSharedPreferenceChangeListener(listener);
         listener = new OnSharedPreferenceChangeListener() {
             @Override

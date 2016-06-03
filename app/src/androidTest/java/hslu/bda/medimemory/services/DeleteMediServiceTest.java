@@ -62,7 +62,7 @@ public class DeleteMediServiceTest extends AndroidTestCase{
         pillCoords.setId(dbAdapter.createDbObject(pillCoords));
         assertTrue(pillCoords.getId() > 0);
         consumed = new Consumed(data.getId(),cal, Status.getStatusById("0", dbAdapter), pillCoords);
-        consumeIndividual = new ConsumeIndividual(data.getId(),cal, Day.getDayById("0", dbAdapter), Eat.getEatById("0", dbAdapter));
+        consumeIndividual = new ConsumeIndividual(data.getId(),Day.getDayById("0", dbAdapter), Eat.getEatById("0", dbAdapter));
         Calendar calStart = new GregorianCalendar(2016,03,21, 17,0);
         Calendar calEnd = new GregorianCalendar(2016,03,21, 7,0);
         consumeInterval = new ConsumeInterval(data.getId(),calStart,calEnd,5,0);

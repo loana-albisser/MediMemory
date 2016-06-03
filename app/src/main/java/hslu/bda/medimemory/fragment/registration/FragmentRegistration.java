@@ -1,10 +1,12 @@
 package hslu.bda.medimemory.fragment.registration;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -71,6 +73,8 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 import hslu.bda.medimemory.R;
+import hslu.bda.medimemory.alert.AlarmDataHandler;
+import hslu.bda.medimemory.alert.AlarmReceiver;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.database.DbHelper;
 import hslu.bda.medimemory.detection.PillDetection;
@@ -82,6 +86,7 @@ import hslu.bda.medimemory.entity.Eat;
 import hslu.bda.medimemory.fragment.MainActivity;
 import hslu.bda.medimemory.fragment.edit.FragmentEdit;
 import hslu.bda.medimemory.fragment.overview.FragmentOverview;
+import hslu.bda.medimemory.notification.NotificationHandler;
 import hslu.bda.medimemory.services.CreateMediService;
 import hslu.bda.medimemory.services.DeleteMediService;
 import hslu.bda.medimemory.services.UpdateMediService;
@@ -195,7 +200,34 @@ public class FragmentRegistration extends Fragment {
         deleteItem();
 
         setDeleteButtonVisibility();
+
+        //setNotification();
+        setAlert();
         return root;
+    }
+
+    private void setNotification() {
+        NotificationHandler notificationHandler = new NotificationHandler(getActivity().getApplicationContext());
+        Collection<Data> dataCollection = Data.getAllDataFromTable(dbAdapter);
+        notificationHandler.createNotification(dataCollection.toArray(new Data[dataCollection.size()]));
+    }
+
+    private void setAlert(){
+        Activity activity = getActivity();
+        Intent alarmIntent = new Intent(activity, AlarmReceiver.class);
+        alarmIntent.setAction("RepeatedAlert");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, 0, alarmIntent, 0);
+
+        AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+        AlarmDataHandler alarmDataHandler = new AlarmDataHandler(activity);
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY, 20);
+        calendar.set(Calendar.MINUTE, 53);
+
+
+        manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
     @Override

@@ -52,7 +52,7 @@ public class ConsumedTest extends AndroidTestCase{
         pillCoords = new PillCoords(data.getId(),new Point(200,200),100,200);
         pillCoords.setId(dbAdapter.createDbObject(pillCoords));
         assertTrue(pillCoords.getId() > 0);
-        consumed = new Consumed(data.getId(),cal,Status.getStatusById("0",dbAdapter), pillCoords);
+        consumed = new Consumed(data.getId(),cal,Status.getStatusById(Status.STATUS_EINGENOMMEN,dbAdapter), pillCoords);
         assertTrue(consumed!=null);
     }
 

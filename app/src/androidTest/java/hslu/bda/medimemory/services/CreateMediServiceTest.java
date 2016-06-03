@@ -57,7 +57,7 @@ public class CreateMediServiceTest extends AndroidTestCase {
         Calendar calEnd = new GregorianCalendar(2016,03,21, 7,0);
         consumeInterval = new ConsumeInterval(data.getId(),calStart,calEnd,5,0);
         assertTrue(consumeInterval!=null);
-        consumeIndividual = new ConsumeIndividual(data.getId(),cal, Day.getDayById("0", dbAdapter), Eat.getEatById("0", dbAdapter));
+        consumeIndividual = new ConsumeIndividual(data.getId(), Day.getDayById("0", dbAdapter), Eat.getEatById("0", dbAdapter));
         assertTrue(consumeIndividual != null);
         allConsumeIndividuals.add(consumeIndividual);
         allConsumeIntervals.add(consumeInterval);

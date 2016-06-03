@@ -1,6 +1,7 @@
 package hslu.bda.medimemory.alert;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -23,11 +24,11 @@ public class AlarmDataHandler {
     private Activity activity;
     private DbAdapter dbAdapter;
     private long minuteInMillis = 60*1000;
+    private long hourInMillis = 60*60*1000;
 
-    public AlarmDataHandler(Activity activity){
-        this.activity = activity;
-        this.dbAdapter = new DbAdapter(activity.getApplicationContext());
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+    public AlarmDataHandler(Context context){
+        this.dbAdapter = new DbAdapter(context.getApplicationContext());
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
     }
 
@@ -38,60 +39,75 @@ public class AlarmDataHandler {
      */
     private long getNextIndividual(Calendar now){
         dbAdapter.open();
+        boolean hasResults= false;
+        long result = Long.MIN_VALUE;
         ConsumeIndividual consumeIndividual = null;
         Calendar next = new GregorianCalendar();
-        long diff =0;
+        //86340000 is 23:59:59 to simulate one day
+        next.setTimeInMillis(Long.MAX_VALUE);
+        long diff =Long.MAX_VALUE;
         for(ConsumeIndividual item : ConsumeIndividual.getAllConsumeIndividual(dbAdapter)){
+            hasResults=true;
+            if(consumeIndividual==null ){
+                consumeIndividual = item;
+
+            }
             diff = calcDiffByIndividualAndNow(consumeIndividual,now);
-            if(consumeIndividual==null && diff >0){
+            if((next.getTimeInMillis()-now.getTimeInMillis()) > diff){
                 consumeIndividual = item;
                 next.setTimeInMillis(diff+now.getTimeInMillis());
-            }else{
-                if((next.getTimeInMillis()-now.getTimeInMillis()) >diff){
-                    consumeIndividual = item;
-                    next.setTimeInMillis(diff+now.getTimeInMillis());
-                }
             }
         }
-
+        if(hasResults){
+            result = now.getTimeInMillis()-next.getTimeInMillis();
+        }
         dbAdapter.close();
-        return now.getTimeInMillis()-next.getTimeInMillis();
+        return result;
     }
 
     private long calcDiffByIndividualAndNow(ConsumeIndividual consumeIndividual, Calendar now) {
-        long result = 0;
+        long result = Long.MAX_VALUE;
         long daytime = 0;
         long eattime = 0;
+        if(consumeIndividual!=null) {
+            switch (consumeIndividual.getDaypart().getId()) {
+                case 0:
+                    daytime = sharedPreferences.getLong("pref_key_morning_reminder", -1);
+                    break;
+                case 1:
+                    daytime = sharedPreferences.getLong("pref_key_noon_reminder", -1);
+                    break;
+                case 2:
+                    daytime = sharedPreferences.getLong("pref_key_evening_reminder", -1);
+                    break;
+                case 3:
+                    daytime = sharedPreferences.getLong("pref_key_night_reminder", -1);
+                    break;
+            }
 
-        switch (consumeIndividual.getDaypart().getId()){
-            case 0:
-                daytime = sharedPreferences.getLong("pref_key_morning_reminder",-1);
-                break;
-            case 1:
-                daytime = sharedPreferences.getLong("pref_key_noon_reminder",-1);
-                break;
-            case 2:
-                daytime =  sharedPreferences.getLong("pref_key_evening_reminder",-1);
-                break;
-            case 3:
-                daytime = sharedPreferences.getLong("pref_key_night_reminder",-1);
-                break;
+            switch (consumeIndividual.getEatpart().getId()) {
+
+                case 0:
+                    eattime = -1 * sharedPreferences.getInt("pref_key_before_food", 0) * minuteInMillis;
+                    break;
+                case 1:
+                    eattime = sharedPreferences.getInt("pref_key_after_food", 0) * minuteInMillis;
+                    break;
+                case 2:
+                    eattime = 0;
+                    break;
+            }
+            Calendar temp = Calendar.getInstance();
+            temp.setTime(new Date());
+            //temp.set
+            result = (daytime + eattime) - now.getTimeInMillis();
+            if(result<0){
+
+                temp.setTimeInMillis(daytime+eattime);
+                temp.add(Calendar.DATE,1);
+                result = temp.getTimeInMillis() - now.getTimeInMillis();
+            }
         }
-
-        switch (consumeIndividual.getEatpart().getId()){
-
-            case 0:
-                eattime = -1*sharedPreferences.getInt("pref_key_before_food",0)*60*1000;
-                break;
-            case 1:
-                eattime = sharedPreferences.getInt("pref_key_after_food",0)*60*1000;
-                break;
-            case 2:
-                eattime = 0;
-                break;
-        }
-
-        result = (daytime+eattime)-now.getTimeInMillis();
 
         return result;
     }
@@ -103,11 +119,15 @@ public class AlarmDataHandler {
      */
     private long getNextInterval(Calendar now){
         dbAdapter.open();
+        boolean hasResult =false;
+        long result = Long.MIN_VALUE;
         ConsumeInterval consumeInterval = null;
         Calendar temp = new GregorianCalendar();
         Calendar next = new GregorianCalendar();
         for(ConsumeInterval item : ConsumeInterval.getAllConsumeInterval(dbAdapter)){
+
             if(item.getWeekday()==-1 || item.getWeekday() == now.get(Calendar.DAY_OF_WEEK)) {
+                hasResult=true;
                 if (item.getStartTime().getTimeInMillis() <= now.getTimeInMillis() && now.getTimeInMillis() < item.getEndTime().getTimeInMillis()) {
                     //calculate Inveraltime
                     long amountOfInterval = calcDiffByConsumeIntervalAndNow(item, now);
@@ -127,12 +147,15 @@ public class AlarmDataHandler {
             }
         }
         dbAdapter.close();
-        return (now.getTimeInMillis()-next.getTimeInMillis());
+        if(hasResult){
+            result = now.getTimeInMillis()-next.getTimeInMillis();
+        }
+        return result;
     }
 
     private long calcDiffByConsumeIntervalAndNow(ConsumeInterval item, Calendar now) {
         long duration = now.getTimeInMillis()-item.getStartTime().getTimeInMillis();
-        long result = (long)Math.ceil(duration/(item.getInterval()*60*60*1000));
+        long result = (long)Math.ceil(duration/(item.getInterval()*hourInMillis));
         return result;
     }
 
@@ -142,13 +165,16 @@ public class AlarmDataHandler {
         Calendar next = new GregorianCalendar();
         long interval = getNextInterval(now);
         long individual = getNextIndividual(now);
-        if(interval>individual){
+        if((interval==individual) && (individual==Long.MIN_VALUE)){
+            next = null;
+        }else if(individual<0 && interval<0){
+            next = null;
+        }
+        else if(interval>individual){
             next.setTimeInMillis(now.getTimeInMillis()+individual);
         }else{
             next.setTimeInMillis(now.getTimeInMillis()+interval);
         }
-
-
         return next;
     }
 

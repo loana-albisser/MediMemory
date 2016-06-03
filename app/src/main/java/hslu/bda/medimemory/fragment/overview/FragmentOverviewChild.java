@@ -1,6 +1,5 @@
 package hslu.bda.medimemory.fragment.overview;
 
-import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
@@ -10,11 +9,8 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.net.nsd.NsdManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -30,26 +26,18 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Point;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import hslu.bda.medimemory.R;
 import hslu.bda.medimemory.database.DbAdapter;
 import hslu.bda.medimemory.detection.PillDetection;
 import hslu.bda.medimemory.entity.Consumed;
-import hslu.bda.medimemory.entity.Data;
 import hslu.bda.medimemory.entity.PillCoords;
 import hslu.bda.medimemory.entity.Status;
-import hslu.bda.medimemory.fragment.MainActivity;
-import hslu.bda.medimemory.fragment.registration.FragmentRegistration;
-import hslu.bda.medimemory.services.PillDetectionService;
-import hslu.bda.medimemory.services.UpdateMediService;
+import hslu.bda.medimemory.services.PillService;
 
 import static hslu.bda.medimemory.entity.Consumed.getAllConsumedByMedid;
 
@@ -259,21 +247,21 @@ public class FragmentOverviewChild extends Fragment  {
                 if (selectedItem == 0) {
                     setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.check_mark));
                     try {
-                        PillDetectionService.setConsumed(Status.getStatusById(Status.STATUS_EINGENOMMEN, dbAdapter), selectedPoint, dbAdapter);
+                        PillService.setConsumed(Status.getStatusById(Status.STATUS_EINGENOMMEN, dbAdapter), selectedPoint, dbAdapter);
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                     }
                 } else if (selectedItem == 1) {
                     setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.question_mark));
                     try {
-                        PillDetectionService.setConsumed(Status.getStatusById(Status.STATUS_VERGESSEN,dbAdapter),selectedPoint,dbAdapter);
+                        PillService.setConsumed(Status.getStatusById(Status.STATUS_VERGESSEN, dbAdapter), selectedPoint, dbAdapter);
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                     }
                 } else if (selectedItem == 2) {
                     setStatus(ContextCompat.getDrawable(getActivity(), R.drawable.x_mark));
                     try {
-                        PillDetectionService.setConsumed(Status.getStatusById(Status.STATUS_VERLOREN, dbAdapter), selectedPoint, dbAdapter);
+                        PillService.setConsumed(Status.getStatusById(Status.STATUS_VERLOREN, dbAdapter), selectedPoint, dbAdapter);
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                     }

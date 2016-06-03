@@ -235,6 +235,7 @@
     <string name="pref_key_before_food" translatable="false">pref_key_before_food</string>
     <string name="pref_key_after_food">pref_key_after_food</string>
     <string name="dialog_MediUpdate">Das Medikament wurde bearbeitet!</string>
+    <string name="consumeAll">alle einnehmen</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

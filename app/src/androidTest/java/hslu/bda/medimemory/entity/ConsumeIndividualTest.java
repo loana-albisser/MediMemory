@@ -47,7 +47,7 @@ public class ConsumeIndividualTest extends AndroidTestCase{
         data.setActive(1);
         data.setId(dbAdapter.createDbObject(data));
         assertTrue(data.getId() > 0);
-        consumeIndividual = new ConsumeIndividual(data.getId(),cal,Day.getDayById("0",dbAdapter),Eat.getEatById("0", dbAdapter));
+        consumeIndividual = new ConsumeIndividual(data.getId(),Day.getDayById("0",dbAdapter),Eat.getEatById("0", dbAdapter));
         assertTrue(consumeIndividual != null);
     }
 
@@ -64,11 +64,15 @@ public class ConsumeIndividualTest extends AndroidTestCase{
         assertEquals(consumeIndividual.getMediid(), data.getId());
 
         //CRUD - TEST UPDATED
-        consumeIndividual.setDaypart(Day.getDayById("1",dbAdapter));
+        consumeIndividual.setDaypart(Day.getDayById("1", dbAdapter));
         assertTrue(dbAdapter.updateDbObject(consumeIndividual));
 
         //CRUD - TEST DELETED
         assertTrue(dbAdapter.deleteDbObject(consumeIndividual));
+    }
+
+    public void testGetAllConsumeIndividual(){
+        Collection<ConsumeIndividual> allConsumeIndividual = ConsumeIndividual.getAllConsumeIndividual(dbAdapter);
     }
 
     @Override

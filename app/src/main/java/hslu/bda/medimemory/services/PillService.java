@@ -1,6 +1,7 @@
 package hslu.bda.medimemory.services;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -12,9 +13,9 @@ import hslu.bda.medimemory.entity.Status;
 /**
  * Created by manager on 28.04.2016.
  */
-public class PillDetectionService {
+public class PillService {
 
-    private PillDetectionService(){}
+    private PillService(){}
 
     /**
      * Create or Update a Consumed Object and gives the Consumed-id back
@@ -42,5 +43,16 @@ public class PillDetectionService {
             id = consumed.getId();
         }
         return  id;
+    }
+
+    public static Collection<Consumed> addConsumedPill(Collection<Consumed> consumeds, DbAdapter dbAdapter) throws  Throwable{
+        try {
+            for (Consumed consumed : consumeds) {
+                consumed=(Consumed)CreateMediService.createTableEntry(consumed, dbAdapter);
+            }
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+        return consumeds;
     }
 }
