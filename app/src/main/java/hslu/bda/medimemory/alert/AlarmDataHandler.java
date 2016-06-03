@@ -97,13 +97,15 @@ public class AlarmDataHandler {
                     eattime = 0;
                     break;
             }
+            long dayTimeinMillis = daytime+eattime;
             Calendar temp = Calendar.getInstance();
             temp.setTime(new Date());
-            //temp.set
-            result = (daytime + eattime) - now.getTimeInMillis();
+            int hour = (int)Math.abs(dayTimeinMillis/hourInMillis);
+            int minute = (int)Math.abs((dayTimeinMillis-(hour*hourInMillis))/minuteInMillis);
+            temp.set(Calendar.HOUR_OF_DAY, hour);
+            temp.set(Calendar.MINUTE, minute);
+            result = temp.getTimeInMillis() - now.getTimeInMillis();
             if(result<0){
-
-                temp.setTimeInMillis(daytime+eattime);
                 temp.add(Calendar.DATE,1);
                 result = temp.getTimeInMillis() - now.getTimeInMillis();
             }

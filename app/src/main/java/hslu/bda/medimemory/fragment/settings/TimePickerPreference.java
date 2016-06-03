@@ -12,6 +12,7 @@ import android.widget.TimePicker;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.SimpleTimeZone;
 
 import hslu.bda.medimemory.R;
 
@@ -61,7 +62,9 @@ public class TimePickerPreference extends DialogPreference {
     @Override
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);        if (positiveResult) {
+            int temp = 0;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                temp = timePicker.getHour();
                 calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
                 calendar.set(Calendar.MINUTE, timePicker.getMinute());
             } else {
@@ -69,8 +72,9 @@ public class TimePickerPreference extends DialogPreference {
                 calendar.set(Calendar.MINUTE, timePicker.getCurrentMinute());
             }
             setSummary(getSummary());
-            if (callChangeListener(calendar.getTimeInMillis())) {
-                persistLong(calendar.getTimeInMillis());
+            temp = calendar.get(Calendar.HOUR_OF_DAY);
+            if (callChangeListener(calendar.getTimeInMillis()+calendar.get(Calendar.ZONE_OFFSET))) {
+                persistLong(calendar.getTimeInMillis()+calendar.get(Calendar.ZONE_OFFSET));
                 notifyChanged();
             }
         }
@@ -85,7 +89,7 @@ public class TimePickerPreference extends DialogPreference {
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         if (restoreValue) {
             if (defaultValue == null) {
-                calendar.setTimeInMillis(getPersistedInt((int) System.currentTimeMillis()));
+                calendar.setTimeInMillis(getPersistedLong((long) System.currentTimeMillis()));
             } else {
                 calendar.setTimeInMillis(Long.parseLong(getPersistedString((String) defaultValue)));
             }
