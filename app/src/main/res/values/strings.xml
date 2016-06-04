@@ -237,6 +237,7 @@
     <string name="dialog_MediUpdate">Das Medikament wurde bearbeitet!</string>
     <string name="overview">Übersicht</string>
     <string name="consumeAll">alle einnehmen</string>
+    <string name="notify_dialog_title">Wähle eingenommene Medis!</string>
 
     <string-array name="array_interval">
         <item id= "hour">@string/hour</item>

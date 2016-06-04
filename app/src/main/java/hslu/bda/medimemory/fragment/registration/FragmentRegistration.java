@@ -201,8 +201,8 @@ public class FragmentRegistration extends Fragment {
 
         setDeleteButtonVisibility();
 
-        //setNotification();
-        setAlert();
+        setNotification();
+        //setAlert();
         return root;
     }
 
